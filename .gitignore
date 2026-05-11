@@ -1,0 +1,54 @@
+# ═══════════════════════════════════════════════════════════════
+# 《AI 时代的 SRE 架构师之路》 · .gitignore
+# ═══════════════════════════════════════════════════════════════
+
+# --- 构建产物 ---
+site/
+output/
+*.pdf
+build/tmp/
+.cache/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+
+# --- Node / 前端工具（如果未来引入）---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Editor / IDE ---
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# --- macOS ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Windows ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# --- 临时 ---
+*.tmp
+*.bak
+*.log
+
+# --- 贯穿项目（如果读者在本仓库里起项目，不跟踪）---
+sre-incident-agent/
+
+# --- 本书不需要的缓存 ---
+.mkdocs-cache/

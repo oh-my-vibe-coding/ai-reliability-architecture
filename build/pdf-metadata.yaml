@@ -1,0 +1,41 @@
+---
+# Pandoc metadata for XeLaTeX PDF build
+# Used by: build/build-pdf.sh
+
+title: AI 时代的 SRE 架构师之路
+subtitle: 写给不被 AI 替代、且能与算法工程师并肩的工程师
+author: SRE to AI SRE Learning Project
+date: 2026-05-05
+lang: zh-CN
+
+# PDF 设置（Pandoc 识别的标准字段）
+documentclass: book
+classoption:
+  - oneside
+  - openany
+geometry:
+  - paperwidth=170mm
+  - paperheight=240mm
+  - top=22mm
+  - bottom=22mm
+  - inner=22mm
+  - outer=20mm
+fontsize: 10.5pt
+linestretch: 1.35
+numbersections: true
+toc: true
+toc-depth: 3
+secnumdepth: 3
+
+# 颜色（LaTeX xcolor / hyperref）
+linkcolor: Maroon
+urlcolor: NavyBlue
+citecolor: Maroon
+toccolor: black
+
+# 代码高亮样式（Pandoc built-in）
+highlight-style: tango
+
+# 其他
+colorlinks: true
+papersize: custom

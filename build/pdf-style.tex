@@ -1,0 +1,198 @@
+% ═══════════════════════════════════════════════════════════════════
+% XeLaTeX preamble for《AI 时代的 SRE 架构师之路》PDF
+% 通过 pandoc --include-in-header 注入
+% ═══════════════════════════════════════════════════════════════════
+
+% --- 中文支持：xeCJK + ctex 风格（不走 ctexbook，保留 Pandoc book class）---
+\usepackage{xeCJK}
+\usepackage{fontspec}
+
+% --- 字体候选：系统里有哪个用哪个 ---
+% 正文 serif（中英混排，主衬线）
+\IfFontExistsTF{Noto Serif CJK SC}{%
+  \setCJKmainfont[BoldFont={Noto Sans CJK SC Bold},ItalicFont={Noto Serif CJK SC}]{Noto Serif CJK SC}%
+}{%
+  \IfFontExistsTF{Source Han Serif SC}{%
+    \setCJKmainfont[BoldFont={Source Han Sans SC Bold}]{Source Han Serif SC}%
+  }{%
+    \IfFontExistsTF{Songti SC}{%
+      \setCJKmainfont[BoldFont={Heiti SC}]{Songti SC}%
+    }{%
+      \IfFontExistsTF{PingFang SC}{%
+        \setCJKmainfont{PingFang SC}%
+      }{%
+        % 最后 fallback —— 让构建不至于直接失败
+        \setCJKmainfont{STSong}%
+      }%
+    }%
+  }%
+}
+
+% 无衬线（标题）
+\IfFontExistsTF{Noto Sans CJK SC}{%
+  \setCJKsansfont[BoldFont={Noto Sans CJK SC Bold}]{Noto Sans CJK SC}%
+}{%
+  \IfFontExistsTF{Source Han Sans SC}{%
+    \setCJKsansfont{Source Han Sans SC}%
+  }{%
+    \IfFontExistsTF{PingFang SC}{%
+      \setCJKsansfont{PingFang SC}%
+    }{%
+      \setCJKsansfont{STHeiti}%
+    }%
+  }%
+}
+
+% 等宽（代码）
+\IfFontExistsTF{JetBrains Mono}{%
+  \setmonofont[Scale=0.88]{JetBrains Mono}%
+}{%
+  \IfFontExistsTF{Menlo}{%
+    \setmonofont[Scale=0.88]{Menlo}%
+  }{%
+    \IfFontExistsTF{Consolas}{%
+      \setmonofont[Scale=0.88]{Consolas}%
+    }{%
+      \setmonofont[Scale=0.88]{Courier New}%
+    }%
+  }%
+}
+
+% 中文等宽（可选，让代码里的中文注释不太窄）
+\IfFontExistsTF{Noto Sans Mono CJK SC}{%
+  \setCJKmonofont{Noto Sans Mono CJK SC}%
+}{%
+  \IfFontExistsTF{PingFang SC}{%
+    \setCJKmonofont{PingFang SC}%
+  }{}%
+}
+
+% --- 段落 / 字号 / 断行 ---
+\setlength{\parskip}{0.4em}
+\setlength{\parindent}{0pt}            % 西式无首行缩进，中文阅读更清晰
+\linespread{1.35}
+\XeTeXlinebreaklocale "zh"              % 中文断行
+\XeTeXlinebreakskip = 0pt plus 1pt
+
+% --- 标题样式（titlesec）---
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\huge\bfseries\color{black!85}}
+  {\normalsize\sffamily\color{black!50}第 \thechapter\ 章}
+  {0.5em}
+  {}
+\titlespacing*{\chapter}{0pt}{-8pt}{16pt}
+
+\titleformat{\section}
+  {\normalfont\sffamily\Large\bfseries\color{black!80}}
+  {\thesection}{0.7em}{}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+
+\titleformat{\subsection}
+  {\normalfont\sffamily\large\bfseries\color{black!75}}
+  {\thesubsection}{0.6em}{}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+
+\titleformat{\subsubsection}
+  {\normalfont\sffamily\normalsize\bfseries\color{black!70}}
+  {\thesubsubsection}{0.5em}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{3pt}
+
+% --- 代码块外观 ---
+\usepackage{xcolor}
+\definecolor{codebg}{HTML}{F7F7F5}
+\definecolor{codeframe}{HTML}{E0E0DD}
+
+% Pandoc 用 fancyvrb + Shaded 环境；我们重定义 Shaded 给它一个浅背景
+\usepackage{framed}
+\usepackage{fancyvrb}
+\renewenvironment{Shaded}{%
+  \begin{snugshade}%
+}{%
+  \end{snugshade}%
+}
+\definecolor{shadecolor}{named}{codebg}
+
+% 允许长代码行换行（防止横向溢出）
+\fvset{%
+  breaklines=true,%
+  breakanywhere=true,%
+  fontsize=\small,%
+  commandchars=\\\{\}%
+}
+
+% --- 表格美化（longtable / booktabs）---
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{calc}
+\setlength{\tabcolsep}{7pt}
+\renewcommand{\arraystretch}{1.25}
+
+% --- 链接（hyperref）---
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor={Maroon},
+  urlcolor={NavyBlue},
+  citecolor={Maroon},
+  pdftitle={AI 时代的 SRE 架构师之路},
+  pdfauthor={SRE to AI SRE Learning Project},
+  pdfsubject={SRE + AI 架构手册},
+  bookmarksopen=false,
+  bookmarksnumbered=true,
+  pdfstartview={Fit}
+}
+
+% --- 页眉页脚 ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{black!60}AI 时代的 SRE 架构师之路}
+\fancyhead[R]{\small\sffamily\color{black!60}v1.2.0}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% --- 列表紧凑（避免中文项目列表过高）---
+\usepackage{enumitem}
+\setlist{itemsep=2pt, topsep=4pt, parsep=0pt}
+
+% --- 引用块（admonition 未 callout 映射时 pandoc 会渲染成 blockquote）---
+\usepackage{mdframed}
+\renewenvironment{quote}{%
+  \begin{mdframed}[%
+    linewidth=2pt,%
+    linecolor=black!25,%
+    backgroundcolor=black!3,%
+    leftline=true,%
+    rightline=false,%
+    topline=false,%
+    bottomline=false,%
+    innertopmargin=6pt,%
+    innerbottommargin=6pt,%
+    innerleftmargin=10pt,%
+    innerrightmargin=10pt]%
+    \small\itshape\color{black!70}%
+}{%
+  \end{mdframed}%
+}
+
+% --- 图片（防止过大溢出）---
+\usepackage{graphicx}
+\setkeys{Gin}{width=\linewidth,keepaspectratio}
+
+% --- 微排版（防止标点挤在行首 / 孤行）---
+\widowpenalty=10000
+\clubpenalty=10000
+\raggedbottom
+
+% --- 附加：支持 emoji 回退（部分 LaTeX 系统会报 Missing character）---
+% 若系统没有 emoji 字体，最好在源里少用 emoji；此处设置一个 fallback
+\IfFontExistsTF{Apple Color Emoji}{%
+  % XeLaTeX 不支持彩色 emoji，这里只保证不缺字符
+}{}
+
+% ═══════════════════════════════════════════════════════════════════
+% END
+% ═══════════════════════════════════════════════════════════════════

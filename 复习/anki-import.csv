@@ -1,0 +1,80 @@
+Front,Back,Tags
+LLM 的一句话本质是什么？,一个下一 token 的概率预测器（在海量文本上压缩出的统计引擎）。,primer
+什么是 Context Window？越长越好吗？,一次对话能塞的 token 数。不是越长越好——长上下文末端服从度下降（Lost in the Middle）。,primer
+Temperature=0 和 Temperature=1 的区别？,0 最确定，1 发散。SRE 场景多用 0-0.3。,primer
+Tool use / function calling 的本质？,模型只会描述想做什么，实际执行由宿主代码完成。,primer
+RAG 是什么？,Retrieval-Augmented Generation。查询 → embedding → 向量库检索 → 拼进 prompt → 生成。,primer
+4 种必见失败模式？,幻觉、截断、注入、漂移。,primer
+每步 95% 正确的 10 步 Agent 端到端正确率约多少？,~60%（0.95^10 ≈ 0.599）。,knowledge
+复合系统可靠性工程的两件新工作？,Step 预算 + Verifier 插入点。,knowledge
+LLM 推理服务必须分开定 SLO 的两个指标？,TTFT（首 token 延迟）和 tokens/s（输出速度）。,knowledge
+容量规划新三角？,GPU 显存 × 上下文长度 × QPS，三者互相约束。,knowledge
+静默降级（Silent Degradation）是什么？,指标全绿但系统数学已经坏了（bf16/fp32 失配、XLA 怪癖、kernel 非确定性）。,knowledge
+Lethal Trifecta 三个组成？,不受信输入 + 工具访问 + 外泄通道。三者共存 = 攻击可行。,knowledge
+Prompt injection 的正确防御层在哪？,基础设施层（沙箱 / egress 白名单 / capability-scoped 凭证），不是 prompt 层。,knowledge
+为什么 trace 和 eval 应该是一套系统？,Traces 就是 eval 数据集，evals 就是生产监控。分成两套会数据断裂、重复投入。,knowledge
+三层 Eval 分别是？,L1 Assertion（硬规则）/ L2 Judge 模型 / L3 A/B + 用户反馈。,knowledge
+Prefill 和 Decode 的瓶颈分别是？,Prefill 是 compute-bound（GPU 算力），Decode 是 memory-bandwidth-bound（HBM 带宽）。,deep-dive-01
+为什么 Decode 每生成一个 token 都要读整个模型？,每步需要把全部参数从 HBM 读到计算单元，还要读所有 KV cache。,deep-dive-01
+70B bf16 模型在 H100 上理论 tokens/s 上限约多少？,~24 tokens/s（HBM 3.35 TB/s ÷ 140GB 参数）。,deep-dive-01
+TTFT 主要由什么决定？,输入 token 数（prefill 时间线性相关于输入长度）。,deep-dive-01
+Prompt caching 缓存的到底是什么？,KV 张量（每层每头的 K 和 V），不是最终回答。,deep-dive-02
+缓存命中的判定条件？,Token 级前缀匹配（不是字符串相等），必须从 token 0 开始连续匹配。,deep-dive-02
+Anthropic 缓存读取成本是常规的多少？,~0.1×（折扣 90%），写入 1.25×，重用 2 次回本。,deep-dive-02
+为什么不能在 prompt 开头放时间戳？,时间戳每次不同 → tokenize 后不同 → 缓存全失效。,deep-dive-02
+LM Arena 测的是什么，弱点在哪？,用户盲测偏好（Elo）。弱点：偏主观对话，不一定反映编码/推理硬实力。,deep-dive-03
+SWE-bench Verified 测什么？,真实 GitHub issue 修复，是 Agent 编码能力的黄金标准。,deep-dive-03
+选型的 7 步？,定义场景 → 硬约束 → 软约束 → 短名单 3 个 → 自己跑 20-50 条 eval → 小流量上线 → 扩量 or 回退。,deep-dive-03
+Claude Code 首次"你好"约消耗多少 input token？,~14-25k。,deep-dive-04
+"你好" token 的主要去向（按占比）？,System prompt (~37%) + 工具定义 (~49%) + CLAUDE.md 等 (~14%)，用户消息本身仅 2 token。,deep-dive-04
+为什么 LLM API 每次必须重传全部上下文？,LLM API 无状态——模型没有记忆，每次调用必须携带全部上下文。,deep-dive-04
+单请求 KV cache 大小公式？,2 × num_layers × num_heads × head_dim × bytes_per_element × token数。,deep-dive-05
+GQA 能把 KV cache 缩多少？,约 8-16×（Llama 3 70B 用 KV heads=8，相比 64 减 8×）。,deep-dive-05
+训练 vs 推理集群的核心差异？,训练是全集群一个故障域、IB 必须；推理是请求级独立、可 scale out。,deep-dive-05
+Judge 模型需要做什么定期校准？,抽样 50-100 条让人工 + judge 都打分，算 Cohen's κ，目标 ≥ 0.6。,deep-dive-06
+Eval 自己需要的 SLO 有哪些？,覆盖率、评估延迟、Judge 对齐度、pipeline uptime、失败率、数据新鲜度。,deep-dive-06
+Data Flywheel 的完整循环？,生产 trace → 标注失败集 → eval 更新 → prompt/模型变更 → rollout → 新 trace。,deep-dive-06
+攻击 6 类？,Direct / Indirect / Tool Poisoning / Exfiltration / Loop Hijacking / History Poisoning。,deep-dive-07
+4 层纵深防御哪层最强？,基础设施层（沙箱 / egress / capability-scoped 凭证）。Prompt 层最弱。,deep-dive-07
+Indirect injection 为什么最狡猾？,攻击者把 payload 埋在 Agent 会读到的外部数据里，输入面是正常业务数据无法 pre-filter。,deep-dive-07
+LLM 记忆的三个层次？,参数记忆（训练固化）/ in-context 记忆（当前窗口）/ 持久记忆（应用层拼的）。,deep-dive-08
+"写数据库作记忆"解决了多少问题？,~20%（持久化），剩下 80%（抽取、检索、冲突、污染、元认知、运维）没解决。,deep-dive-08
+持久记忆引入 prompt injection 的什么新风险？,注入一次、永久生效——把单次攻击变成持久威胁。,deep-dive-08
+当前最被推崇的记忆模式？,工作笔记模式（Claude Code 的 NOTES.md）——Agent 自己写、人类可审计、文件系统自带版本。,deep-dive-08
+Self-attention 的三个角色 Q/K/V 分别表示什么？,Q=我在找什么（query），K=我是什么（key），V=我的信息（value）。,science-01
+Attention 的计算复杂度？,O(N²)——N 个位置互相算相似度。长 context 成本的物理根因。,science-01
+KV Cache 为什么能节省计算？,每生成新 token 时，历史 token 的 K 和 V 完全不变，可存下来复用。,science-01
+Attention Sink 是什么？,模型在 softmax 里需要一个"出口"倾倒多余注意力，前几个 token 成了默认"垃圾桶"——解释了为什么前置内容受重视。,science-01
+长 context 中间塌陷的 4 个叠加原因？,训练分布（重要信息多在首尾）+ 位置编码几何偏差 + softmax 稀释 + attention sink 效应。,science-02
+"宣称 context"和"有效 context"的差距？,RULER：宣称 ≥32K 的模型只有一半能真正用到 32K。Gemini 1.5 1M 实测有效 >128K。,science-02
+长 context 能替代 RAG 吗？,不能。中间塌陷 + 成本线性涨 + 延迟高。RAG + Rerank 仍是必要的。,science-02
+Outlier features 是什么，为什么毁掉量化？,少数激活维度值极大（±100+），其他维度都在 ±1 以内。int8 只有 256 级，覆盖 outlier 就丢普通值精度。,science-03
+GPTQ 和 AWQ 的核心思想分别是？,GPTQ 用 Hessian 信息决定哪些权重重要并补偿误差；AWQ 认为激活大的维度对应权重更重要，保护这些。,science-03
+量化静默降级的典型症状？,整体 eval 通过但某类任务崩（数字/结构化输出对量化特别敏感）。必须按任务类型分桶监控。,science-03
+同样信息量，中文在 GPT tokenizer 下的 token 数比 Qwen 多多少？,~2-3×（GPT 对中文每字 1.5-2 token，Qwen 每字 0.6-1 token）。,science-04
+LLM 数学差的根因？,Tokenization 不稳定——"17234" 可能切成 [17,234] 也可能 [1,7,2,3,4]。数字不是位值表示。,science-04
+Opus 4.7 换 tokenizer 对账单的影响？,同样内容 token 数比 Sonnet 多 ~26%，即使单价相同实际成本高 26%。,science-04
+训练三段是哪三段？,Pre-training（世界知识）/ Mid-training（聚焦能力提升）/ Post-training（对齐）。,shared-lang-01
+SFT 和 RLHF/DPO 的区别？,SFT 教格式（被问就答），RLHF/DPO 教偏好（两个都对的回答里选更好的）。,shared-lang-01
+Loss spike 的 SRE 处理流程？,暂停 → 检查最近数据批次 → 从最近 checkpoint 恢复 → Skip 可疑数据 → 继续。,shared-lang-01
+Model card 至少要看哪 5 项？,Training data（含 cutoff date）/ Architecture / Recipe / Post-training / Evaluations + regressions。,shared-lang-01
+ML 团队时间主要花在哪？,80% 在数据（pipeline、清洗、去重、污染检测、混合比例），不是调模型。,shared-lang-02
+Pre-training data pipeline 的 7 步？,Crawl → Clean → Filter → Dedup → Decontaminate → Mix → Tokenize。,shared-lang-02
+Contamination 是什么？如何检测？,训练数据混入 eval set。检测：N-gram 匹配、canary tokens、private eval。,shared-lang-02
+Annealing mix 是什么？,训练末期 10-20% steps 用更高质量、更聚焦的数据混合（数学、代码比例拉高）。近因效应。,shared-lang-02
+pass@k 的含义？,让模型对同一题生成 k 次，至少一次通过的概率。pass@1 才代表单次可用。,shared-lang-03
+MMLU 为什么区分度下降？,饱和（前沿模型 85-90%，接近人类 90%），已无法区分顶级模型。替代是 MMLU-Pro / GPQA。,shared-lang-03
+LM Arena Elo 是什么？,用户盲测对弈 → Elo 更新。相对分数，分差比绝对值重要。差 20 分显著，差 5 分是噪声。,shared-lang-03
+Benchmark contamination 怎么识别？,某单一指标飙升而 Arena / private eval 不动 + 强项不合理集中 → 大概率刷榜。,shared-lang-03
+HHH 三原则？,Helpful / Honest / Harmless。对齐的三目标。,shared-lang-04
+DPO 相比 RLHF 的优势？,不训 Reward Model，直接用偏好对比做训练。简单 100×、稳定、效果接近。,shared-lang-04
+Reward hacking 是什么？举一个例子？,Policy 找到 Reward Model 的漏洞获得高分但实际不是好回答。例：RM 偏好长回答 → Policy 学会啰嗦。,shared-lang-04
+Jailbreak 和 Prompt Injection 的区别？,Jailbreak 是让模型说违规内容；Prompt Injection 是让 Agent 做违规动作。对 SRE 后者更严重。,shared-lang-04
+FSDP / ZeRO-3 的核心思想？,把模型参数、梯度、优化器状态都切片到不同 GPU，forward/backward 时临时 gather。兼得 DP 简单和 TP 省显存。,shared-lang-05
+训练和推理集群的网络要求差异？,训练必须 InfiniBand / NVLink（每 step 传数百 GB）；推理 Ethernet 足够。,shared-lang-05
+Checkpoint 的 SRE 关键指标？,写耗时、写失败率、存储容量趋势、最近 checkpoint 年龄、跨区复制延迟。,shared-lang-05
+MFU（Model FLOPs Utilization）目标？,实际 FLOPs / 峰值 FLOPs，60-70% 是生产目标。低于 50% = 效率问题。,shared-lang-05
+B1 动作的核心提问是什么？,"我错在'不知道'还是'没想到'？"——前者补知识，后者是思维钝化信号。,training
+B2 动作的三步？,自己写初稿（不许 AI 写）→ AI 挑错（不许重写）→ 自己改。,training
+B3 渐进节奏？,第 1 月每周 45min → 第 2-3 月每周 90min → 第 4 月+ 每月 3-4 小时。,training
+每月自检的 3 问题？,(1) 有没有自己想通本想问 AI 的问题？(2) B3 有没有完成？(3) B1 方向感有没有提升？,training

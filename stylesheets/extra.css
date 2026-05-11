@@ -1,0 +1,389 @@
+/* ────────────────────────────────────────────────────────────────
+   《AI 时代的 SRE 架构师之路》 · MkDocs Material 补充样式
+   目标：优化中文阅读 + 表格 / 代码块 / callout / 打印体验
+   作用域：only 此站点；不影响 Markdown 源。
+   ──────────────────────────────────────────────────────────────── */
+
+/* =========== 字体栈（CJK 优先）=========== */
+
+:root {
+  /* 正文：中文衬线优先（长篇阅读更友好） */
+  --md-text-font-family:
+    "Noto Serif CJK SC",
+    "Source Han Serif SC",
+    "Source Han Serif CN",
+    "PingFang SC",
+    "Microsoft YaHei",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    serif;
+
+  /* 标题：中文无衬线 */
+  --md-heading-font-family:
+    "Noto Sans CJK SC",
+    "Source Han Sans SC",
+    "Source Han Sans CN",
+    "PingFang SC",
+    "Microsoft YaHei",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    sans-serif;
+
+  /* 代码字体 */
+  --md-code-font-family:
+    "JetBrains Mono",
+    "SFMono-Regular",
+    "SF Mono",
+    "Menlo",
+    "Consolas",
+    "Liberation Mono",
+    "Noto Sans Mono CJK SC",
+    monospace;
+}
+
+body,
+.md-typeset {
+  font-family: var(--md-text-font-family);
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-family: var(--md-heading-font-family);
+  letter-spacing: -0.01em;
+}
+
+.md-typeset code,
+.md-typeset pre,
+.md-typeset kbd {
+  font-family: var(--md-code-font-family);
+}
+
+/* =========== 正文宽度（避免大屏过宽）=========== */
+
+.md-grid {
+  max-width: 78rem;
+}
+
+/* 主内容区略收紧，提高中文长段落可读性 */
+.md-content {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+@media screen and (min-width: 76.25em) {
+  /* 侧栏存在时不收紧 */
+  .md-main__inner {
+    max-width: none;
+  }
+}
+
+/* =========== 正文排版 =========== */
+
+.md-typeset {
+  font-size: 0.85rem;
+  line-height: 1.75;
+}
+
+.md-typeset p {
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+
+.md-typeset h1 {
+  font-size: 1.9em;
+  font-weight: 700;
+  margin: 0 0 0.6em;
+  padding-bottom: 0.3em;
+  border-bottom: 3px solid var(--md-primary-fg-color);
+}
+
+.md-typeset h2 {
+  font-size: 1.45em;
+  font-weight: 600;
+  margin: 1.8em 0 0.6em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset h3 {
+  font-size: 1.2em;
+  font-weight: 600;
+  margin: 1.5em 0 0.5em;
+}
+
+.md-typeset h4 {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin: 1.2em 0 0.4em;
+}
+
+/* =========== 表格（重要：默认 Material 表格较挤）=========== */
+
+.md-typeset table:not([class]) {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--md-default-fg-color--lightest);
+  color: var(--md-default-fg-color);
+  font-weight: 600;
+  border-bottom: 2px solid var(--md-default-fg-color--lighter);
+  padding: 0.6em 0.8em;
+}
+
+.md-typeset table:not([class]) td {
+  padding: 0.55em 0.8em;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset table:not([class]) tr:nth-child(even) td {
+  background: var(--md-default-bg-color--lighter, rgba(0, 0, 0, 0.015));
+}
+
+/* 表格过宽时横向滚动（否则挤死单元格） */
+.md-typeset__table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========== 代码块 =========== */
+
+.md-typeset code {
+  font-size: 0.82em;
+  padding: 0.12em 0.38em;
+  border-radius: 3px;
+  background: var(--md-code-bg-color);
+}
+
+.md-typeset pre > code {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  padding: 0.9em 1em;
+}
+
+.md-typeset pre {
+  margin: 1em 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 长代码行强制允许换行（在打印和 PDF 里特别有用） */
+@media print {
+  .md-typeset pre > code,
+  .md-typeset code {
+    white-space: pre-wrap !important;
+    word-break: break-all;
+  }
+}
+
+/* =========== Callout / Admonition 视觉层级 =========== */
+
+.md-typeset .admonition,
+.md-typeset details {
+  font-size: 0.82rem;
+  border-radius: 4px;
+  border-width: 0 0 0 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.md-typeset .admonition > .admonition-title,
+.md-typeset details > summary {
+  font-weight: 600;
+  padding-top: 0.55em;
+  padding-bottom: 0.55em;
+}
+
+/* note · 蓝 */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-left-color: #0969da;
+  background: rgba(9, 105, 218, 0.06);
+}
+
+/* tip · 绿 */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-left-color: #1a7f37;
+  background: rgba(26, 127, 55, 0.06);
+}
+
+/* info (= IMPORTANT) · 紫 */
+.md-typeset .admonition.info,
+.md-typeset details.info {
+  border-left-color: #8250df;
+  background: rgba(130, 80, 223, 0.06);
+}
+
+/* warning · 黄 */
+.md-typeset .admonition.warning,
+.md-typeset details.warning {
+  border-left-color: #d97706;
+  background: rgba(217, 119, 6, 0.07);
+}
+
+/* danger (= CAUTION) · 红 */
+.md-typeset .admonition.danger,
+.md-typeset details.danger {
+  border-left-color: #cf222e;
+  background: rgba(207, 34, 46, 0.06);
+}
+
+/* =========== 导航 / 侧栏 =========== */
+
+.md-nav__title {
+  font-family: var(--md-heading-font-family);
+  font-weight: 600;
+}
+
+.md-nav__link {
+  font-family: var(--md-heading-font-family);
+  font-size: 0.78rem;
+}
+
+/* 当前章节高亮加粗 */
+.md-nav__item--active > .md-nav__link {
+  font-weight: 700;
+  color: var(--md-primary-fg-color);
+}
+
+/* =========== 目录（右侧 TOC）=========== */
+
+.md-nav--secondary .md-nav__title {
+  font-size: 0.8rem;
+}
+
+.md-nav--secondary .md-nav__link {
+  font-size: 0.75rem;
+}
+
+/* =========== Footnote =========== */
+
+.md-typeset .footnote-ref {
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+/* =========== Task list =========== */
+
+.md-typeset .task-list-indicator::before {
+  background-color: var(--md-default-fg-color--lightest);
+}
+
+.md-typeset [type="checkbox"]:checked + .task-list-indicator::before {
+  background-color: #1a7f37;
+}
+
+/* =========== Mermaid 图（若有）=========== */
+
+.md-typeset .mermaid {
+  text-align: center;
+  margin: 1em 0;
+}
+
+/* =========== 打印 / PDF 样式 =========== */
+
+@media print {
+  /* 隐藏导航、tab、搜索、footer 等非内容元素 */
+  .md-header,
+  .md-tabs,
+  .md-sidebar,
+  .md-footer,
+  .md-search,
+  .md-top,
+  .md-nav--primary,
+  .md-nav--secondary,
+  .md-source,
+  .md-consent {
+    display: none !important;
+  }
+
+  .md-main__inner,
+  .md-content,
+  .md-grid {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 正文略缩 */
+  .md-typeset {
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: #1a1a1a;
+  }
+
+  /* 链接打印友好色 */
+  .md-typeset a {
+    color: #0b5394;
+    text-decoration: none;
+  }
+  .md-typeset a[href]::after {
+    content: "";
+  }
+
+  /* 标题避免跨页 + 孤行 */
+  .md-typeset h1,
+  .md-typeset h2,
+  .md-typeset h3,
+  .md-typeset h4 {
+    page-break-after: avoid;
+    break-after: avoid-page;
+  }
+
+  .md-typeset p,
+  .md-typeset li,
+  .md-typeset blockquote,
+  .md-typeset pre,
+  .md-typeset table {
+    page-break-inside: avoid;
+    break-inside: avoid-page;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* 每个一级标题新起一页（按喜好开关） */
+  /* .md-typeset h1 { page-break-before: always; } */
+}
+
+/* =========== 杂项微调 =========== */
+
+/* 链接在正文里略有下划线暗示（悬停明显） */
+.md-typeset a {
+  text-decoration-color: rgba(0, 0, 0, 0);
+  transition: text-decoration-color 0.15s;
+}
+
+.md-typeset a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+/* 引用块（非 admonition）用作"关键一句话总结" */
+.md-typeset blockquote {
+  color: var(--md-default-fg-color--light);
+  border-left: 3px solid var(--md-default-fg-color--lightest);
+  background: var(--md-default-fg-color--lightest);
+  padding: 0.2em 1em;
+  border-radius: 0 4px 4px 0;
+}
+
+/* 横线更淡 */
+.md-typeset hr {
+  border-color: var(--md-default-fg-color--lightest);
+}
