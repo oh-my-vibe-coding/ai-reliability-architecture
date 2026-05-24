@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────
 # MkDocs Material 站点配置
-# 源文件：《AI 时代的 SRE 架构师之路》v1.3.3
+# 源文件：《AI 时代的 SRE 架构师之路》v1.4.0
 # 目标：在线阅读站点
 #
 # 重要：MkDocs 要求 docs_dir ≠ mkdocs.yml 所在目录。
@@ -119,14 +119,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.3.3
+    default: v1.4.0
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的 SRE 架构师之路》 · v1.3.3 · 2026-05-24 ·
+  《AI 时代的 SRE 架构师之路》 · v1.4.0 · 2026-05-24 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────
@@ -204,6 +204,10 @@ nav:
       - 10 · AI 系统事故模式库: 深入/10-AI系统事故模式库.md
       - 11 · AI SRE 现实图谱: 深入/11-AI-SRE现实图谱.md
       - 12 · Claude / GPT / Gemini 使用指南: 深入/12-Claude-GPT-Gemini三大模型系列使用指南.md
+      - 13 · 离线 / 批量推理: 深入/13-离线批量推理.md
+      - 14 · 微调作为运维对象: 深入/14-微调作为运维对象.md
+      - 15 · Model Registry 与上线流程: 深入/15-模型注册表与上线流程.md
+      - 16 · Embedding 服务作为独立运维对象: 深入/16-Embedding-服务作为独立运维对象.md
 
   - 科学 · 恰到好处的机制:
       - 01 · Attention 与 Transformer 的 SRE 视角: 科学/01-Attention与Transformer的SRE视角.md

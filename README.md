@@ -8,7 +8,7 @@ tags: [handbook, index]
 
 > 写给 **不被 AI 替代、且能与算法工程师并肩** 的工程师
 >
-> **版本**：v1.3.3 · 2026-05-24  ·  [📝 CHANGELOG](维护/CHANGELOG.md)  ·  [🔧 维护系统](维护/README.md)
+> **版本**：v1.4.0 · 2026-05-24  ·  [📝 CHANGELOG](维护/CHANGELOG.md)  ·  [🔧 维护系统](维护/README.md)
 
 ---
 
@@ -78,6 +78,10 @@ tags: [handbook, index]
 - [深入 10 · AI 系统事故模式库](深入/10-AI系统事故模式库.md)
 - [深入 11 · AI SRE 现实图谱](深入/11-AI-SRE现实图谱.md)
 - [深入 12 · Claude / GPT / Gemini 三大模型系列使用指南](深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)
+- [深入 13 · 离线 / 批量推理的 SRE 实践](深入/13-离线批量推理.md)
+- [深入 14 · 微调作为运维对象（LoRA / QLoRA / 全参）](深入/14-微调作为运维对象.md)
+- [深入 15 · Model Registry 与上线流程](深入/15-模型注册表与上线流程.md)
+- [深入 16 · Embedding 服务作为独立运维对象](深入/16-Embedding-服务作为独立运维对象.md)
 
 ### 科学（恰到好处的机制）
 > 不讲如何训练模型，只讲"做好工程判断必须知道的机制"。4 篇高 ROI 专题。
