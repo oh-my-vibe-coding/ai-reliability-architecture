@@ -8,7 +8,7 @@ tags: [handbook, index]
 
 > 写给 **不被 AI 替代、且能与算法工程师并肩** 的工程师
 >
-> **版本**：v1.7.0 · 2026-06-02  ·  [📝 CHANGELOG](维护/CHANGELOG.md)  ·  [🔧 维护系统](维护/README.md)
+> **版本**：v1.7.1 · 2026-06-03  ·  [📝 CHANGELOG](维护/CHANGELOG.md)  ·  [🔧 维护系统](维护/README.md)
 
 ---
 
