@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────
 # MkDocs Material 站点配置
-# 源文件：《AI 时代的 SRE 架构师之路》v1.7.1
+# 源文件：《AI 时代的 SRE 架构师之路》v1.8.0
 # 目标：在线阅读站点
 #
 # 重要：MkDocs 要求 docs_dir ≠ mkdocs.yml 所在目录。
@@ -119,14 +119,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.7.1
+    default: v1.8.0
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的 SRE 架构师之路》 · v1.7.1 · 2026-06-03 ·
+  《AI 时代的 SRE 架构师之路》 · v1.8.0 · 2026-06-07 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────
@@ -137,36 +137,38 @@ nav:
   - 首页:
       - 书的入口: README.md
       - 学习路线图: 学习路线图.md
-      - 前言: 00-前言.md
-      - 引章 · 大模型速览: 01-引章-大模型速览.md
       - 样式指南: 样式指南.md
 
-  - 第一部分 · 理念:
+  - 开场:
+      - 前言 · 为什么需要这本书: 00-前言.md
+      - 引章 · 大模型速览: 01-引章-大模型速览.md
+
+  - 第一部分 · 处境与角色:
       - 第 1 章 · AI 时代工程师的真实处境: 理念/01-AI时代工程师的真实处境.md
       - 第 2 章 · SRE 架构师的角色迁移: 理念/02-SRE架构师的角色迁移.md
       - 第 3 章 · 学习能力才是新的护城河: 理念/03-学习能力才是新的护城河.md
 
-  - 第二部分 · 知识:
-      - 第 4 章 · 架构与复合 AI 可靠性数学: 知识/04-系统架构与复合AI可靠性数学.md
-      - 第 5 章 · AI 推理可靠性工程: 知识/05-AI推理服务的可靠性工程.md
+  - 第二部分 · 核心能力:
+      - 第 4 章 · 系统架构与复合 AI 可靠性数学: 知识/04-系统架构与复合AI可靠性数学.md
+      - 第 5 章 · AI 推理服务的可靠性工程: 知识/05-AI推理服务的可靠性工程.md
       - 第 6 章 · AI 自治与上下文架构约束: 知识/06-AI自治与上下文架构约束.md
       - 第 7 章 · 质量可观测性与 Data Flywheel: 知识/07-质量可观测性与DataFlywheel.md
       - 第 8 章 · 组织与判断力: 知识/08-组织与判断力.md
       - 第 9 章 · 工程底座: 知识/09-工程底座.md
 
-  - 第三部分 · 架构:
-      - 架构 01 · AI 系统参考架构: 架构/01-AI系统参考架构.md
-      - 架构 02 · AI SRE 组织设计: 架构/02-AI-SRE组织设计.md
-      - 架构 03 · 架构师的决策框架: 架构/03-架构师的决策框架.md
-      - 架构 04 · AI SRE 成熟度模型 L1-L5: 架构/04-AI-SRE成熟度模型.md
-      - 架构 05 · 不可逆决策与 Day 2 状态: 架构/05-不可逆决策与Day2状态.md
-      - 架构 06 · 预算治理：四种 budget 的统合视图: 架构/06-预算治理.md
-      - 架构 07 · 与外部世界的契约: 架构/07-与外部世界的契约.md
+  - 第三部分 · 架构决策:
+      - 第 10 章 · AI 系统参考架构: 架构/01-AI系统参考架构.md
+      - 第 11 章 · AI SRE 组织设计: 架构/02-AI-SRE组织设计.md
+      - 第 12 章 · 架构师的决策框架: 架构/03-架构师的决策框架.md
+      - 第 13 章 · AI SRE 成熟度模型: 架构/04-AI-SRE成熟度模型.md
+      - 第 14 章 · 不可逆决策与 Day 2 状态: 架构/05-不可逆决策与Day2状态.md
+      - 第 15 章 · 预算治理: 架构/06-预算治理.md
+      - 第 16 章 · 与外部世界的契约: 架构/07-与外部世界的契约.md
 
-  - 第四部分 · 练习:
-      - 第 10 章 · 三个核心训练动作: 练习/10-三个核心训练动作.md
-      - 周循环总览: 练习/周循环总览.md
-      - 贯穿项目 · SRE 事故助手: 练习/贯穿项目-SRE事故助手.md
+  - 第四部分 · 训练与落地:
+      - 第 17 章 · 三个核心训练动作: 练习/10-三个核心训练动作.md
+      - 第 18 章 · 周循环与 19 周路线: 练习/周循环总览.md
+      - 第 19 章 · 贯穿项目 · SRE 事故助手: 练习/贯穿项目-SRE事故助手.md
       - Unit 0 · AI 大模型上手:
           - 总览: 练习/Unit0-AI大模型上手/总览.md
           - Week 1 · API 与工具调用: 练习/Unit0-AI大模型上手/Week1-API与工具调用.md
@@ -198,61 +200,65 @@ nav:
           - 总览: 练习/Unit5-数值与编译器级调试/总览.md
           - Week 1 · 数值级原理: 练习/Unit5-数值与编译器级调试/Week1-数值级原理.md
           - Week 2 · Runbook 产出: 练习/Unit5-数值与编译器级调试/Week2-Runbook产出.md
-      - Capstone · AI 生产架构评审包: 练习/Capstone-AI生产架构评审包.md
+      - 第 20 章 · Capstone · AI 生产架构评审包: 练习/Capstone-AI生产架构评审包.md
 
-  - 深入 · 工程专题:
-      - 01 · 首包延迟与吞吐的影响因素: 深入/01-首包延迟与吞吐的影响因素.md
-      - 02 · Prompt Caching 原理: 深入/02-Prompt-Caching原理.md
-      - 03 · 模型与工具场景化最佳实践: 深入/03-模型与工具场景化最佳实践.md
-      - 04 · 为什么简单"你好"也消耗数万 token: 深入/04-为什么简单你好也消耗数万token.md
-      - 05 · LLM 推理服务的容量规划: 深入/05-LLM推理服务的容量规划.md
-      - 06 · Eval Pipeline 设计: 深入/06-Eval-Pipeline设计.md
-      - 07 · Agent Prompt Injection 红队实战: 深入/07-Agent-Prompt-Injection红队实战.md
-      - 08 · 大模型的"记忆"是怎么回事: 深入/08-大模型的记忆是怎么回事.md
-      - 09 · 何时不该用 AI: 深入/09-何时不该用AI.md
-      - 10 · AI 系统事故模式库: 深入/10-AI系统事故模式库.md
-      - 11 · AI SRE 现实图谱: 深入/11-AI-SRE现实图谱.md
-      - 12 · Claude / GPT / Gemini 使用指南: 深入/12-Claude-GPT-Gemini三大模型系列使用指南.md
-      - 13 · 离线 / 批量推理: 深入/13-离线批量推理.md
-      - 14 · 微调作为运维对象: 深入/14-微调作为运维对象.md
-      - 15 · Model Registry 与上线流程: 深入/15-模型注册表与上线流程.md
-      - 16 · Embedding 服务作为独立运维对象: 深入/16-Embedding-服务作为独立运维对象.md
-      - 17 · LLM 网关的 SRE 视角: 深入/17-LLM网关的SRE视角.md
-      - 18 · LLM 成本工程: 深入/18-LLM成本工程.md
-      - 19 · 模型服务框架对比: 深入/19-模型服务框架对比.md
+  - 配套资源 · 深入专题:
+      - 推理服务核心:
+          - 01 · 首包延迟与吞吐: 深入/01-首包延迟与吞吐的影响因素.md
+          - 02 · Prompt Caching 原理: 深入/02-Prompt-Caching原理.md
+          - 04 · 为什么简单"你好"也消耗数万 token: 深入/04-为什么简单你好也消耗数万token.md
+          - 05 · LLM 推理服务的容量规划: 深入/05-LLM推理服务的容量规划.md
+      - 质量与评估:
+          - 06 · Eval Pipeline 设计: 深入/06-Eval-Pipeline设计.md
+          - 10 · AI 系统事故模式库: 深入/10-AI系统事故模式库.md
+      - 安全与自治:
+          - 07 · Agent Prompt Injection 红队实战: 深入/07-Agent-Prompt-Injection红队实战.md
+          - 08 · 大模型的"记忆"是怎么回事: 深入/08-大模型的记忆是怎么回事.md
+          - 09 · 何时不该用 AI: 深入/09-何时不该用AI.md
+      - 运维对象扩展:
+          - 13 · 离线 / 批量推理: 深入/13-离线批量推理.md
+          - 14 · 微调作为运维对象: 深入/14-微调作为运维对象.md
+          - 15 · Model Registry 与上线流程: 深入/15-模型注册表与上线流程.md
+          - 16 · Embedding 服务作为独立运维对象: 深入/16-Embedding-服务作为独立运维对象.md
+          - 17 · LLM 网关的 SRE 视角: 深入/17-LLM网关的SRE视角.md
+          - 18 · LLM 成本工程: 深入/18-LLM成本工程.md
+      - 参考与选型:
+          - 03 · 模型与工具场景化最佳实践: 深入/03-模型与工具场景化最佳实践.md
+          - 11 · AI SRE 现实图谱: 深入/11-AI-SRE现实图谱.md
+          - 12 · Claude / GPT / Gemini 使用指南: 深入/12-Claude-GPT-Gemini三大模型系列使用指南.md
+          - 19 · 模型服务框架对比: 深入/19-模型服务框架对比.md
 
-  - 科学 · 恰到好处的机制:
-      - 01 · Attention 与 Transformer 的 SRE 视角: 科学/01-Attention与Transformer的SRE视角.md
-      - 02 · Lost in the Middle: 科学/02-Lost-in-the-Middle.md
-      - 03 · Quantization 为什么有时坏: 科学/03-Quantization为什么有时坏.md
-      - 04 · Tokenization 的坑: 科学/04-Tokenization的坑.md
+  - 配套资源 · 机制与协作:
+      - 科学机制:
+          - 01 · Attention 与 Transformer 的 SRE 视角: 科学/01-Attention与Transformer的SRE视角.md
+          - 02 · Lost in the Middle: 科学/02-Lost-in-the-Middle.md
+          - 03 · Quantization 为什么有时坏: 科学/03-Quantization为什么有时坏.md
+          - 04 · Tokenization 的坑: 科学/04-Tokenization的坑.md
+      - 共同语言:
+          - 01 · 训练生命周期与 Recipe: 共同语言/01-训练生命周期与Recipe.md
+          - 02 · Data 是 ML 的真正核心: 共同语言/02-Data是ML的真正核心.md
+          - 03 · Research-level Evaluation: 共同语言/03-Research-Level-Evaluation.md
+          - 04 · Alignment 的词汇: 共同语言/04-Alignment的词汇.md
+          - 05 · 分布式训练基础设施: 共同语言/05-分布式训练基础设施.md
 
-  - 共同语言 · 与 ML 对话:
-      - 01 · 训练生命周期与 Recipe: 共同语言/01-训练生命周期与Recipe.md
-      - 02 · Data 是 ML 的真正核心: 共同语言/02-Data是ML的真正核心.md
-      - 03 · Research-level Evaluation: 共同语言/03-Research-Level-Evaluation.md
-      - 04 · Alignment 的词汇: 共同语言/04-Alignment的词汇.md
-      - 05 · 分布式训练基础设施: 共同语言/05-分布式训练基础设施.md
-
-  - 复习:
-      - 复习系统 README: 复习/README.md
-      - 核心概念卡: 复习/核心概念卡.md
-      - Active Recall 题库: 复习/Active-Recall题库.md
-      - Bloom 分级说明: 复习/Bloom分级说明.md
-
-  - 代码:
-      - 代码 README: 代码/README.md
-      - 01 · Claude Caching GUIDE: 代码/01-claude-caching-GUIDE.md
-      - 02 · 最小 Agent GUIDE: 代码/02-minimal-agent-GUIDE.md
-      - 04 · Eval Skeleton GUIDE: 代码/04-eval-skeleton-GUIDE.md
-
-  - 附录:
-      - A · 每月自检表: 附录/A-每月自检表.md
-      - B · 一手材料与参考文献: 附录/B-参考文献.md
-      - C · 术语表: 附录/C-术语表.md
-      - D · 厂商官方学习资源: 附录/D-厂商官方学习资源.md
-      - E · 模板库: 附录/E-模板库.md
-      - F · SRE 行为反模式 Top 10: 附录/F-SRE行为反模式Top10.md
+  - 配套资源 · 工具:
+      - 复习系统:
+          - 复习系统 README: 复习/README.md
+          - 核心概念卡: 复习/核心概念卡.md
+          - Active Recall 题库: 复习/Active-Recall题库.md
+          - Bloom 分级说明: 复习/Bloom分级说明.md
+      - 参考代码:
+          - 代码 README: 代码/README.md
+          - 01 · Claude Caching GUIDE: 代码/01-claude-caching-GUIDE.md
+          - 02 · 最小 Agent GUIDE: 代码/02-minimal-agent-GUIDE.md
+          - 04 · Eval Skeleton GUIDE: 代码/04-eval-skeleton-GUIDE.md
+      - 附录:
+          - A · 每月自检表: 附录/A-每月自检表.md
+          - B · 一手材料与参考文献: 附录/B-参考文献.md
+          - C · 术语表: 附录/C-术语表.md
+          - D · 厂商官方学习资源: 附录/D-厂商官方学习资源.md
+          - E · 模板库: 附录/E-模板库.md
+          - F · SRE 行为反模式 Top 10: 附录/F-SRE行为反模式Top10.md
 
   - 维护 · 让书活着:
       - 维护系统 README: 维护/README.md
@@ -262,6 +268,5 @@ nav:
       - 季度审查清单: 维护/季度审查清单.md
       - 更新模板: 维护/更新模板.md
       - AI 辅助更新: 维护/AI辅助更新.md
+      - 阅读版构建: 阅读版构建.md
       - PDF 构建说明: build/README.md
-
-  - 阅读版构建: 阅读版构建.md

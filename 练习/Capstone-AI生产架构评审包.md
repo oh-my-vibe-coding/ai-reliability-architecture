@@ -1,10 +1,10 @@
 ---
-title: Capstone · AI 操作生产环境架构评审包
-updated: 2026-05-05
-tags: [part-3, practice, capstone, architecture-review]
+title: 第 20 章 · Capstone：AI 生产架构评审包
+updated: 2026-06-07
+tags: [part-4, practice, capstone, architecture-review]
 ---
 
-# Capstone · AI 操作生产环境架构评审包
+# 第 20 章 · Capstone：AI 生产架构评审包
 
 > [← 返回目录](../README.md)  ·  [← 周循环总览](周循环总览.md)
 
@@ -50,7 +50,7 @@ tags: [part-3, practice, capstone, architecture-review]
 
 ## 最终产出
 
-**一份《AI 操作生产环境架构评审包》**，格式不限（Confluence / Notion / Markdown / Google Doc），但结构见下。
+**一份《AI 生产架构评审包》**，格式不限（Confluence / Notion / Markdown / Google Doc），但结构见下。
 
 **长度参考**：15-30 页（Markdown 约 800-1500 行）。**不要更长**——评审会上没人会读。
 
@@ -219,7 +219,7 @@ tags: [part-3, practice, capstone, architecture-review]
 ### 第一轮 · AI 挑错
 
 ```
-我刚完成了一份 AI 操作生产环境的架构评审包，请按以下维度挑错：
+我刚完成了一份 AI 生产架构评审包，请按以下维度挑错：
 
 1. **技术漏洞**：数字不一致、计算错误、指标缺失
 2. **逻辑漏洞**：某节说 A 但另一节暗示 not A

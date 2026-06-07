@@ -1,10 +1,10 @@
 ---
-title: 贯穿项目 · SRE 事故助手 RAG + Agent
-updated: 2026-05-24
-tags: [part-3, practice, capstone-project, rag, agent, sre-incident-assistant]
+title: 第 19 章 · 贯穿项目：SRE 事故助手
+updated: 2026-06-07
+tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ---
 
-# 贯穿项目 · SRE 事故助手 RAG + Agent
+# 第 19 章 · 贯穿项目：SRE 事故助手
 
 > [← 返回目录](../README.md)  ·  [← 周循环总览](周循环总览.md)  ·  [→ Capstone · 架构评审包](Capstone-AI生产架构评审包.md)
 

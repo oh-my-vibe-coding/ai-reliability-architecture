@@ -1,12 +1,12 @@
 ---
-title: 第 7 章 · 质量可观测性 ＋ Data Flywheel
-updated: 2026-05-09
+title: 第 7 章 · 质量可观测性与 Data Flywheel
+updated: 2026-06-07
 tags: [part-2, knowledge]
 ---
 
-# 第 7 章 · 质量可观测性 ＋ Data Flywheel
+# 第 7 章 · 质量可观测性与 Data Flywheel
 
-> 所属：第二部分 · 知识  ·  [← 返回目录](../README.md)
+> 所属：第二部分 · 核心能力  ·  [← 返回目录](../README.md)
 
 传统 observability 的三大支柱是 **metrics / logs / traces**。AI 时代多一个**质量（quality）**，而且它不是第四根独立的柱子，而是**和前三根融合**成一个系统。
 
@@ -125,5 +125,5 @@ flowchart LR
 
 ---
 
-上一章 → [第 6 章 · AI 自治 ＋ 上下文的架构性约束](06-AI自治与上下文架构约束.md)
+上一章 → [第 6 章 · AI 自治与上下文架构约束](06-AI自治与上下文架构约束.md)
 下一章 → [第 8 章 · 组织与判断力](08-组织与判断力.md)

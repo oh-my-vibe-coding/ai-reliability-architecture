@@ -1,6 +1,6 @@
 ---
 title: PDF 构建系统
-updated: 2026-05-05
+updated: 2026-06-07
 tags: [meta, build, pdf, pandoc, xelatex]
 ---
 
@@ -33,12 +33,14 @@ tags: [meta, build, pdf, pandoc, xelatex]
 
 **解法**：PDF 只做**主书版**——读者会从头到尾读的内容：
 - 前言 + 引章
-- 理念 / 知识（概念骨架）
-- 练习 · **Unit 总览 + Capstone + 贯穿项目 + 周循环**（执行骨架）
+- 第一部分 · 处境与角色
+- 第二部分 · 核心能力
+- 第三部分 · 架构决策
+- 第四部分 · 训练与落地（含 Unit 总览、Capstone、贯穿项目、周循环）
 - 附录 A / E（工具）
 
 **不塞 PDF 的**：
-- **深入 01-10**（按需查的工程专题）
+- **深入 01-19**（按需查的工程专题）
 - **科学 01-04**（机制参考）
 - **共同语言 01-05**（ML 术语表）
 - **Unit 的 Week 详情**（执行手册属性，在线查更方便）
@@ -54,12 +56,12 @@ tags: [meta, build, pdf, pandoc, xelatex]
 
 ```bash
 bash build/build-pdf.sh
-# 输出：output/AI时代SRE架构师之路-v1.2.0.pdf
+# 输出：output/AI时代SRE架构师之路-v1.8.0.pdf
 ```
 
 **改版本号**：
 ```bash
-VERSION=v1.3.0 bash build/build-pdf.sh
+VERSION=v1.8.1 bash build/build-pdf.sh
 ```
 
 ---
@@ -173,7 +175,7 @@ pip install mkdocs-with-pdf
 cp build/build-pdf.sh build/build-pdf-deep.sh
 # 编辑，把 FILES 改成 深入/*.md
 # 跑：bash build/build-pdf-deep.sh
-# 输出：output/AI时代SRE架构师之路-v1.2.0-深入卷.pdf
+# 输出：output/AI时代SRE架构师之路-v1.8.0-深入卷.pdf
 ```
 
 同理做科学卷、共同语言卷、复习卷。每本 50-100 页较舒适。
