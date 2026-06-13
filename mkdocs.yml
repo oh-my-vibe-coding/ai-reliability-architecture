@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────
 # MkDocs Material 站点配置
-# 源文件：《AI 时代的 SRE 架构师之路》v1.8.1
+# 源文件：《AI 时代的 SRE 架构师之路》v1.8.4
 # 目标：在线阅读站点
 #
 # 重要：MkDocs 要求 docs_dir ≠ mkdocs.yml 所在目录。
@@ -119,14 +119,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.8.1
+    default: v1.8.4
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的 SRE 架构师之路》 · v1.8.1 · 2026-06-08 ·
+  《AI 时代的 SRE 架构师之路》 · v1.8.4 · 2026-06-13 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────

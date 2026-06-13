@@ -1,6 +1,6 @@
 ---
 title: CHANGELOG · 书的版本历史
-updated: 2026-06-08
+updated: 2026-06-13
 tags: [meta, changelog]
 ---
 
@@ -20,6 +20,115 @@ tags: [meta, changelog]
 > 这一段累积下一次 patch / minor 的草稿改动。
 
 *（无）*
+
+---
+
+## v1.8.4 — 2026-06-13
+
+**月度快照消化 · Anthropic Opus 4.8 / Fable 5 / Gemini Computer Use Preview**：v1.8.3 标注"待人工补"的外部快照（深入 03 / 12 / 附录 C）这一轮一次性补齐。绕开沙箱无法直连的 `r.jina.ai`，改用 `arena.ai` / `openrouter.ai` 公开 API、`swebench.com` 主页内嵌的 `<script id="leaderboard-data">`、`docs.claude.com` / `ai.google.dev` / `api-docs.deepseek.com` 源站直拉，再以 `gh api` 拉 SWE-bench experiments 仓库做交叉验证。
+
+### 修订
+
+- **[深入 03 · 模型与工具场景化最佳实践](../深入/03-模型与工具场景化最佳实践.md)** — 快照日期 2026-05-24 → 2026-06-13。
+    - §3.1 Anthropic 表升级：旗舰 Opus 4.7 → **Opus 4.8（2026-05-28 发布）**，加 `effort` 默认 `high` 的 SRE 警示（这是 4.7 → 4.8 升级的最大坑）；新增 **Claude Fable 5（2026-06-09，研究分支，$10/$50 per MTok）** 与 **Claude Mythos Preview（Project Glasswing 防御性安全研究，邀请制）** 两行。
+    - §3.4 xAI 表：Grok 4.3 标注定价（$1.25/$2.5）+ 加 Grok Build 0.1（2026-05-20）行。
+    - §3.10 中国新贵表：Kimi K2.6 加 **K2.7 Code（2026-06-12）**；MiniMax M2.5/M2.7 加 **M3（2026-05-31）**；Stepfun Step 3.5 Flash 加 **3.7 Flash（2026-05-28）**；新增 **Qwen 3.6 / 3.7 Plus / 3.7 Max** 行。
+    - §3.11 LM Arena 表口径切换：Arena Score 自 2026-Q2 起在 `arena.ai/leaderboard` 已不再公开，改为按 chat-modality / webdev-modality **rank 排序**，旧 Score 列保留为"最后已知值"做参考。补充 chat-modality 新晋的 MiniMax M3 (#17)、Grok 4.20 beta (#19) 等；webdev modality 加 Muse Spark / Gemini 3.5 Flash 等位次。
+    - §3.11 SWE-bench 加 2026-06-13 校对脚注（数据自 5 月没动是个**实质事实信号**，不是漏校对）。
+    - §1.5 OpenRouter Top 10 表加 6 月新模型补充 note（K2.7 Code / MiniMax M3 / Step 3.7 / Opus 4.8 / Fable 5 / Grok 4.3 / Nemotron 3 Ultra / Qwen 3.7）；现有用量数字保留为 2026-05-24 抽样，承认 `/rankings` 页面需登录无法独立验证。
+    - TL;DR #3 加新版本提示；多处场景表 `Opus 4.7 Thinking` → `Opus 4.8 Thinking`；§3 顶部"主流大模型详细介绍"标题从 2026-05 改 2026-06 快照。
+    - 三条 footnote（arena / openrouter / swe）更新抓取来源（直连源站 vs 旧的 r.jina.ai 代理）。
+- **[深入 12 · Claude / GPT / Gemini 三大模型系列使用指南](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)** — 快照日期 2026-05-24 → 2026-06-13。
+    - §1 Claude 段：当前 Opus = Opus 4.8；新增 Fable / Mythos 研究分支说明；加 `WARNING` callout 解释 `effort` 默认 `high` 的预算放大效应与"在 SDK/网关包装层显式 override"的 SRE 动作。
+    - §1 Gemini 段：旗舰对比目标从"Opus 4.7"改为"Opus 4.8"；Computer Use Preview 行加致命三角与红队回链——首次显式承认 Gemini 进入 computer use 后必须按致命三角扩展防御。
+- **[附录 C · 术语表](../附录/C-术语表.md)** — 快照日期 2026-05-24 → 2026-06-13。
+    - "Tokenizer 代际差异"条：把"Opus 4.7"扩成"Opus 4.7+（含 4.8）"——4.8 继承同一 tokenizer，但加注"4.8 还把 effort 默认设为 high"。
+    - "Claude Opus / Sonnet / Haiku" 条：写明当前各档具体版本号（4.8 / 4.6 / 4.5）+ Opus 4.8 effort 默认警示。
+    - 新增三条术语：**Claude Fable / Mythos**、**Computer Use Preview**（三家都开放了，且承载致命三角风险）、**`effort` 参数（reasoning effort）**（跨厂商通用 + 4.8 默认 high 的坑）。
+- **[复习/核心概念卡 ↔ 复习/anki-import.csv](../复习/核心概念卡.md)** — tokenizer 卡的 Q/A 两文件同步从"Opus 4.7"扩成"Opus 4.7+（含 4.8）"，A 段补"4.8 effort 默认 high 叠加预算"。核心概念卡 frontmatter 同步到 2026-06-13。
+- **README / mkdocs.yml / 维护/README.md / build 链路** — 版本号 v1.8.3 → v1.8.4 五处同步。
+
+<details>
+<summary><b>关键设计决策</b>（点击展开）</summary>
+
+- **为什么是 patch 而非 minor**：没有新章节、没有改结构——是 v1.8.3 标注"待人工补"的快照消化，属于 patch 定义里的"快照数据 + 勘误"。
+- **为什么把 `effort` 默认 `high` 当头条**：这是 Opus 4.7 → 4.8 升级时**唯一会让 SRE 措手不及**的行为变化。tokenizer / 价格 / context 几乎没动，但默认 effort 把每个调用都拉到深思考档——书的 SRE 视角必须把"预算被悄悄放大 3-10×"写在用户能看到的第一行，而不是埋在脚注里。
+- **为什么把 Gemini Computer Use Preview 写进深入 12 而不是只在深入 03 一带而过**：致命三角是本书第 6 章的核心 SRE 主张；当主流厂商**全部**进入 computer use（Anthropic / OpenAI / Google），不在三大模型系列指南里点出"这条 capability 改变了你的攻击面"是失职。
+- **为什么把 LM Arena 表改为 rank-only 而不是从社区脚本反算 Score**：源站不再公开 Score 这件事本身是个**重要信号**——读者应该知道"数字精度时代"在 LLM 榜单上已经过去。反算 Score 是伪精确；如实写"rank only"反而帮读者建立健康的"模型对比 ≠ 精确 ELO"的心智。
+- **为什么保留 §1.5 OpenRouter 表的 5 月用量而不重抓**：`/rankings` 页面 Next.js 客户端渲染、需要登录态，沙箱里抓不到；强行用 `/api/v1/models` 返回的"模型清单"伪装成"用量排名"会反过来污染数据。诚实方案：表保留+加 note 补充新模型，下个月人工跑一次 `/rankings` 真正校对。
+- **SWE-bench 数据没动是个事实信号**：mini-SWE-agent 与全局 Top 5 自 2026-02 / 2025-12 后头部已数月未刷分。这条**沉默事实**比"换数字"更值得在脚注里点出——SRE 选型时该考虑"这一档可能就是当前能力上限"。
+
+</details>
+
+### v1.8.3 → v1.8.4 工作量摘要
+
+- 编辑文件 8 个（深入 03 / 12，附录 C，复习/核心概念卡、复习/anki-import.csv，README，mkdocs.yml，维护/README.md）
+- CHANGELOG 增 1 条（本条）
+- 维护章节 frontmatter 全部同步到 2026-06-13
+- 外部源站直连验证 6 处（arena.ai、openrouter.ai/api/v1/models、swebench.com、docs.claude.com、ai.google.dev、api-docs.deepseek.com） + 1 处 GitHub API（SWE-bench/experiments）
+
+---
+
+## v1.8.3 — 2026-06-13
+
+**月度维护 · build 链路版本对齐 + 月度漂移记录**：按 [月度更新清单](月度更新清单.md) 走 6 月这一轮。本轮在本地完成"build 链路残留版本号修正 + 内部一致性校对 + 复习系统抽检"，外部快照（LM Arena / OpenRouter / SWE-bench / 厂商 docs）因维护环境无法直连 `r.jina.ai` / `arena.ai` / `platform.openai.com` / `docs.claude.com`，按 [AI辅助更新.md §1](AI辅助更新.md) 边界**不擅自更新事实数据**，转为后续人工跑外部抓取后再以 v1.8.4 patch 收口。
+
+### 修订
+
+- **`build/build-pdf.sh`** — 默认 `VERSION` 从陈旧的 `v1.8.1` 同步为 `v1.8.3`，让 `bash build/build-pdf.sh` 直接出当前版本号的 PDF。
+- **`build/pdf-style.tex`** — PDF 页眉右侧版本号从 `v1.8.0` 同步为 `v1.8.3`，让出版的 PDF 页眉与封面、与 README/CHANGELOG 对齐。
+- **`build/README.md`** — 三处构建说明里的示例输出文件名 `v1.8.0` / `VERSION=v1.8.1` 同步为 `v1.8.3`。
+- **`阅读版构建.md`** — `# 输出到 output/AI时代SRE架构师之路-v1.8.0.pdf` 同步为 `v1.8.3`。
+- **`README.md` / `mkdocs.yml` / `维护/README.md`** — 版本号 `v1.8.2 → v1.8.3` 三处同步（含 mkdocs.yml `extra.version.default` 和 `copyright`）。
+
+### 月度漂移记录（外部快照已超出本月窗口，待补）
+
+按漂移度表，下列章节的快照截至 2026-05-24 / 2026-05-10，距本月已 3-5 周，进入"必须校对"窗口。本轮**没有**直接修改它们的事实数据：
+
+- **深入 03 · 模型与工具场景化最佳实践（🕒 极不稳）** — §3.11 LM Arena Top 10 / Coding Top 5、SWE-bench Verified Top 5、§1.5 OpenRouter Top 10、§3 各厂商旗舰定价均仍为 2026-05-24 快照，需用 Jina Reader 代理（`r.jina.ai`）逐项校对。
+- **深入 12 · Claude / GPT / Gemini 三大模型系列使用指南（📊 快变）** — Claude Opus/Sonnet/Haiku、GPT/mini/nano、Gemini Pro/Flash/Flash-Lite 命名与 context 窗口需对官方 docs 校对。
+- **深入 08 · 大模型记忆（📊 快变）** — `updated: 2026-05-05`，已超 5 周，前沿研究方向（Letta / Mem0 / Zep 版本、新论文）需扫一遍。
+- **深入 11 · AI SRE 现实图谱（📊 快变）** — `updated: 2026-05-10`，治理框架 / vendor postmortem 需补一轮。
+- **附录 B · 参考文献（📊 快变）** — `updated: 2026-05-10`，链接存活性抽样未做。
+- **附录 D · 厂商官方学习资源（📊 快变）** — Anthropic Academy / OpenAI Cookbook / DeepLearning.AI 课程列表需扫。
+- **共同语言 03 · Research-Level Evaluation（📊 快变）** — Benchmark 顶模型未校对。
+
+### 抽样校对（已确认无需改）
+
+- **复习/核心概念卡 ↔ 复习/anki-import.csv** — 抽检 Opus 4.7 vs Sonnet 4.6 tokenizer 体积差（"约 35%"）、RULER context 有效长度（"宣称 ≥32K 一半能用"）、Gemini 1.5 Pro 1M 实测有效（">128K"）三处快变事实卡——两文件口径一致，未漂移。
+- **跨文件链接** — 用脚本扫了全书 1366 条 markdown `[..](..md)` 内链，13 条"未匹配"全部为样式指南 / 模板库 / AI 辅助更新文档里的占位示例链（`prev.md` / `next.md` / `docs/architecture-review.md` / `../X/Y.md`），不是真断链。
+- **章节编号回归** — 抽检 v1.8.0 引入的"第 10-16 章 / 第 17-20 章"新编号在 README、学习路线图、各章末"下一步"导航与附录引用中的使用——未发现仍指向旧编号（如旧的"第 10 章 · 三个核心训练动作"或"架构 01-07"作正文章节号）的遗漏。
+
+<details>
+<summary><b>关键设计决策</b>（点击展开）</summary>
+
+- **为什么是 patch 而非 minor**：没有新增章节、没有改动结构——只是 build 链路的版本号同步 + 月度漂移记录 + 内部一致性抽检，属于 patch 定义里的"勘误 / 快照对齐"。
+- **为什么不直接更新外部快照**：维护环境无法直连 `r.jina.ai` 与各厂商 docs，按 [AI辅助更新.md §1](AI辅助更新.md) 与 §8 "AI 辅助的不要清单"，不擅自从内部知识或缓存填充事实数据；标记为"待人工补"反而比"AI 拍脑袋写"更诚实。
+- **build 链路是真问题**：v1.8.0 / v1.8.1 / v1.8.2 patch 时只 bump 了 README + mkdocs + CHANGELOG，没同步 `build/build-pdf.sh` 的默认 `VERSION` 和 `pdf-style.tex` 的页眉版本——读者跑 `bash build/build-pdf.sh` 出来的 PDF 文件名和页眉都是旧版本。这是 release 流程的盲区，本轮一次性补齐。
+- **v1.8.4 预期内容**：人工或在有外部网络的环境下跑一遍 [月度更新清单 Part A](月度更新清单.md#part-a--快照数据更新每月必做) 后，把 LM Arena / OpenRouter / SWE-bench / 各厂商 docs 的快照统一更新到 2026-06。
+
+</details>
+
+---
+
+## v1.8.2 — 2026-06-13
+
+**维护元数据纠错**：清理 v1.8.0 重排版后留在维护章节里的"陈旧元数据"和"结构遗漏"，让维护文档和成书结构对齐。不改任何正文。
+
+### 修订
+
+- **维护/README.md** — 当前版本号从陈旧的 `v1.5.0 · 2026-06-01` 同步为 `v1.8.2 · 2026-06-13`，对齐根目录 README 与 CHANGELOG；frontmatter `updated` 同步。
+- **维护/漂移度表.md** — 补全 v1.8.0 引入但漂移度表里漏掉的「**Part III · 架构决策**（第 10-16 章）」分区，并把「**练习**」分区从 `Part III · 训练` 修正为 `Part IV · 训练与落地`，章节编号从旧的 `10`（练习目录）改写为新的 `第 17-20 章`。
+- **知识分区命名** — 漂移度表里 `Part II · 能力画像` 改为 `Part II · 核心能力`，与 README 主四部分命名口径一致。
+
+<details>
+<summary><b>关键设计决策</b>（点击展开）</summary>
+
+- **为什么是 patch 而非 minor**：没有新增书内章节、没有改全书结构——只是把维护文档自身和已发布的 v1.8.0/v1.8.1 成书结构对齐，属于"勘误"。
+- **范围严格限定**：本轮**没有**直接修改深入 03 的模型快照、定价或榜单——按 [AI辅助更新.md](AI辅助更新.md) §8，事实数据级别的更新需要人类决策；本次只处理"维护文档自身的内部不一致"。
+- **本月（2026-06）的 📊 章节状态**：深入 03 / 12、共同语言 03、附录 B / D 的 `updated` 仍为 2026-05-24（部分附录 B 为 2026-05-10），距今约 3 周，按漂移度表是"进入需要月度校对的窗口期"。本条目不擅自更新事实数据；下一次月度更新时人工确认 LM Arena / OpenRouter / SWE-bench / 各厂商 docs 的最新状态。
+
+</details>
 
 ---
 
