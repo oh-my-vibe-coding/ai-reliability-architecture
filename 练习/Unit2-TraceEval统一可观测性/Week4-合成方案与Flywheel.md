@@ -1,7 +1,7 @@
 ---
 title: Unit 2 · Week 4 · 合成方案 + Data Flywheel
 updated: 2026-05-05
-tags: [part-3, practice, unit2, week]
+tags: [part-4, practice, unit2, week]
 ---
 
 # Unit 2 · Week 4 · 合成方案 + Data Flywheel

@@ -126,7 +126,7 @@ flowchart TB
 ### 2.1 训练阶段
 
 **Long Context 训练**
-- Llama 3.1 从 128k 继续训练到 128k 数据上
+- Llama 3.1 在 128k 长度的数据上继续训练
 - 训练样本刻意在中间放关键信息
 - **但成本高、数据难收**
 
@@ -171,7 +171,7 @@ flowchart TB
 - 长 context 质量**在中间塌陷**
 - 长 context 成本**线性增长**（每次请求 prefill 巨贵）
 - 长 context **延迟高**（prefill 数秒级）
-- RAG 的 chunking + rerank 本质上是**把"该模型 attention 的注意力"前置到搜索引擎**
+- RAG 的 chunking + rerank 本质上是**把"本该由模型注意力来做的筛选"前置到搜索引擎**
 
 **正确立场**：长 context 是工具箱里的一把工具，不是替代 RAG 的银弹。
 

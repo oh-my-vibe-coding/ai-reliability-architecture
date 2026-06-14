@@ -1,7 +1,7 @@
 ---
 title: Unit 0 · Week 2 · 本地 RAG
 updated: 2026-05-24
-tags: [part-3, practice, unit0, week]
+tags: [part-4, practice, unit0, week]
 ---
 
 # Unit 0 · Week 2 · 本地 RAG

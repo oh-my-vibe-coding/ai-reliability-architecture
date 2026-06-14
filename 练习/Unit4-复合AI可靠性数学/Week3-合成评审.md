@@ -1,7 +1,7 @@
 ---
 title: Unit 4 · Week 3 · 合成评审与失效放大分析
 updated: 2026-05-05
-tags: [part-3, practice, unit4, week]
+tags: [part-4, practice, unit4, week]
 ---
 
 # Unit 4 · Week 3 · 合成评审与失效放大分析

@@ -1,7 +1,7 @@
 ---
 title: Unit 2 · Week 3 · Judge 模型选型与校准
 updated: 2026-05-05
-tags: [part-3, practice, unit2, week]
+tags: [part-4, practice, unit2, week]
 ---
 
 # Unit 2 · Week 3 · Judge 模型选型与校准

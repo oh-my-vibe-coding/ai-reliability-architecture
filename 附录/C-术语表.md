@@ -1,12 +1,18 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-06-13
+updated: 2026-06-14
 tags: [appendix]
 ---
 
 # 附录 C · 术语表
 
 > [← 返回目录](../README.md)
+
+> [!IMPORTANT]
+> **这张表分两层，用法不同。**
+>
+> - **第一性术语（下面 5 个分区，建议背下来）**：跨工具、跨厂商、跨年份长寿的概念——致命三角、Blast Radius、Reversibility、Step Budget 这类是基石，工具换代它们也不变，值得真正记进脑子。
+> - **当前产品 / 参数名词（文末单列，查用即可）**：具体模型名、档位、默认参数行为——随厂商版本月度漂移，**不要背**，用到时查、并以厂商官方文档为准。这一层带 🕒 快照标记，标注的数字只是当期量级。
 
 ## 大模型基础
 
@@ -19,12 +25,6 @@ tags: [appendix]
 | Temperature / top-p | 控制输出随机性的采样参数 |
 | Tool Use / Function Calling | LLM 返回结构化"工具调用"请求，由宿主代码执行并回灌结果 |
 | Streaming | Token 逐个返回的输出模式 |
-| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 Opus 4.8，2026-05-28），Sonnet 偏平衡主力（4.6），Haiku 偏轻量快速（4.5）。**注意**：Opus 4.8 起 `effort` 默认 `high`，调用方不显式 override 会一次性吃掉 3-10× token 预算 |
-| Claude Fable / Mythos | 在 Opus/Sonnet/Haiku 主线之外的研究分支：Fable 5（2026-06-09）通用研究形态、Mythos Preview 是 Project Glasswing 防御性安全研究专用（邀请制）。不是日常生产首选 |
-| GPT flagship / mini / nano / reasoning | OpenAI GPT 系列的常见分层：旗舰做复杂任务，mini/nano 做低成本高频任务，reasoning 档用于复杂推理 |
-| Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定档为 Gemini 3.5 Flash，旗舰为 Gemini 3.1 Pro Preview（Gemini 3 Pro Preview 已于 2026-03-09 关停）|
-| Computer Use Preview | 让 LLM 直接驱动浏览器/桌面操作的能力。当前可用：Anthropic Claude Computer Use、OpenAI Codex/Operator、Google Gemini 2.5 Computer Use Preview。**SRE 警示**：启用即把模型同时拉到 "私有数据 + 不受信内容 + 外部行动" 三条线上，必须按致命三角扩展防御 |
-| `effort` 参数（reasoning effort） | Anthropic / OpenAI / Google 推理模型上控制"思考深度"的统一参数，档位通常为 `none/low/medium/high/xhigh`。每升一档延迟与 token 成本可放大数倍。**Claude Opus 4.8 起在 API/Claude Code 上默认 `high`**，是 4.7 → 4.8 升级的最大坑 |
 | Reasoning / Thinking Budget | 推理时让模型"多想一会"的预算控制，通常会增加延迟和 token 成本 |
 | 精度（精度位数 / Precision） | 每个模型参数占多少字节，直接决定显存占用和带宽需求：**fp32 = 4 / bf16 = 2 / fp16 = 2 / int8 = 1 / int4 = 0.5** 字节。例：70B bf16 ≈ 140GB；70B int4 ≈ 35GB |
 
@@ -41,7 +41,7 @@ tags: [appendix]
 | 术语 | 含义 |
 |---|---|
 | TTFT | Time To First Token，推理服务延迟的关键 SLI |
-| Silent Degradation | 指标全绿但系统已经数学错误的静默故障 |
+| Silent Degradation | 指标全绿但系统已经数学出错的静默故障 |
 | Judge Model | 用模型评估另一个模型输出质量的评估方法 |
 | Data Flywheel | 生产 trace → 标注 → eval → 改进 → rollout 的反馈回路 |
 | Assertion Battery | 任务专属的硬规则校验集（替代"全局幻觉率"这类不可操作指标） |
@@ -62,3 +62,19 @@ tags: [appendix]
 | Compound AI System | 由多步推理、工具调用、检索组成的复合系统 |
 | Step Budget | 一条 Agent 链路允许的最大推理步数 |
 | Verifier / Gate | 在链路中插入的校验节点，用于截断错误累积 |
+
+---
+
+## 当前产品 / 参数名词（2026-06 快照 🕒）
+
+> [!WARNING]
+> 这一层是**查用即可、不要背**的快变信息：模型名、档位、默认参数行为随厂商版本月度漂移。下表是 **2026-06 快照**，实际选型 / 调用前以厂商官方文档为准。完整选型口径见 [深入 12 · 三大模型系列使用指南](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)。
+
+| 术语 | 含义 |
+|---|---|
+| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 Opus 4.8，2026-05-28），Sonnet 偏平衡主力（4.6），Haiku 偏轻量快速（4.5）。**注意**：Opus 4.8 起 `effort` 默认 `high`，调用方不显式 override 会一次性吃掉 3-10× token 预算 |
+| Claude Fable / Mythos | 在 Opus/Sonnet/Haiku 主线之外的研究分支：Fable 5（2026-06-09）通用研究形态、Mythos Preview 是 Project Glasswing 防御性安全研究专用（邀请制）。不是日常生产首选 |
+| GPT flagship / mini / nano / reasoning | OpenAI GPT 系列的常见分层：旗舰做复杂任务，mini/nano 做低成本高频任务，reasoning 档用于复杂推理 |
+| Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定档为 Gemini 3.5 Flash，旗舰为 Gemini 3.1 Pro Preview（Gemini 3 Pro Preview 已于 2026-03-09 关停）|
+| Computer Use Preview | 让 LLM 直接驱动浏览器/桌面操作的能力。当前可用：Anthropic Claude Computer Use、OpenAI Codex/Operator、Google Gemini 2.5 Computer Use Preview。**SRE 警示**：启用即把模型同时拉到 "私有数据 + 不受信内容 + 外部行动" 三条线上，必须按致命三角扩展防御 |
+| `effort` 参数（reasoning effort） | Anthropic / OpenAI / Google 推理模型上控制"思考深度"的统一参数，档位通常为 `none/low/medium/high/xhigh`。每升一档延迟与 token 成本可放大数倍。**Claude Opus 4.8 起在 API/Claude Code 上默认 `high`**，是 4.7 → 4.8 升级的最大坑 |

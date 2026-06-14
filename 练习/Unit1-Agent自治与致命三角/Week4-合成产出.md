@@ -1,7 +1,7 @@
 ---
 title: Unit 1 · Week 4 · 合成产出 ＋ 红队自检
 updated: 2026-05-05
-tags: [part-3, practice, unit1, week]
+tags: [part-4, practice, unit1, week]
 ---
 
 # Unit 1 · Week 4 · 合成产出 ＋ 红队自检

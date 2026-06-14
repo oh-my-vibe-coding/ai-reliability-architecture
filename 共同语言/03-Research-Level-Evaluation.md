@@ -322,7 +322,7 @@ Paper 里报告"我们赢的 10 个 benchmark"，没提"我们输的 5 个"。
 > - Private eval（你们自己 held-out 的）动了多少？
 > - Regression check 做了吗？万一 code 好了但 reasoning 退了？
 
-这些问题**每一个都值得追问**，因为每一个都可能让线上事故。
+这些问题**每一个都值得追问**，因为每一个都可能引发线上事故。
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: 科学 04 · Tokenization 的坑
-updated: 2026-05-05
+updated: 2026-06-14
 tags: [science, tokenization, cost, multilingual]
 ---
 
@@ -173,18 +173,21 @@ Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同
 
 ---
 
-## 5. Opus 4.7 的 tokenizer 事件
+## 5. Opus 4.7 的 tokenizer 事件（2026-06 快照 🕒）
 
-2026 年 Anthropic 给 Claude Opus 4.7 换了 tokenizer：
+2026 年 Anthropic 给 Claude Opus 4.7 换了 tokenizer（4.8 沿用同一套）：
 
 - Sonnet 4.6：每 1M token ≈ **750k 英文词**
-- Opus 4.7：每 1M token ≈ **555k 英文词**
+- Opus 4.7+（含 4.8）：每 1M token ≈ **555k 英文词**
 
-**差异 ~26%**。
+同样一段内容，词数固定，Opus 把它切成的 token 更多——多多少？算的是 `750k / 555k ≈ 1.35`，即 **Opus 4.7+ 的 token 体积比 Sonnet 4.6 大约 1.35×，多约 35%**。
+
+> [!CAUTION]
+> 这里很容易把方向算反。"555 比 750 少 26%"说的是 Sonnet 比 Opus 省，分母是 750；而我们要的是"Opus 比 Sonnet 多多少"，分母得是 555——`750/555-1 ≈ 35%`。账单跟着 token 数走，所以**对成本有意义的方向是 35%（1.35×），不是 26%**。
 
 **意味着**：
-- **同样一段内容，Opus 4.7 的 token 数比 Sonnet 4.6 多 26%**
-- 即使单价一样，Opus 4.7 的实际成本高 26%
+- **同样一段内容，Opus 4.7+ 的 token 数比 Sonnet 4.6 多约 35%**
+- 即使单价一样，Opus 4.7+ 的实际成本高约 35%
 - 迁移时**账单会"莫名其妙涨"**
 
 **为什么 Anthropic 要换**：

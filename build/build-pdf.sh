@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # --- 配置 ---
-VERSION="${VERSION:-v1.8.5}"
+VERSION="${VERSION:-v1.9.0}"
 OUTPUT_DIR="output"
 OUTPUT_FILE="${OUTPUT_DIR}/AI时代SRE架构师之路-${VERSION}.pdf"
 BUILD_DIR="build"
@@ -128,6 +128,9 @@ FILES=(
   "练习/Unit5-数值与编译器级调试/总览.md"
 
   "练习/Capstone-AI生产架构评审包.md"
+
+  # 结语
+  "99-结语.md"
 
   # 附录（仅工具类，其他链接到在线站即可）
   "附录/A-每月自检表.md"

@@ -289,7 +289,7 @@ SRE 能帮上什么：
 **每条是**：
 ```json
 {
-  "system": "你是一个帮助的助手",
+  "system": "你是一个乐于助人的助手",
   "user": "写一个 Python 函数排序列表",
   "assistant": "```python\ndef sort_list(lst): return sorted(lst)\n```"
 }
