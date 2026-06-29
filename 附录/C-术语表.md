@@ -1,6 +1,6 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-06-14
+updated: 2026-06-30
 tags: [appendix]
 ---
 
@@ -54,6 +54,8 @@ tags: [appendix]
 | Capability-scoped Credentials | 权限按操作范围细分、最小化的凭证 |
 | Blast Radius | 一个操作失败时可能影响的范围 |
 | Reversibility | 操作可回滚的程度，自治分级的核心判据 |
+| Harness（宿主运行时） | 包在模型外面、把工具调用意图变成受控系统动作的那层：负责工具注册、权限执行、沙箱/egress、上下文管理、审计与预算/中断。模型负责"提出下一步"，harness 负责"决定下一步是否被允许"。Agent 的真实安全边界在这里，不在 prompt 里 |
+| Canonical Schema（内部规范协议） | 多上游网关自定义的统一请求/响应结构。各厂商协议先经 provider adapter 翻译成它，再对外暴露。原则是字段取"所有上游的并集，不是交集" |
 
 ## 架构
 
@@ -78,3 +80,4 @@ tags: [appendix]
 | Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定档为 Gemini 3.5 Flash，旗舰为 Gemini 3.1 Pro Preview（Gemini 3 Pro Preview 已于 2026-03-09 关停）|
 | Computer Use Preview | 让 LLM 直接驱动浏览器/桌面操作的能力。当前可用：Anthropic Claude Computer Use、OpenAI Codex/Operator、Google Gemini 2.5 Computer Use Preview。**SRE 警示**：启用即把模型同时拉到 "私有数据 + 不受信内容 + 外部行动" 三条线上，必须按致命三角扩展防御 |
 | `effort` 参数（reasoning effort） | Anthropic / OpenAI / Google 推理模型上控制"思考深度"的统一参数，档位通常为 `none/low/medium/high/xhigh`。每升一档延迟与 token 成本可放大数倍。**Claude Opus 4.8 起在 API/Claude Code 上默认 `high`**，是 4.7 → 4.8 升级的最大坑 |
+| Messages API / Responses API / Chat Completions | 当前三种主流 LLM 调用协议：Anthropic **Messages API**（block-structured、默认无状态、`tool_use`/`tool_result`、`stop_reason`）；OpenAI **Responses API**（OpenAI 新项目推荐的统一 agentic 面，input/output item、内置工具、remote MCP、可选状态延续）；OpenAI **Chat Completions**（经典兼容层，`messages`/`choices[]`/`finish_reason`/`tool_calls`）。差异不只在字段名，更在状态、工具循环、流式与计费语义，详见 [深入 17](../深入/17-LLM网关的SRE视角.md) |

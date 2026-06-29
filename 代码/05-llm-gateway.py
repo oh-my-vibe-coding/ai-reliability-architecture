@@ -178,7 +178,11 @@ def metrics():
 # 1. 把 tenant_usage 存 Redis（否则重启清零）
 # 2. 细粒度限流（滑动窗口 / token bucket）
 # 3. 路由：根据 model 选不同 provider
-# 4. Fallback：主 provider 挂了切备用
-# 5. Prompt injection 检测前置
-# 6. Audit log（所有 prompt 留档，脱敏）
-# 7. Tracing：OpenTelemetry
+# 4. Canonical protocol schema：内部不要直接暴露任一家上游格式
+# 5. Provider adapter fixtures：每家上游的 request / response / stream / error 都留测试样例
+# 6. 独立 stream parser：不要把 Claude / OpenAI / Gemini 流式协议塞进一个万能 parser
+# 7. Fallback：主 provider 挂了切备用
+# 8. MCP / tool approval boundary：如果网关代理工具调用，必须在 harness 层做 allow / deny / ask
+# 9. Prompt injection 检测前置
+# 10. Audit log（所有 prompt 留档，脱敏；原始 upstream payload 保留引用）
+# 11. Tracing：OpenTelemetry

@@ -1,6 +1,6 @@
 ---
 title: 深入 17 · LLM 网关的 SRE 视角
-updated: 2026-06-01
+updated: 2026-06-30
 tags: [deep-dive, gateway, sre, multi-provider, observability]
 ---
 
@@ -81,7 +81,45 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 
 每接入一家新上游都不是"加一个 adapter 就好了"。下面这些坑只在网关位才会显形：
 
-### 3.1 流式协议的不一致
+### 3.1 先把协议翻译成 canonical schema
+
+> [!NOTE]
+> 本节协议事实以 Anthropic Claude Messages API、OpenAI Responses API / Chat Completions 官方文档为准，快照日期为 2026-06-30。协议会变；网关设计要假设它会继续漂移。
+
+多上游网关最大的错觉，是以为 Claude / OpenAI / Gemini 的差别只是字段名不同。真正的差别在**协议语义**：谁保存状态、工具调用如何回灌、流式事件如何结束、usage 字段代表什么、MCP 工具由谁连接、错误是否是 HTTP 错误。
+
+| 面 | Claude Messages API | OpenAI Responses API | OpenAI Chat Completions |
+|---|---|---|---|
+| 基本抽象 | `messages` + content blocks；默认由客户端保存完整历史 | `input` / output items；面向 agentic workflow，可用 `previous_response_id` / `store` 做状态延续 | `messages` + `choices[]`；经典 chat 形态，客户端保存历史 |
+| 工具调用 | `tool_use` content block；结果作为 `user` 消息里的 `tool_result` block 回灌 | 输出 items 里出现 function / built-in / MCP 相关 item；工具结果再作为 input item 回灌 | `message.tool_calls`；结果用 `role="tool"` + `tool_call_id` 回灌 |
+| 结束原因 | `stop_reason`，常见有 `end_turn`、`tool_use`、`max_tokens`、`pause_turn`、`refusal` | response status + output item 类型；流式下看 typed events 与 done/error | `finish_reason`，常见有 `stop`、`length`、`tool_calls`、`content_filter` |
+| 流式 | SSE 有 `event:` 名称；如 message / content block / delta / stop 等层级事件 | SSE typed events；增量可能是 text、function arguments、tool progress 等不同事件 | SSE chunk；历史兼容里常见 `data: ...` + `[DONE]` |
+| 内置工具 | Web / code / MCP 等能力按 Claude API 版本与 beta 状态暴露 | Responses 是 OpenAI 新项目推荐面，统一内置 tools、function calling、remote MCP | 支持 function/tool calling，但不是新 agentic 能力的主承载面 |
+| MCP | Messages API 的 MCP connector 需要声明远端 server 与对应 toolset；鉴权/可用性是协议边界 | Responses API 支持 remote MCP / connectors；会出现 MCP list / approval / call 相关 items | 不应把 Chat Completions 当 MCP 主路径 |
+
+**网关侧的最低工程要求**：不要把任何一家供应商的请求/响应格式直接暴露成公司内部标准。内部应该先定义一套 canonical schema，再由 provider adapter 做双向翻译。
+
+最小 canonical schema 至少要包含：
+
+```yaml
+request:
+  tenant_id: string
+  task_type: string
+  model_policy: string        # 不是裸 model name
+  input_messages: []          # 内部统一消息块
+  tools: []                   # 内部工具定义，不等同于上游原始 tools
+  budget: {tokens, steps, wall_clock_ms}
+response:
+  output_blocks: []
+  action_requests: []         # tool/function/mcp 调用意图
+  stop_class: enum            # completed / needs_tool / filtered / length / error / paused
+  usage_union: object         # 所有上游 usage 字段的并集
+  upstream_raw_ref: string    # 原始请求/响应/错误的留档引用
+```
+
+这里的关键词是 **union，不是 intersection**。如果 canonical schema 只保留三家都有的字段，你会把最重要的差异删掉：Claude 的 `cache_read` / `cache_creation`、OpenAI reasoning / cached / tool 相关 usage、不同供应商的安全拒答细分、MCP approval 状态，都会在事故排查时消失。
+
+### 3.2 流式协议的不一致
 
 - OpenAI 风格：`data: {chunk}\n\ndata: [DONE]\n\n`
 - Anthropic 风格：`event: <type>\ndata: {...}\n\n`，多种事件类型
@@ -90,7 +128,7 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 
 **网关侧的最低工程要求**：每个上游的流解析器**必须是独立模块**，不要试图写一个通用解析器。一旦试图通用化，所有疑难故障都会卡在这一处。
 
-### 3.2 错误语义的不一致
+### 3.3 错误语义的不一致
 
 - 同样是"上下文超长"，OpenAI 是 `context_length_exceeded`（400），Anthropic 是 `invalid_request_error`（400 但 message 完全不同），Gemini 是 `INVALID_ARGUMENT`（400，proto 风格）
 - 同样是"配额耗尽"，有的家是 429，有的家是 403 + 特定 code
@@ -102,11 +140,11 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 2. **保留原始错误**——在响应里加一个 `x-upstream-error` header 或 trailer，调用方排查时需要原始信息
 3. 把"200 + 实际是过载文案"作为一类**伪成功**单独识别——这种事故不靠状态码能发现
 
-### 3.3 计费字段的不一致
+### 3.4 计费字段的不一致
 
 参见 [深入 02 · 5.5 多上游网关位的特殊风险](02-Prompt-Caching原理.md#55-多上游网关位的特殊风险语义不一致--计费陷阱)。这里再强调一句：**网关计费日志的字段集是"所有上游字段的并集，不是交集"**——任何一家上游有的字段都要留位置，没有就填 0。否则月底对账就会出现"账面少了 X% 的缓存命中收入"这类事故，且无法追溯。
 
-### 3.4 同名模型不一定是同一个模型
+### 3.5 同名模型不一定是同一个模型
 
 `gpt-4o-2024-08-06` 在 OpenAI 直连和 Azure OpenAI 上**实际行为可能不同**——Azure 有自己的 safety layer 和路由策略。`claude-3-5-sonnet` 在 Anthropic 直连和 AWS Bedrock 上**也不同**——延迟特性、错误码、流式行为都有差异。
 
@@ -203,6 +241,15 @@ network gateway logs (含上面三列)
 - [ ] 计费日志同时记录 prompt / cache_read / cache_write / completion 四列
 - [ ] 计费日志附 output_hash / finish_reason
 - [ ] 每个 (model × channel) 单独看 SLI，从不混合
+
+**协议适配**
+
+- [ ] 内部 API 有 canonical schema，不直接暴露 Claude / OpenAI / Gemini 任一家的原始格式
+- [ ] Claude Messages、OpenAI Responses、OpenAI Chat Completions 各有独立 adapter 与 fixture，不共用一个"万能解析器"
+- [ ] `stop_reason` / `finish_reason` / response status 映射到统一 `stop_class`，同时保留原始字段
+- [ ] 流式事件的 start / delta / tool / error / done 都有逐供应商测试样例
+- [ ] MCP / function / tool 调用都先落成内部 `action_request`，再由 harness 决定是否执行
+- [ ] 原始上游 request / response / error 有留档引用，事故复盘能还原供应商原文
 
 **可控**
 

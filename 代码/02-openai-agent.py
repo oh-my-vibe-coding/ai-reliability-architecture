@@ -5,8 +5,9 @@ OpenAI 版本的最小 Agent（对照 02-minimal-agent.py）。
 
 关键差异（vs Anthropic）：
 - OpenAI 用 "function calling"（也叫 tool calling），语义相近但字段略不同
-- 2025+ OpenAI 推荐用 Responses API（stateful），本例用 Chat Completions 保持对齐
+- OpenAI 2025+ 新项目通常优先评估 Responses API；本例故意用 Chat Completions，方便和 02-minimal-agent.py 做字段级对照
 - stop_reason 叫 finish_reason
+- 更系统的 Claude / OpenAI 协议差异见：深入 17 · LLM 网关的 SRE 视角
 
 关联章节：Unit 0 · Week 1；深入 07
 """

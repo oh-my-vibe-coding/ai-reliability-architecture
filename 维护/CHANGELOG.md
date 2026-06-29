@@ -1,6 +1,6 @@
 ---
 title: CHANGELOG · 书的版本历史
-updated: 2026-06-14
+updated: 2026-06-30
 tags: [meta, changelog]
 ---
 
@@ -19,7 +19,22 @@ tags: [meta, changelog]
 
 > 这一段累积下一次 patch / minor 的草稿改动。
 
-### 结构性改进 · 让"最不会朽的那层"成为承重墙（2026-06-14）
+---
+
+## v1.9.1 — 2026-06-30
+
+**内容补充 + 结构性改进**：本次 patch 汇总自 v1.9.0 以来累积的两批未发布改动——一批是把 harness agent 思想与 Claude/OpenAI 协议对照织入承重章节，一批是让"最不会朽的那层"成为承重墙的结构性修订。均为织入式增补/质量修订，未新增独立章节，故归 patch 级。
+
+### 内容补充 · Harness Agent 思想 + Claude/OpenAI 协议对照
+
+把三块此前散落或缺失的内容织入承重章节，让读者形成"Agent 边界在 harness、协议差异在网关"的连续认知链。均为织入式增补，未新增独立文件，故 `mkdocs.yml` / README 导航不变。
+
+- **Harness 作为安全边界** — [第 6 章](../知识/06-AI自治与上下文架构约束.md) 在致命三角后新增「Harness：Agent 的真实安全边界」一节 + 边界对照表（工具注册/权限/出站/上下文/审计 harness 该做什么 vs prompt 做不到什么）；[第 10 章参考架构](../架构/01-AI系统参考架构.md) 在 Orc 后补「Harness 是 Orc / Tool / M / Obs 的交界面」横切面表，并在 S/M 档组件清单点明 harness 责任（工具白名单/日志/硬预算 → canonical schema）。
+- **Claude / OpenAI 协议对照** — [深入 17 · LLM 网关](../深入/17-LLM网关的SRE视角.md) 新增 §3.1「先把协议翻译成 canonical schema」：Claude Messages API / OpenAI Responses API / OpenAI Chat Completions 在状态、工具循环、stop/finish reason、流式事件、内置工具、MCP 上的差异对照表 + canonical schema 草案（字段取并集不取交集）；原 3.1-3.4 顺延为 3.2-3.5；自检清单加「协议适配」分组。
+- **高层协议哲学 + 代码定位** — [深入 12](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md) 加「API 协议哲学：Messages、Responses 与 Chat Completions」选型级小节（回链深入 17，不重复字段细节）；[代码 02 minimal-agent](../代码/02-minimal-agent-GUIDE.md) 加「这个 demo 真正在教什么：harness loop」；[代码 02-openai-agent.py](../代码/02-openai-agent.py) 顶注澄清"故意用 Chat Completions 做字段对照、新项目优先评估 Responses API"；[代码 05-llm-gateway.py](../代码/05-llm-gateway.py)「下一步改造」补 canonical schema / per-provider adapter fixtures / 独立 stream parser / MCP approval boundary / 原始 payload 留档。
+- **术语与参考** — [附录 C 术语表](../附录/C-术语表.md) 新增 Harness、Canonical Schema 两条第一性术语 + Messages/Responses/Chat Completions 协议对照条；[附录 B 参考文献](../附录/B-参考文献.md) 新增「LLM API 协议与网关（深入 17）」一手资料分区（Anthropic Messages/Tool use/Streaming/MCP connector、OpenAI Responses/Migrate/Streaming/Function calling/Remote MCP/Chat Completions、MCP 官方规范）。
+
+### 结构性改进 · 让"最不会朽的那层"成为承重墙
 
 一轮针对全书"飞跃幸存律"落差的修订：本书已有漂移度/维护系统来标记会朽的内容，但纪律用得不均匀，且把最不会朽的那层（真理本身、角色制度化、训练层）建得偏薄。这轮把六处补齐，并把新纪律写进规范。
 
@@ -30,8 +45,6 @@ tags: [meta, changelog]
 - **训练层提为主产品** — 修复元数据：25 个 Unit 文件 `part-3`→`part-4`（Unit 属第四部分，原误标为第三部分）。[前言](../00-前言.md)/[README](../README.md) 把贯穿项目前置为第四部分主干、点明产出可用于面试/晋升。6 个 Unit 总览各加「骨架/载体」两栏表（训练意图永久 vs 当期工具可替换）。
 - **补厚耐久洞见** — [第 3 章](../理念/03-学习能力才是新的护城河.md) 黑暗期补可操作判据（能提出可验证假设→去查证；提不出→继续熬）；[第 2 章](../理念/02-SRE架构师的角色迁移.md) 补"会判断 vs 会做"的分界线（能否被追责地外包）；[第 8 章](../知识/08-组织与判断力.md) 把"组织判断力是硬能力"从否定清单拎进正文立节，并修 L26"软能力组"↔"很硬"的矛盾；[附录 C 术语表](../附录/C-术语表.md) 轻量分两层（第一性术语 vs 当前产品/参数名词）。
 - **把新纪律写进规范** — [样式指南](../样式指南.md) 新增 §14 快照单一事实源 / §15 自失效触发器 / §16 术语两层制与 part-N 约定，并补 3 条检查清单项；[更新模板](更新模板.md) 自检清单加"改快照数字必回改源章节""强建议带自失效触发器"两条。
-
-> **未 bump 版本号**：以上为结构性/质量修订，未新增独立章节。版本号留待下一次正式 `/release` 统一提升。
 
 ---
 

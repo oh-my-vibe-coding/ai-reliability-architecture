@@ -1,6 +1,6 @@
 ---
 title: 附录 B · 一手材料与参考文献
-updated: 2026-05-10
+updated: 2026-06-30
 tags: [appendix]
 ---
 
@@ -48,6 +48,11 @@ tags: [appendix]
 - Anthropic / Claude Docs · Models、Prompt engineering、Extended thinking、Tool use、Prompt caching
 - OpenAI Platform Docs · Models、Responses API、Function calling、Structured outputs、Reasoning、Prompt caching
 - Google Gemini API Docs · Models、Text generation、Long context、Thinking、Function calling、Live API
+
+## LLM API 协议与网关（深入 17）
+- Anthropic API Docs · Messages API、Tool use（how tool use works）、Streaming、MCP connector
+- OpenAI Platform Docs · Responses API reference、Migrate to the Responses API、Streaming responses、Function calling、Remote MCP、Chat Completions reference
+- Model Context Protocol（MCP）· 官方规范 modelcontextprotocol.io
 
 ## 复合 AI 系统（Unit 4）
 - Chip Huyen · 《Agents》（huyenchip.com, 2025）

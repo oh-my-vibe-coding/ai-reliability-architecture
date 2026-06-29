@@ -1,6 +1,6 @@
 ---
 title: 代码 02 · 最小 Agent · 教学指南
-updated: 2026-05-24
+updated: 2026-06-30
 tags: [code, guide, agent, tool-use]
 ---
 
@@ -81,6 +81,23 @@ devfs          196K  196K     0 100% /dev
 - 每次 iteration 对应一次 API 调用
 - `stop_reason="tool_use"` 触发工具执行，`stop_reason="end_turn"` 结束
 - Loop 有 `max_iterations=10` 的硬上限
+
+### 这个 demo 真正在教什么：harness loop
+
+这个例子表面上是在教 Claude tool use，实际上更重要的是在教 **harness loop**：
+
+```text
+模型提出动作意图
+  → harness 校验权限 / 白名单 / 预算
+  → harness 执行工具
+  → harness 回灌 tool_result
+  → harness 记录 trace / usage / 错误
+  → 模型继续或结束
+```
+
+换成 OpenAI 也一样。`02-openai-agent.py` 里字段名变成 `tool_calls`、`tool_call_id`、`finish_reason`，但循环结构没有变。生产系统真正要抽象的是这层 harness：工具注册、权限执行、超时、取消、审计、脱敏、budget，而不是某一家 API 的字段名。
+
+这也是为什么本 demo 的白名单、`max_iterations`、timeout 和 tool result 清洗，比"模型会不会调用工具"更值得学。模型只是在协议里表达"我想做什么"；宿主 harness 才决定它能不能做。
 
 ---
 
