@@ -64,6 +64,9 @@ tags: [appendix]
 | Compound AI System | 由多步推理、工具调用、检索组成的复合系统 |
 | Step Budget | 一条 Agent 链路允许的最大推理步数 |
 | Verifier / Gate | 在链路中插入的校验节点，用于截断错误累积 |
+| 并行维度（TP / PP / EP / DP） | 把单卡装不下的大模型摊到多卡的四种切法：**TP**（张量并行，切层内权重、降单请求延迟、每 token 多次 all-reduce、只能待 NVLink 域内）、**PP**（流水线并行，按层分段、跨节点装大模型、有流水线气泡）、**EP**（专家并行，MoE 专用、把专家摊到多卡、每 MoE 层 all-to-all）、**DP**（数据并行，整个单元复制、加吞吐但不省显存）。铁律：`总卡数 = TP×PP×DP（MoE 再 ×EP）`，TP 在节点内、PP/DP/EP 跨节点。详见 [深入 20](../深入/20-单卡装不下的大模型分布式推理.md) |
+| PD 解耦（Prefill/Decode Disaggregation） | 把 prefill（吃算力、容忍延迟）和 decode（吃带宽、延迟敏感）放到两个独立 GPU 池，各用最合适的硬件与并行度，中间传 KV cache。目标是 **goodput**（同时满足 TTFT 与 TPOT 两个 SLO 前提下的每卡有效请求数），而非裸吞吐。详见 [深入 20 · §4](../深入/20-单卡装不下的大模型分布式推理.md) |
+| 互联带宽层级 | 多卡推理的物理地基：**HBM（卡内，TB/s）≫ NVLink/NVSwitch（节点内，百 GB/s 级）≫ InfiniBand/RoCE（跨节点，~50 GB/s/卡）≫ 以太网**。每降一层掉约一个数量级，决定了每种并行"能跨多远"。数字快照见 [深入 20 · §1](../深入/20-单卡装不下的大模型分布式推理.md) |
 
 ---
 

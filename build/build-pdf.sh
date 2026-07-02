@@ -8,7 +8,7 @@
 set -euo pipefail
 
 # --- 配置 ---
-VERSION="${VERSION:-v1.9.1}"
+VERSION="${VERSION:-v1.10.0}"
 OUTPUT_DIR="output"
 OUTPUT_FILE="${OUTPUT_DIR}/AI时代SRE架构师之路-${VERSION}.pdf"
 BUILD_DIR="build"
