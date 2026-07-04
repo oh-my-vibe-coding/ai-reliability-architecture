@@ -1,6 +1,6 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-06-30
+updated: 2026-07-04
 tags: [appendix]
 ---
 
@@ -18,8 +18,8 @@ tags: [appendix]
 
 | 术语 | 含义 |
 |---|---|
-| Token | 模型的最小处理单位，中文 1-2 字/token，英文约 0.75 词/token |
-| Tokenizer 代际差异 | 同一厂商不同代模型可能换 tokenizer，相同字符的 token 数会变。例：Claude Opus 4.7 起换了新 tokenizer，1M context 对应 ~555k 词，而同 1M context 的 Sonnet 4.6 对应 ~750k 词——意味着 Opus 4.7+（含 4.8）的 token 体积比 Sonnet 4.6 大约 1.35×，按 token 计账时要单独估 |
+| Token | 模型的最小处理单位。英文约 0.75 词/token；中文通常每字 1-2 个 token——tokenizer 差异大，中文友好的 tokenizer 可低至 1 token/字以下，分厂商数字见 [科学 04](../科学/04-Tokenization的坑.md) |
+| Tokenizer 代际差异 | 同一厂商不同代模型可能换 tokenizer，相同字符的 token 数会变，按 token 计账时要对每代单独估。例（2026-06 快照 🕒，详见 [科学 04 · §5](../科学/04-Tokenization的坑.md)）：Claude Opus 4.7 起换了新 tokenizer，1M context 对应 ~555k 词，而同 1M context 的 Sonnet 4.6 对应 ~750k 词——意味着 Opus 4.7+（含 4.8）的 token 体积比 Sonnet 4.6 大约 1.35× |
 | Context Window | 一次对话能容纳的最大 token 数 |
 | System Prompt | 贯穿整个对话的指令 / 规则 |
 | Temperature / top-p | 控制输出随机性的采样参数 |
@@ -50,7 +50,7 @@ tags: [appendix]
 
 | 术语 | 含义 |
 |---|---|
-| Lethal Trifecta | 不受信输入 + 工具访问 + 外泄通道三者共存的危险组合 |
+| Lethal Trifecta | 私有数据访问 + 不受信输入 + 外泄通道三者共存的危险组合（Simon Willison 原版三条腿）。工具访问不是独立的一条腿，而是放大器——同时加宽不受信输入的入口和外泄通道的出口。详见 [第 6 章](../知识/06-AI自治与上下文架构约束.md) |
 | Capability-scoped Credentials | 权限按操作范围细分、最小化的凭证 |
 | Blast Radius | 一个操作失败时可能影响的范围 |
 | Reversibility | 操作可回滚的程度，自治分级的核心判据 |
@@ -64,9 +64,11 @@ tags: [appendix]
 | Compound AI System | 由多步推理、工具调用、检索组成的复合系统 |
 | Step Budget | 一条 Agent 链路允许的最大推理步数 |
 | Verifier / Gate | 在链路中插入的校验节点，用于截断错误累积 |
-| 并行维度（TP / PP / EP / DP） | 把单卡装不下的大模型摊到多卡的四种切法：**TP**（张量并行，切层内权重、降单请求延迟、每 token 多次 all-reduce、只能待 NVLink 域内）、**PP**（流水线并行，按层分段、跨节点装大模型、有流水线气泡）、**EP**（专家并行，MoE 专用、把专家摊到多卡、每 MoE 层 all-to-all）、**DP**（数据并行，整个单元复制、加吞吐但不省显存）。铁律：`总卡数 = TP×PP×DP（MoE 再 ×EP）`，TP 在节点内、PP/DP/EP 跨节点。详见 [深入 20](../深入/20-单卡装不下的大模型分布式推理.md) |
+| 并行维度（TP / PP / EP / DP） | 把单卡装不下的大模型摊到多卡的四种切法：**TP**（张量并行，切层内权重、降单请求延迟、每 token 多次 all-reduce、只能待 NVLink 域内）、**PP**（流水线并行，按层分段、跨节点装大模型、有流水线气泡）、**EP**（专家并行，MoE 专用、把专家摊到多卡、每 MoE 层 all-to-all）、**DP**（数据并行，整个单元复制、加吞吐但不省显存）。铁律：`总卡数 = TP×PP×DP`；EP 不是再乘的第五维——MoE 的专家在既有 DP×TP 的同一批卡上重新摊开（如 DeepSeek decode 的 144 卡：attention 走 DP144、路由专家走 EP144）。TP 在节点内、PP/DP/EP 跨节点。详见 [深入 20](../深入/20-单卡装不下的大模型分布式推理.md) |
 | PD 解耦（Prefill/Decode Disaggregation） | 把 prefill（吃算力、容忍延迟）和 decode（吃带宽、延迟敏感）放到两个独立 GPU 池，各用最合适的硬件与并行度，中间传 KV cache。目标是 **goodput**（同时满足 TTFT 与 TPOT 两个 SLO 前提下的每卡有效请求数），而非裸吞吐。详见 [深入 20 · §4](../深入/20-单卡装不下的大模型分布式推理.md) |
 | 互联带宽层级 | 多卡推理的物理地基：**HBM（卡内，TB/s）≫ NVLink/NVSwitch（节点内，百 GB/s 级）≫ InfiniBand/RoCE（跨节点，~50 GB/s/卡）≫ 以太网**。每降一层掉约一个数量级，决定了每种并行"能跨多远"。数字快照见 [深入 20 · §1](../深入/20-单卡装不下的大模型分布式推理.md) |
+| Prompt Registry | 管理 prompt 工件生命周期的"包管理器"：**稳定标识符 + 不可变版本 + 可移动指针（label）**——发布 = 移动指针、回滚 = 指针移回。发布单元是"模板 + 模型版本 + 采样参数 + 工具 schema"（四联版本绑定 Prompt/Model/Embedding/Judge 的 prompt 侧）。详见 [深入 21](../深入/21-Prompt作为运维对象.md) |
+| 回放评审（Backtest） | 从生产 trace 采样真实请求，用候选 prompt / 模型版本重跑并与当前版本成对比较的发布前评审——"用昨天的真实流量预演明天的行为"。详见 [深入 21 · §4](../深入/21-Prompt作为运维对象.md) |
 
 ---
 

@@ -25,12 +25,12 @@
 
 准备：
     # 方案 A: Ollama
-    ollama pull qwen3:7b
+    ollama pull qwen3:8b
     ollama serve
 
     # 方案 B: vLLM
     python -m vllm.entrypoints.openai.api_server \\
-        --model Qwen/Qwen3-7B-Instruct \\
+        --model Qwen/Qwen3-8B \\
         --enable-auto-tool-choice \\
         --tool-call-parser hermes
 """

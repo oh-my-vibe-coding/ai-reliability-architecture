@@ -6,7 +6,7 @@ OpenAI 版本的 Prompt Caching 示范（对照 01-claude-caching.py）。
 ⚠️  快照提示
 --------------------------------------------------
 本文件包含模型名、定价、厂商能力等快变信息。
-内容快照日期为 2026-05-05；实际选型或上线前，请以厂商
+内容快照日期为 2026-07-04；实际选型或上线前，请以厂商
 官方 pricing 和当前生产验证为准：
     https://openai.com/api/pricing
     https://platform.openai.com/docs/models
@@ -14,11 +14,11 @@ OpenAI 版本的 Prompt Caching 示范（对照 01-claude-caching.py）。
 
 关键差异（vs Anthropic）：
 - OpenAI 是**自动 caching**，不需要 cache_control 显式标记
-- 最小 token 数 1024（和 Anthropic 相同）
-- 折扣只有 50%（Anthropic 是 90%）
+- 最小 token 数 1024（Anthropic 随模型 512–4096 不等）
+- 折扣按代际：gpt-4o 代 50%、GPT-4.1 代 75%、GPT-5 系 90%
 - 不分写入/读取，没写入额外成本
 
-对应章节：深入 02 · §3（三家对比）
+对应章节：深入 02 · §4（三家对比）
 """
 
 import os
@@ -62,19 +62,22 @@ def ask_with_caching(question: str):
     return response.choices[0].message.content
 
 
-# ---- 成本对照（近似，2026-05）----
+# ---- 成本对照（近似，2026-07）----
 # OpenAI GPT-5 mini:
 #   - 常规输入: $0.25/MTok
-#   - 缓存输入: $0.125/MTok（折扣 50%）
+#   - 缓存输入: $0.025/MTok（折扣 90%——GPT-5 系口径；gpt-4o 代只有 50%）
 # Anthropic Sonnet 4.6:
 #   - 常规输入: $3/MTok
 #   - 缓存写入: $3.75/MTok（+25%）
 #   - 缓存读取: $0.30/MTok（折扣 90%）
 #
-# 规模化场景下：
-# - 重用次数少（<5）: OpenAI 自动 caching 更省心
-# - 重用次数多（>10）: Anthropic 的 90% 折扣更省钱
+# 规模化场景下（对端为 GPT-5 系时读取折扣打平，都省 90%）：
+# - 低重用 / 低频场景: OpenAI 更划算（无写入溢价，可选 24h 延长保留）
+# - 对端是 gpt-4o / GPT-4.1 代且高重用: Anthropic 反而更省钱
 
+# ⚠️ 运行前：把 SYSTEM_PROMPT / LARGE_CONTEXT 替换为真实长文本（合计 ≥1024 token）。
+# 仓库里是几十 token 的占位文本，低于 OpenAI 最小缓存门槛（1024，自动缓存不生效），
+# 直接运行两次调用的 cached_tokens 都会是 0，下面的"部分命中"不会出现。
 if __name__ == "__main__":
     print("=== 第一次调用（无缓存）===")
     ask_with_caching("系统 CPU 使用率 90% 该怎么排查？")

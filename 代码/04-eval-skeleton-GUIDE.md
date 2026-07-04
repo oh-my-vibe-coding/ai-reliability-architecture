@@ -1,6 +1,6 @@
 ---
 title: 代码 04 · Eval Pipeline 骨架 · 教学指南
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [code, guide, eval, pydantic]
 ---
 
@@ -70,16 +70,16 @@ L2 scores: {'relevance': 8.5, 'safety': 9.0, 'completeness': 8.0}
 ### A · Pydantic ValidationError
 
 ```
-pydantic.ValidationError: 1 validation error for RunbookResponse
-steps -> 0 -> safety
-  value is not a valid enumeration member
+pydantic_core._pydantic_core.ValidationError: 1 validation error for RunbookResponse
+steps.0.safety
+  Input should be 'low', 'medium' or 'high' [type=literal_error, input_value='critical', input_type=str]
 ```
 
 模型输出的 schema 不对。这是 **L1 catch 到了的问题**——它就是为此设计的。
 
 **修复方向**：
 - 调 prompt 明确 enum 值
-- 用 Anthropic 的 JSON mode 强制 schema
+- 用 Anthropic 的 Structured Outputs（`output_config.format` 指定 json_schema，或 `client.messages.parse()` 直接绑 Pydantic 模型）强制 schema
 - 加重试机制（L1 fail → 用更严 prompt 重问）
 
 ### B · JSON 解析失败
@@ -132,6 +132,10 @@ except (json.JSONDecodeError, TypeError):
 
 生产上要**统计这种失败率**——如果 > 5%，说明 judge prompt 不够明确。
 
+### E · KeyError: '"relevance"'——`.format()` 与 JSON 花括号冲突
+
+如果你在 judge prompt 里写了 JSON 示例（`{"relevance": int, ...}`），又用 `.format()` 注入变量，Python 会把示例里的花括号也当成占位符，直接抛 `KeyError`。修复：把示例的花括号转义成双写（`{{"relevance": int, ...}}`），或改用字符串拼接注入。改造任务里要求你改 judge prompt——这是最容易踩的一类模板注入 bug。
+
 ---
 
 ## 4. 改造任务
@@ -143,6 +147,7 @@ except (json.JSONDecodeError, TypeError):
 - 每周让人工给 20 条样本打分
 - 计算 **agreement rate**：`|human - judge| <= 1` 的比例
 - agreement < 70% → 暂停 judge 自动决策
+- 进阶：本骨架用 1-10 分演示对齐度计算；生产建议 binary 标签制（[深入 06 · §2.1](../深入/06-Eval-Pipeline设计.md)）——把 judge 输出改成 pass/fail 并重算 κ，是最有价值的改造练习
 
 **思考**：N = 20 够吗？什么时候需要更多？
 
@@ -180,7 +185,7 @@ def on_failure(sample, l1_result, l2_result):
     })
 ```
 
-**关键**：配合 [Data Flywheel](../深入/06-Eval-Pipeline设计.md#5--data-flywheelseval--改进--再-eval-的循环) 的完整闭环。
+**关键**：配合 [Data Flywheel](../深入/06-Eval-Pipeline设计.md#5-data-flywheeleval--改进--再-eval-的循环) 的完整闭环。
 
 ### 任务 5 · 多 Judge Ensemble（较难）
 
@@ -248,7 +253,7 @@ Judge 模型的 agreement rate 掉到 55% 你会怎么处理？
 - 或者在 rubric 里加"简洁度"作为一个负向维度
 - 严重时换 judge 模型
 
-参考 [深入 06 · §2.1](../深入/06-Eval-Pipeline设计.md) 的对齐度追踪和偏见。
+参考 [深入 06 · §2.2-§2.3](../深入/06-Eval-Pipeline设计.md) 的 judge 工程纪律与对齐度追踪。
 
 </details>
 
@@ -268,7 +273,7 @@ Judge 模型的 agreement rate 掉到 55% 你会怎么处理？
 - 正常服务**不 degrade**（eval 是观察者）
 - 但失去"线上质量监控"，风险上升
 
-**错误预算**：1 小时挂机扣 10% 月度 budget。超预算 = 需要改 eval 基础设施。
+**错误预算**：1 小时挂机 ≈ 消耗 28% 月度 budget（99.5% uptime → 216 分钟/月，见深入 06 §4 算例）。超预算 = 需要改 eval 基础设施。
 
 </details>
 

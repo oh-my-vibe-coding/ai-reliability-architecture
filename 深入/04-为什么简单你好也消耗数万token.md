@@ -1,6 +1,6 @@
 ---
 title: 深入 04 · 为什么简单"你好"也会让 LLM 消耗数万 Token
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [deep-dive, tokens, agent-architecture, cost]
 ---
 
@@ -212,7 +212,7 @@ pie title 一次"你好"请求的 token 分布
 
 ### 如果不用缓存
 
-每说一次"你好"，按 Claude Sonnet 4.6 $3/MTok 输入价计算：
+每说一次"你好"，按 Claude Sonnet 4.6 输入价 $3/MTok（取[深入 03 §3.1](03-模型与工具场景化最佳实践.md) 的 2026-07 快照价；量级参考另见[深入 18](18-LLM成本工程.md)）计算：
 
 - 14,650 token × $3/MTok = **$0.044 每次**
 - 一天说 100 次 = $4.4/天
@@ -233,12 +233,12 @@ Anthropic 缓存：**写入 1.25×，读取 0.1×**（见[深入 02](02-Prompt-C
 
 ### DeepSeek V4 Flash 更夸张
 
-- Cache-hit 输入：$0.0028/MTok
+- Cache-hit 输入：$0.0028/MTok（深入 03 2026-07 快照价）
 - 14,650 token 命中成本：**$0.00004** 每次
-- 比传统 API 便宜 50-100×
+- 与自身 cache-miss 价 $0.14/MTok 相比差 50×（口径同深入 03）；与 Claude Sonnet 4.6 无缓存输入价 $3/MTok 相比约差三个数量级
 
 > [!TIP]
-> **这是国产推理服务能做到超低价的核心原因**——大规模缓存共享 + cache-hit 定价差异。
+> **这是国产推理服务能做到超低价的核心原因之一**——自动前缀缓存默认开启 + cache-hit 定价把 KV 复用的成本直接让利给用户（缓存按用户隔离，不跨用户共享）。
 
 ---
 
@@ -248,11 +248,11 @@ Anthropic 缓存：**写入 1.25×，读取 0.1×**（见[深入 02](02-Prompt-C
 
 答案：**有一些厂商在做，但不普及**，且有工程代价。
 
-### 5.1 Anthropic 的 `prompt_cache`（客户端显式管理）
+### 5.1 Anthropic 的 Prompt Caching（`cache_control`，客户端显式管理）
 缓存仍然在服务端，但客户端要**每次都发完整 prompt**，匹配靠 prefix。**客户端视角没"减负"**。
 
-### 5.2 OpenAI 的 Assistants API v2 / Responses API
-服务端存储 thread、tools、files。客户端只发增量。
+### 5.2 OpenAI 的 Responses API（其前身 Assistants API 已宣布弃用）
+服务端存储对话状态、tools、files。客户端只发增量。
 - **优点**：客户端轻
 - **缺点**：
   - 失去可控性（不知道 prompt 到底长啥样）
@@ -261,8 +261,8 @@ Anthropic 缓存：**写入 1.25×，读取 0.1×**（见[深入 02](02-Prompt-C
   - 不适合跨厂商的 Agent 框架
 
 ### 5.3 Google Gemini Context Caching
-显式创建 cached content，按时间付费。**客户端要先 create，再引用 ID**。
-- 适合：单次大 context，大量复用
+隐式缓存已默认开启（行为类似 OpenAI 的自动缓存，客户端照发全量 prompt）；真正给客户端"减负"的是显式路径：创建 cached content、按存储时长付租金，**客户端要先 create，再引用 ID**。
+- 适合：单次大 context，大量复用（显式路径的主场）
 - 不适合：对话场景的动态上下文
 
 ### 结论
@@ -415,7 +415,7 @@ if input_tokens > budget_per_request:
 
 ## 8. 常见陷阱
 
-- ❌ **每次把当前时间塞 system prompt 前面**：缓存每次失效，账单翻倍（参见[深入 02 · 缓存失效](02-Prompt-Caching原理.md#4-缓存何时失效)）
+- ❌ **每次把当前时间塞 system prompt 前面**：缓存每次失效，账单翻倍（参见[深入 02 · 失效的七种形态](02-Prompt-Caching原理.md#5-缓存什么时候作废失效的七种形态)）
 - ❌ **`CLAUDE.md` 越长越好**：错。长到没人读的 `CLAUDE.md` 只在付钱，不在赋能
 - ❌ **把 user_id 放 prompt 开头做"个性化"**：每个用户独享缓存，命中率归零
 - ❌ **工具注册一大堆但 90% 用不上**：token 都在白占
@@ -444,7 +444,7 @@ if input_tokens > budget_per_request:
 - Anthropic · Prompt Caching docs · https://platform.claude.com/docs/en/docs/build-with-claude/prompt-caching
 - Anthropic · Building effective agents · https://www.anthropic.com/research/building-effective-agents
 - OpenAI · Prompt Caching · https://platform.openai.com/docs/guides/prompt-caching
-- OpenAI · Assistants API / Responses API · https://platform.openai.com/docs/
+- OpenAI · Responses API · https://platform.openai.com/docs/api-reference/responses
 - Google · Gemini Context Caching · https://ai.google.dev/gemini-api/docs/caching
 - DeepSeek · Context Caching · https://api-docs.deepseek.com/guides/kv_cache
 

@@ -1,6 +1,6 @@
 ---
 title: Unit 5 · Week 1 · 数值级原理 + 复现实验
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit5, week]
 ---
 
@@ -27,7 +27,7 @@ tags: [part-4, practice, unit5, week]
 > - URL: https://colab.research.google.com/
 >
 > **选项 B · 更小的模型**
-> - Qwen3-1.5B / Phi-3-mini 在 MacBook 上可跑（bf16 或 int8）
+> - Qwen3-1.7B / Phi-4-mini 在 MacBook 上可跑（bf16 或 int8）
 > - 不够 frontier 但**足够展示数值层现象**
 > - 用 `transformers` 或 `mlx`（Apple Silicon 专用，推理飞快）
 >
@@ -66,8 +66,8 @@ tags: [part-4, practice, unit5, week]
 
 ```python
 # 伪代码示意
-model_bf16 = load_model("llama-3-7b", dtype=torch.bfloat16)
-model_fp32 = load_model("llama-3-7b", dtype=torch.float32)
+model_bf16 = load_model("llama-3-8b", dtype=torch.bfloat16)
+model_fp32 = load_model("llama-3-8b", dtype=torch.float32)
 
 prompts = [
     # 挑 20 条你自己场景的样本
@@ -129,28 +129,29 @@ outputs = [generate(model, prompt, temp=0, seed=42) for _ in range(10)]
 **低配替代（路线 C）**：
 
 ```python
-# 纯 PyTorch CPU 展示 reduce op 的非确定性
+# 纯 PyTorch CPU 展示非确定性的根因：浮点加法不满足结合律
 import torch
 
-torch.use_deterministic_algorithms(False)  # 默认
-x = torch.randn(1000, 1000)
+torch.manual_seed(0)
+x = torch.randn(10_000_000)
 
-results = []
-for _ in range(10):
-    # 某些 reduction op 在 CPU 上也可能非确定（特别是 atomic add）
-    r = torch.nn.functional.softmax(x @ x.T, dim=-1).sum()
-    results.append(r.item())
+# 同一组数，三种求和顺序
+print(x.sum().item())                # 原始顺序
+print(x.flip(0).sum().item())        # 倒序
+print(x.sort().values.sum().item())  # 按大小排序后求和
 
-# 打印差异（一般 CPU 上会相同，但说明 kernel 确定性是配置出来的，不是天然的）
-print(f"结果: {results}")
-print(f"差异: {max(results) - min(results)}")
+# 观察：三个结果的尾数不同（实测一例：519.51935 / 519.51978 / 519.5，
+# 具体数值随环境有差异）——同一组浮点数，加法顺序变了，结果就变了。
+# GPU kernel 非确定的根因正在这里：atomic add 的执行顺序由调度决定，
+# 每次运行可能不同，等价于每次换一种求和顺序
 
-# 对比：开确定性模式
-torch.use_deterministic_algorithms(True, warn_only=True)
-# 重跑——某些 kernel 会拒绝运行（抛异常提示"no deterministic version"）
+# 对比：开严格确定性模式
+torch.use_deterministic_algorithms(True)
+# 只有实际调用到官方文档列表里的非确定 op 才会抛异常——
+# matmul / softmax 有确定性实现，照常运行，不要期待这里报错
 ```
 
-**意义**：即使不跑大模型，也能**亲手见证 PyTorch 哪些 op 默认非确定**——这是 runbook 里关键一节。
+**意义**：即使不跑大模型，也能**亲手见证非确定性的根因**——浮点加法顺序不同结果就不同，GPU 上调度顺序不受你控制。这是 runbook 里关键一节。
 
 #### 实验 C · 长 context 的精度累积
 
@@ -165,24 +166,25 @@ long_ctx = "..." * 50000 tokens
 **低配替代（路线 C）**：
 
 ```python
-# 纯矩阵层面模拟：长序列的 softmax 累积精度损失
+# 纯矩阵层面模拟：长序列下 bf16 attention 的精度损失
 import torch
 
-def simulate_attention(seq_len: int, dtype):
-    # 伪 attention: Q @ K^T 后 softmax
-    Q = torch.randn(1, seq_len, 64).to(dtype)
-    K = torch.randn(1, seq_len, 64).to(dtype)
-    scores = (Q @ K.transpose(-1, -2)) / (64 ** 0.5)
-    return torch.nn.functional.softmax(scores, dim=-1)
-
-# 对比 bf16 vs fp32 在不同序列长度下的偏差
+# 固定 seed，只在 fp32 生成一份 Q/K/V；bf16 路径转换同一份数据——
+# 两条路径必须喂相同输入，diff 才是精度差，而不是两组无关随机数之差
 for seq_len in [128, 1024, 8192]:
-    a = simulate_attention(seq_len, torch.bfloat16).float()
-    b = simulate_attention(seq_len, torch.float32)
-    diff = (a - b).abs().mean()
-    print(f"seq_len={seq_len}, mean abs diff = {diff:.6f}")
+    torch.manual_seed(42)
+    Q = torch.randn(1, seq_len, 64)
+    K = torch.randn(1, seq_len, 64)
+    V = torch.randn(1, seq_len, 64)
+    out_fp32 = torch.softmax((Q @ K.transpose(-1, -2)) / (64 ** 0.5), dim=-1) @ V
+    Qb, Kb, Vb = Q.to(torch.bfloat16), K.to(torch.bfloat16), V.to(torch.bfloat16)
+    out_bf16 = (torch.softmax((Qb @ Kb.transpose(-1, -2)) / (64 ** 0.5), dim=-1) @ Vb).float()
+    rel = ((out_bf16 - out_fp32).abs() / (out_fp32.abs() + 1e-9)).mean()
+    print(f"seq_len={seq_len}, 平均相对误差 = {rel:.4f}")
 
-# 观察：seq_len 越大，bf16 的累积误差越明显
+# 观察：相对误差随 seq_len 上升（实测约 0.025 → 0.044）
+# 注意必须看相对误差：softmax 的每个概率约按 1/seq_len 缩小，
+# 绝对误差会被稀释得越来越小，只看绝对误差会得出相反结论
 # 这就是"长 context 更容易出数值问题"的数学本质
 ```
 
@@ -209,7 +211,7 @@ for seq_len in [128, 1024, 8192]:
 
 ## 周末自检
 
-- [ ] 至少跑完**两个实验**（可以不是上面三个的其中两个）
+- [ ] 至少跑完**两个实验**（不必限于上面三个，可自行设计等价实验）
 - [ ] 记录了具体的观察
 - [ ] 实验可被**重复跑**（代码 / seed / 环境都记录了）
 - [ ] 能解释**生产场景下这些问题如何暴露**

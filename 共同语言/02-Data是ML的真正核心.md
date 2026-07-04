@@ -1,6 +1,6 @@
 ---
 title: 共同语言 02 · Data 是 ML 的真正核心
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [shared-language, data, pipeline, contamination]
 ---
 
@@ -233,13 +233,15 @@ SRE 能帮上什么：
 |---|---|---|---|
 | **Response-only** | 最终答案 | 回答风格 | Alpaca / Vicuna（用 GPT-4 回答训 LLaMA）|
 | **Trace-level** | 完整思考链 | 推理能力 | DeepSeek-R1 distilled → Qwen/Llama 小模型 |
-| **Reward-model** | "这个回答打 8 分" | 判断力 | RLHF 里的 reward model 本质上也是一种蒸馏 |
+| **Reward-model** | "这个回答打 8 分" | 判断力 | RLAIF / Constitutional AI（强模型当 AI 评委打偏好分，蒸成小 reward model）|
+
+注意区分：经典 RLHF 的 reward model 从**人类**偏好标注学习，没有教师模型，属于普通监督学习——不算蒸馏。只有当打分的是强模型（RLAIF、Constitutional AI 的 AI 反馈），再把这种判断力蒸进小 reward model 时，才属于这一形态。
 
 **三种形态的"人话"对照**：
 
 > - Response-only：学生抄了老师的标准答案——格式像、风格像，但遇到没见过的题就不会。
 > - Trace-level：学生看了老师的解题草稿——知道怎么一步步推，换道类似的题也能自己推。
-> - Reward-model：学生没看老师做题，而是看了老师给全班作业打的分数——学会了"什么样的是好回答"的判断力。
+> - Reward-model：学生没看 AI 老师做题，而是看了它给全班作业打的分数——学会了"什么样的是好回答"的判断力。
 
 **对 SRE 意味着什么**：
 
@@ -271,7 +273,7 @@ SRE 能帮上什么：
 
 ### 7.3 SRE 要知道的
 
-- **合成数据的成本**：生成 1B token 的 Claude/GPT 数据可能 **$500K-$5M**
+- **合成数据的成本**：自己算一笔账——1B 输出 token × $15-25/MTok（旗舰档定价以[深入 03](../深入/03-模型与工具场景化最佳实践.md) 的快照为准）≈ $1.5-2.5 万；verify-then-train 常见 10-20× 过采样（生成十条只留一条），叠加长 prompt 与验证开销后通常落在**十几万到数十万美元**；保留率高或改用低价档位时能压到数万。离线生成走 Batch API 还能再省 50%（三家官方口径一致；Anthropic 上叠加 prompt caching 后综合节省更高，见[深入 18](../深入/18-LLM成本工程.md)）
 - **合成数据的 quality control**：也是 eval pipeline 问题
 - **合法性**：用 OpenAI 输出训 LLM **违反 OpenAI 条款**（很多公司还是做了）
 

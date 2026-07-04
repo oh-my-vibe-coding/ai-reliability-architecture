@@ -1,6 +1,6 @@
 ---
 title: Unit 1 · Week 3 · 自治分级表
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit1, week]
 ---
 
@@ -16,9 +16,9 @@ tags: [part-4, practice, unit1, week]
 （simonwillison.net/2025/Sep/30/designing-agentic-loops/）
 
 重点关注：
-- 他怎么定义"agentic loop"和"autonomous loop"
-- 哪些操作他明确说"永远不要让 AI 自己做"
-- "reversibility"（可回滚性）为什么是分级的核心判据
+- 他怎么定义 LLM agent（"runs tools in a loop to achieve a goal"），以及无人值守的 YOLO mode 有哪三个风险（误删改坏文件、源码与密钥被窃、机器被当成攻击跳板）
+- 想开 YOLO mode 时，他给的三个选项（安全沙箱 / 用别人的电脑 / 直接冒险）各接受了什么残余风险；tightly scoped credentials（staging 环境 + 预算封顶）和把网络锁到可信主机白名单，又各砍掉了哪类风险
+- 文中没有"永远不要让 AI 做 X"的清单，也没出现 reversibility 这个词。做一道归纳题：从他的实际做法（专开一个 $5 预算封顶的 Fly org、只在隔离环境里做加删索引这类操作）反推，他不肯放进无人值守循环的是哪类操作——他的判据更像可回滚性、blast radius 可控，还是花费封顶？带着你的答案做本周的分级表
 
 ## 产出 · B2 · 60 分钟（不用 AI 写）
 

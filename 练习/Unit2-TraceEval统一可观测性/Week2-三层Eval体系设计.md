@@ -1,6 +1,6 @@
 ---
 title: Unit 2 · Week 2 · 三层 Eval 体系设计
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit2, week]
 ---
 
@@ -28,6 +28,7 @@ tags: [part-4, practice, unit2, week]
 
 **对照读**：OpenAI Evals 仓库 README + 一个 example
   - URL: https://github.com/openai/evals
+  - 注：该仓库已停止活跃维护（2026-05 快照 🕒）——读它是为了理解 eval template 的结构范式，不是工具选型对象。
 
 **关注**：
 - Langfuse 怎么把 trace 直接变成 eval 样本？

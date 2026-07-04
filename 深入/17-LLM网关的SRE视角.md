@@ -1,6 +1,6 @@
 ---
 title: 深入 17 · LLM 网关的 SRE 视角
-updated: 2026-06-30
+updated: 2026-07-04
 tags: [deep-dive, gateway, sre, multi-provider, observability]
 ---
 
@@ -69,7 +69,7 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 
 普通 HTTP trace 一个 span 一个请求即可。LLM 流式请求**必须**记录：
 
-- 首 token 的时间点（用于 `ttft_model_ms`，参见[深入 01 · TTFT 四段归因](01-首包延迟与吞吐的影响因素.md#110-网关位的-ttft-四段归因gateway-side-attribution)）
+- 首 token 的时间点（用于 `ttft_model_ms`，参见[深入 01 · TTFT 四段归因](01-首包延迟与吞吐的影响因素.md#310-网关位的-ttft-四段归因gateway-side-attribution)）
 - 流期间的 token 增量心跳（每 N 个 token 或每 N 秒一次 span event）
 - 流结束原因：正常 stop / 客户端断开 / 上游异常 / 网关主动断（参见 [深入 10 · Pattern 16 · Zombie Stream](10-AI系统事故模式库.md#pattern-16--zombie-stream伪存活流)）
 
@@ -142,11 +142,11 @@ response:
 
 ### 3.4 计费字段的不一致
 
-参见 [深入 02 · 5.5 多上游网关位的特殊风险](02-Prompt-Caching原理.md#55-多上游网关位的特殊风险语义不一致--计费陷阱)。这里再强调一句：**网关计费日志的字段集是"所有上游字段的并集，不是交集"**——任何一家上游有的字段都要留位置，没有就填 0。否则月底对账就会出现"账面少了 X% 的缓存命中收入"这类事故，且无法追溯。
+参见 [深入 02 · 6.5 多上游网关位的特殊风险](02-Prompt-Caching原理.md#65-多上游网关位的特殊风险)。这里再强调一句：**网关计费日志的字段集是"所有上游字段的并集，不是交集"**——任何一家上游有的字段都要留位置，没有就填 0。否则月底对账就会出现"账面少了 X% 的缓存命中收入"这类事故，且无法追溯。
 
 ### 3.5 同名模型不一定是同一个模型
 
-`gpt-4o-2024-08-06` 在 OpenAI 直连和 Azure OpenAI 上**实际行为可能不同**——Azure 有自己的 safety layer 和路由策略。`claude-3-5-sonnet` 在 Anthropic 直连和 AWS Bedrock 上**也不同**——延迟特性、错误码、流式行为都有差异。
+`gpt-4o-2024-08-06` 在 OpenAI 直连和 Azure OpenAI 上**实际行为可能不同**——Azure 有自己的 safety layer 和路由策略。你当前的主力模型 ID（写作时如 `claude-sonnet-4.x`）同时挂 Anthropic 直连和 AWS Bedrock，两条通道**也不同**——延迟特性、错误码、流式行为都有差异。重点不在具体型号，而在同一个模型 ID 走了两条通道。
 
 **网关侧必须做的**：
 
@@ -183,7 +183,7 @@ response:
 
 很多组织把"AI 网关"划归"中间件团队"或"API 平台团队"，把"AI SRE"留给"算法/推理团队"。这种切分在 LLM 时代是错的，理由有三：
 
-1. **用户感知的 SLO 在网关位定型**。上游再稳，网关一行流式解析写错（参见 [Pattern 16 · Zombie Stream](10-AI系统事故模式库.md#pattern-16--zombie-stream伪存活流)）就全线崩。所有"用户认为是模型问题"的事故，事后查 80% 都是网关问题。
+1. **用户感知的 SLO 在网关位定型**。上游再稳，网关一行流式解析写错（参见 [Pattern 16 · Zombie Stream](10-AI系统事故模式库.md#pattern-16--zombie-stream伪存活流)）就全线崩。"用户以为是模型问题"的事故，事后追查八成落在网关。
 2. **AI 特有的故障模式集中在网关位**。本书前面 16 个事故 Pattern 里至少有 6 个（Cache Miss Storm、Tokenizer Drift、Cost Explosion via Context、KV Preemption、Batching Spike、Zombie Stream）的最佳观察/拦截点都在网关——不是在模型里。
 3. **计费、路由、限流是 AI SRE 的责任，而它们都长在网关上**。把网关划走等于把可靠性预算的控制权交出去。
 
@@ -236,7 +236,7 @@ network gateway logs (含上面三列)
 
 **可观测**
 
-- [ ] TTFT 按 client/gateway/upstream/model 四段拆分（[深入 01 · 1.10](01-首包延迟与吞吐的影响因素.md#110-网关位的-ttft-四段归因gateway-side-attribution)）
+- [ ] TTFT 按 client/gateway/upstream/model 四段拆分（[深入 01 · 3.10](01-首包延迟与吞吐的影响因素.md#310-网关位的-ttft-四段归因gateway-side-attribution)）
 - [ ] 流式请求有 token 级心跳，不是字节级
 - [ ] 计费日志同时记录 prompt / cache_read / cache_write / completion 四列
 - [ ] 计费日志附 output_hash / finish_reason
@@ -253,7 +253,7 @@ network gateway logs (含上面三列)
 
 **可控**
 
-- [ ] 入口 RPM/TPM 限流 + 上游 inflight token budget 限流（[深入 05 · 陷阱 5](05-LLM推理服务的容量规划.md#陷阱-5在网关层用-rpm-限流等于没做容量保护)）
+- [ ] 入口 RPM/TPM 限流 + 上游 inflight token budget 限流（[深入 05 · 陷阱 5](05-LLM推理服务的容量规划.md#陷阱-5在网关层仅用-rpm-限流相当于没有实施容量保护)）
 - [ ] 流式 N 秒无 token 增量主动断流，不等上层超时
 - [ ] 通道级降级路径已演练（不只是文档）
 
@@ -269,9 +269,9 @@ network gateway logs (含上面三列)
 
 ## 8. 关联与延伸
 
-- [深入 01 · TTFT 四段归因](01-首包延迟与吞吐的影响因素.md#110-网关位的-ttft-四段归因gateway-side-attribution) —— 网关位最重要的 SLI 拆解
-- [深入 02 · 多上游 Caching 风险](02-Prompt-Caching原理.md#55-多上游网关位的特殊风险语义不一致--计费陷阱) —— 缓存语义不一致与计费陷阱
-- [深入 05 · inflight token 限流](05-LLM推理服务的容量规划.md#陷阱-5在网关层用-rpm-限流等于没做容量保护) —— 容量保护的正确抽象
+- [深入 01 · TTFT 四段归因](01-首包延迟与吞吐的影响因素.md#310-网关位的-ttft-四段归因gateway-side-attribution) —— 网关位最重要的 SLI 拆解
+- [深入 02 · 多上游 Caching 风险](02-Prompt-Caching原理.md#65-多上游网关位的特殊风险) —— 缓存语义不一致与计费陷阱
+- [深入 05 · inflight token 限流](05-LLM推理服务的容量规划.md#陷阱-5在网关层仅用-rpm-限流相当于没有实施容量保护) —— 容量保护的正确抽象
 - [深入 10 · Pattern 16 · Zombie Stream](10-AI系统事故模式库.md#pattern-16--zombie-stream伪存活流) —— 网关位独有的伪存活流事故
 - [深入 11 · AI SRE 现实图谱](11-AI-SRE现实图谱.md) —— 真实生产环境的系统/指标/组织边界全景
 - [Unit 2 · Trace-Eval 统一可观测性](../练习/Unit2-TraceEval统一可观测性/总览.md) —— 把这一篇里的可观测要求落到具体设计
@@ -280,4 +280,4 @@ network gateway logs (含上面三列)
 
 ---
 
-上一篇 → [深入 16 · Embedding 服务作为独立运维对象](16-Embedding-服务作为独立运维对象.md)
+← [深入 16 · Embedding 服务作为独立运维对象](16-Embedding-服务作为独立运维对象.md)  ·  [📖 目录](../README.md)  ·  [深入 18 · LLM 成本工程 →](18-LLM成本工程.md)

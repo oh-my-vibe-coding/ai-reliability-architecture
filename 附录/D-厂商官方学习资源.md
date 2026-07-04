@@ -141,7 +141,7 @@ tags: [appendix, training, vendor-official, 📊]
 
 建议**边学本书边挑对应厂商课程做实操**。Table 按 Track 组织：
 
-### Track A · 能力
+### 能力面
 
 | 本书章节 | 推荐对应官方课程 | 为什么 |
 |---|---|---|
@@ -153,9 +153,9 @@ tags: [appendix, training, vendor-official, 📊]
 | [深入 03 · 选型](../深入/03-模型与工具场景化最佳实践.md) | 三大厂 cookbook 各选一个任务动手 | 比 benchmark 更真实的感知 |
 | [深入 06 · Eval Pipeline](../深入/06-Eval-Pipeline设计.md) | Anthropic Course 4 · Prompt Evals | 系统 eval 设计 |
 
-### Track B · 学习（不适用——厂商没有"学习方法"培训）
+### 学习方法（不适用——厂商没有"学习方法"培训）
 
-### Track C · 协作
+### 协作面
 
 | 本书章节 | 推荐对应官方课程 | 为什么 |
 |---|---|---|

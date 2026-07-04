@@ -1,6 +1,6 @@
 ---
 title: 代码 02 · 最小 Agent · 教学指南
-updated: 2026-06-30
+updated: 2026-07-02
 tags: [code, guide, agent, tool-use]
 ---
 
@@ -22,6 +22,7 @@ tags: [code, guide, agent, tool-use]
 - Python 3.10+
 - Anthropic API key
 - 能跑 shell 命令的环境（代码示例用 `uptime`、`df` 等 Linux/macOS 命令；Windows 需改白名单）
+- 注意 `free` 只有 Linux 有，macOS 上这一步会返回 ERROR——不用修，正好观察 Agent 拿到工具报错后怎么继续，这本身就是教学点
 
 ### 安装
 
@@ -44,7 +45,7 @@ export ANTHROPIC_API_KEY=sk-ant-...
 === 例 1：让 Agent 查磁盘 ===
 
 --- Iteration 1 ---
-[Tool call] run_shell({"command": "df -h"})
+[Tool call] run_shell({"command": "df"})
 [Tool result] Filesystem      Size  Used Avail Use% Mounted on
 /dev/disk1s1   466G  120G  346G  26% /
 devfs          196K  196K     0 100% /dev
@@ -66,7 +67,7 @@ devfs          196K  196K     0 100% /dev
 [Tool result] ...
 
 --- Iteration 3 ---
-[Tool call] run_shell({"command": "df -h"})
+[Tool call] run_shell({"command": "df"})
 [Tool result] ...
 
 --- Iteration 4 ---
@@ -78,6 +79,7 @@ devfs          196K  196K     0 100% /dev
 
 **关键观察**：
 - 模型**自主**决定调用哪个工具、调用几次
+- Tool call 里只有命令名（`"df"` 而不是 `"df -h"`）——`-h` 等参数由服务端 `COMMAND_SPECS` 硬编码，模型只能选名字，不能传参数
 - 每次 iteration 对应一次 API 调用
 - `stop_reason="tool_use"` 触发工具执行，`stop_reason="end_turn"` 结束
 - Loop 有 `max_iterations=10` 的硬上限
@@ -127,8 +129,10 @@ devfs          196K  196K     0 100% /dev
 ### C · `tool_use_id` 不匹配
 
 ```
-InvalidRequestError: tool_result_id does not match
+anthropic.BadRequestError: Error code: 400 - unexpected `tool_use_id` found in `tool_result` blocks
 ```
+
+（API 错误体里的 `type` 叫 `invalid_request_error`，但 SDK 抛出的异常类是 `anthropic.BadRequestError`——写 `except` 或搜文档时认后者。）
 
 **原因**：代码里循环处理多个 tool_use block 时，`tool_use_id` 没对应上。
 
@@ -178,7 +182,7 @@ def write_to_scratch(filename: str, content: str) -> str:
 
 方法：
 - 在 system prompt 里要求 JSON schema
-- 或用 Anthropic 的 JSON mode（查 docs）
+- 或用 Anthropic 的 Structured Outputs（`output_config.format` 指定 json_schema，或 `client.messages.parse()` 直接绑 Pydantic 模型）
 
 ### 任务 3 · 多步任务（较难）
 

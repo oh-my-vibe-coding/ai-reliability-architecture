@@ -1,6 +1,6 @@
 ---
 title: 深入 18 · LLM 成本工程
-updated: 2026-06-01
+updated: 2026-07-04
 tags: [deep-dive, cost, finops, token-economics]
 ---
 
@@ -62,7 +62,7 @@ tags: [deep-dive, cost, finops, token-economics]
 ```
 
 **经验口诀**：
-- 一个日均 10 万次调用、每次 5k prompt + 500 completion 的 Sonnet 级应用 → **月成本约 $3k-8k**
+- 一个日均 1 万次调用、每次 5k prompt + 500 completion 的 Sonnet 级应用 → **月成本约 $3k-8k**
 - 加上 Agent 多步调用（×3-10 步）→ **$10k-80k**
 - 加上 128k context 的长文档场景 → **$50k-200k+**
 
@@ -311,7 +311,7 @@ tags: [deep-dive, cost, finops, token-economics]
 ```
 1. Prompt Caching（几乎零成本，50-80% prompt 节省）
    ↓
-2. 批处理迁移（离线任务走 Batch API，60%+ 节省）
+2. 批处理迁移（离线任务走 Batch API——官方折扣以[深入 13](13-离线批量推理.md)快照为准，约五折；叠加 caching / 降档后综合节省可达 60%+）
    ↓
 3. 模型降级路由（意图路由 → 轻量模型，40-60% 节省）
    ↓
@@ -351,4 +351,4 @@ tags: [deep-dive, cost, finops, token-economics]
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 
-← [深入 17 · LLM 网关的 SRE 视角](17-LLM网关的SRE视角.md)  ·  [📖 目录](../README.md)
+← [深入 17 · LLM 网关的 SRE 视角](17-LLM网关的SRE视角.md)  ·  [📖 目录](../README.md)  ·  [深入 19 · 模型服务框架对比 →](19-模型服务框架对比.md)

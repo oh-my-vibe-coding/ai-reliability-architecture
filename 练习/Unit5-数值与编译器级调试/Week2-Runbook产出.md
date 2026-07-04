@@ -1,6 +1,6 @@
 ---
 title: Unit 5 · Week 2 · Runbook 产出
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit5, week]
 ---
 
@@ -35,7 +35,7 @@ tags: [part-4, practice, unit5, week]
 什么情况怀疑是数值级问题？（给 on-call 工程师 5 秒钟扫一眼）
 
 - ✅ 可用性正常 + 延迟正常 + **质量明显降**
-- ✅ 按任务类型分桶的 L2 分 **一个类掉 > 5 分**
+- ✅ 按任务类型分桶的 L2 均分 **一个类掉 > 1.5-2 分**，或跌出该类近 30 天波动带（p5）
 - ✅ 输出长度分布突变
 - ✅ 数字 / 结构化输出错误率涨 3× 以上
 - ✅ 最近**有硬件更换 / CUDA 升级 / 模型量化 / kernel 库升级**
@@ -60,6 +60,7 @@ flowchart TD
     D -->|否| E{某个 batch size 专门差?}
     X3 --> E
     E -->|是| X4[kernel 非确定性<br/>padding 问题]
+    E -->|否| X5[进入最小复现流程<br/>见 W1 方法论，收集证据后升级]
 ```
 
 #### 页 3 · 数值层诊断命令集
@@ -171,7 +172,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 
 ---
 
-**完成 Unit 5 = 完成整本书的 Track A 闭环**。
+**完成 Unit 5 = 完成整本书训练主线的闭环**。
 
 **下一步（强烈建议）** → [🏆 Capstone · AI 操作生产架构评审包](../Capstone-AI生产架构评审包.md)
 

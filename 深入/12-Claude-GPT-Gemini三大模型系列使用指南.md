@@ -1,6 +1,6 @@
 ---
 title: 深入 12 · Claude / GPT / Gemini 三大模型系列使用指南
-updated: 2026-06-30
+updated: 2026-07-02
 tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 ---
 
@@ -105,7 +105,7 @@ Gemini 当前的分层（2026-06 快照）：
 - **Gemini 3.1 Flash Live / TTS**：语音、视频、实时双向交互。
 - **Gemini Deep Research / Antigravity Agent / Computer Use Preview**：Google 体系下的"托管式 Agent"分支，对应 Anthropic 的 computer use、OpenAI 的 Codex。
   - **Computer Use Preview**（`gemini-2.5-computer-use-preview-10-2025`）：让 Gemini 直接驱动浏览器/操作系统。
-  - **风险**：同时踩到了致命三角的三条线——私有数据 + 不受信内容 + 外部行动。
+  - **风险**：同时踩到了致命三角的三条腿——私有数据访问（上下文/系统里的敏感数据）+ 不受信输入（网页内容）+ 外泄通道（对外请求/表单提交）。
   - **动作**：启用前必须按 [深入 07 · Prompt Injection 红队](07-Agent-Prompt-Injection红队实战.md) 走一轮 egress 防御和权限白名单审计。详见 [第 6 章 · 致命三角](../知识/06-AI自治与上下文架构约束.md)。
 
 Gemini 的工程气质是：**长上下文、多模态、Google 生态整合、Flash 档高性价比**。如果任务里有大量 PDF、视频、图片、表格、长文档，或者你已经在 Google Cloud / Vertex AI 体系里，Gemini 是必须评估的主线。

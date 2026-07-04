@@ -1,6 +1,6 @@
 ---
 title: Bloom 分级说明 · 本书练习的认知层级
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [review, bloom-taxonomy, learning-science]
 ---
 
@@ -35,6 +35,8 @@ tags: [review, bloom-taxonomy, learning-science]
 | **评估 Evaluate** | 判断、审查、挑战 | 审查某架构方案的完备性 |
 | **创造 Create** | 设计、提出、整合 | 为新业务设计 AI 自治策略 |
 
+**"综合"是哪一层**：本书 Unit 目标里写的"综合"是顶层 Create 的工作译名——1956 初版把"整合多个部分、产出新方案"这类行为叫 Synthesis（综合），2001 修订版改名为 Create，而 Unit 产出的本质恰好就是这件事，所以练习各 Unit 总览统一写作"综合（Create）"。下文看到"综合"，对应的就是上表最顶层的"创造"。
+
 ---
 
 ## 2. 本书各类练习的 Bloom 分布
@@ -46,7 +48,7 @@ tags: [review, bloom-taxonomy, learning-science]
 | **章末 self-check** | 记忆 / 理解 | 每章末尾 |
 | **Active Recall 题** | 理解 / 分析 | [Active Recall 题库](Active-Recall题库.md) |
 | **Week 任务** | 应用 | 每周 |
-| **Unit 产出（B2 主产出）** | **综合 / 创造** | 每 Unit 末 |
+| **Unit 产出（B2 主产出）** | **综合（Create）** | 每 Unit 末 |
 | **红队练习** | **评估** | Unit 1 Week 4 |
 | **跨章综合题** | **创造** | Active Recall 题库 · 综合部分 |
 

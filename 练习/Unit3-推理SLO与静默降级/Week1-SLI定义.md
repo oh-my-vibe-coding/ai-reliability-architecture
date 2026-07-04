@@ -1,6 +1,6 @@
 ---
 title: Unit 3 · Week 1 · SLI 定义
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit3, week]
 ---
 
@@ -58,12 +58,14 @@ tags: [part-4, practice, unit3, week]
 
 | SLI | 定义 | 目标 | 告警阈值 |
 |---|---|---|---|
-| KV cache utilization | 显存占比 | < 85% | > 95% |
+| KV cache utilization | 预分配 KV 池的块使用率（vLLM: `gpu_cache_usage_perc`） | < 85% | > 95% |
 | Queue depth | 排队请求数 | < 2× batch_size | > 5× |
 | GPU util | 算力利用率 | ... | ... |
 | Preemption rate | 抢占频率 | < 1% | > 5% |
 | Active concurrency | 同时服务数 | ... | ... |
 | Input size p99 | 输入长度分位 | 监控漂移 | 突增 2× |
+
+**注意**：不要用 `nvidia-smi` 的显存占比当这个 SLI——vLLM 等引擎启动时就预分配约 90% 显存作 KV 池，显存占比常态接近满、与负载无关。
 
 #### Section 3 · 质量类 SLI（最容易忽略）
 
@@ -82,7 +84,7 @@ tags: [part-4, practice, unit3, week]
 - 哪些指标会**同步变化**（一起好 / 一起坏）？
 - 哪些指标会**反向变化**（一个好代表另一个会坏）？
   - 例：cache hit rate 低 → TTFT 飙升
-  - 例：tokens/s 高通常意味着 batch size 大 → TTFT 不稳
+  - 例：服务端聚合 tokens/s 高通常意味着 batch 排得满 → 单请求 TTFT 与流速抖动。注意区分聚合吞吐与单请求速度两个视角（见 [深入 01](../../深入/01-首包延迟与吞吐的影响因素.md) §4.4）——Section 1 定义的 tokens/s SLI 是单请求视角
 
 ### AI 挑错
 

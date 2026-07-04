@@ -1,6 +1,6 @@
 ---
 title: Unit 0 · Week 2 · 本地 RAG
-updated: 2026-05-24
+updated: 2026-07-02
 tags: [part-4, practice, unit0, week]
 ---
 
@@ -21,11 +21,12 @@ tags: [part-4, practice, unit0, week]
   - 不要用 markdown 之外的格式（pdf 会拖累第一次上手）
   - 文档总量 < 1 MB 即可
 - [ ] 选向量库：**SQLite + sqlite-vec** 或 **FAISS**（二选一，本地跑）
-  - **不要上 Pinecone / Weaviate / Milvus** —— 云服务是陷阱，本地跑才能看清楚每一步
+  - **不要上 Pinecone / Weaviate / Milvus** —— 独立部署的服务是第一次上手的陷阱，多一个服务多一层黑盒；嵌入式方案（sqlite-vec / FAISS）才能看清楚每一步
 
 ### 核心编码（3-4 小时，可拆到两个晚上）
 - [ ] 写切分逻辑：按段落或固定 token 数切（500-800 token/片较合理）
-- [ ] 调 embedding API（Anthropic / OpenAI / 本地 bge 都行），把每片转成向量存库
+- [ ] 调 embedding API（OpenAI / Voyage / 本地 bge 都行），把每片转成向量存库
+  - 注意 Anthropic 不提供 embedding API，官方推荐的是 Voyage——别去 Anthropic 文档里找 embedding 端点
 - [ ] 写检索函数：查询 → embedding → 向量库 top-K 相似度搜索 → 返回片段 + 来源路径
 - [ ] 改造上周的 CLI：
   - 用户提问先调检索工具（作为 tool use 的一个工具）

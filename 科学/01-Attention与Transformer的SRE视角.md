@@ -1,6 +1,6 @@
 ---
 title: 科学 01 · Attention 与 Transformer 的 SRE 视角
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [science, transformer, attention, mechanism]
 ---
 
@@ -168,11 +168,11 @@ N 个位置互相算相似度 → **N² 个相似度值**。
 - Head 3 学共指（"它"指代什么）
 - Head N ...
 
-**代价**：N 个 head 就有 N 份 K 和 V → KV cache 大 N 倍。
+**代价**：每个 head 各存一份 K 和 V（每份维度是 d/N）。KV cache 总量 ∝ **KV head 数 × head_dim**——MHA 里 KV head 数被绑死等于 Q head 数，想省 cache 就得从这个乘积下手。
 
 ### GQA：让多个 Q head 共享一组 KV
 
-**问题**：64 个 head 就有 64 份 K 和 V → KV cache 大 64 倍 → 你的 GPU 显存大半被 KV cache 吃掉，能服务的并发数骤降。
+**问题**：64 个 Q head 就意味着 64 个 KV head，长 context、高并发下你的 GPU 显存大半被 KV cache 吃掉，能服务的并发数骤降。
 
 **解决思路**：Q 的差异要大（每个 head 确实该看不同东西），但 **K 和 V 可以少一些**——因为"被查的东西"不需要 64 份不同的索引，8 份就够了。这就是 GQA 的核心直觉。
 
@@ -189,11 +189,17 @@ GQA（Grouped Query Attention）：
 | GQA（KV=8）| 8 | **0.125×** |
 | MQA（KV=1）| 1 | 0.016× |
 
-现代模型（Llama 3、Mistral、Qwen、DeepSeek）**几乎全用 GQA**——这是容量规划[深入 05](../深入/05-LLM推理服务的容量规划.md) 的前提。
+现代模型（Llama 3、Mistral、Qwen）**几乎全用 GQA**——这是容量规划[深入 05](../深入/05-LLM推理服务的容量规划.md) 的前提。DeepSeek 是显眼的例外：它用 MLA 把 KV cache 压得比 GQA 还小（见下一节）。
 
 ---
 
 ## 6. 新变种：SRE 该知道的进化
+
+### MLA（DeepSeek）
+Multi-head Latent Attention：不直接存每个 head 的 K/V，先把它们压成一个低秩 latent 向量存进 cache，用时再展开。
+- **好处**：KV cache 比 GQA 更小——每 token 每层只存一个几百维的 latent，不是 8 份 KV head
+- **代价**：读 cache 后多一步"解压"计算
+- **SRE 含义**：估 DeepSeek 的 KV cache 不能套 GQA 公式（KV head 数 × head_dim）；它的 MLA/EP 部署配置见[深入 20](../深入/20-单卡装不下的大模型分布式推理.md)
 
 ### Sliding Window Attention（Mistral）
 每个位置**只看最近 W 个位置**，不是全部。把 O(N²) 降到 O(N·W)。
@@ -224,7 +230,7 @@ SRE 必须知道的故障面：
 
 **实现上**：要做 `x - max(x)` 保护 → 这个"减 max"操作在 FlashAttention、bf16 实现里**可能出 bug**。
 
-Anthropic 2026 年初的事故就有一部分属于此类——**kernel 实现出 bug 了，softmax 变成近似 argmax，输出质量悄悄降**。
+Anthropic《A postmortem of three recent issues》（2025-09 复盘，事故发生在 2025 年 8-9 月）里的数值 bug 属同一族——XLA:TPU 对 approximate top-k 的误编译叠加 bf16/fp32 精度失配，让采样阶段的 token 选择悄悄偏离预期、指标全绿。注意它出在采样而非 attention softmax，但故障面同类：**kernel 数值 bug → 质量静默下降**。
 
 ### 7.2 bf16 vs fp32 的精度损失
 

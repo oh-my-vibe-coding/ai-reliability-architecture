@@ -1,6 +1,6 @@
 ---
 title: 深入 05 · LLM 推理服务的容量规划
-updated: 2026-06-03
+updated: 2026-07-02
 tags: [deep-dive, capacity-planning, inference, gpu]
 ---
 
@@ -103,9 +103,9 @@ flowchart TD
 
 - 在 H100 上跑 70B bf16，模型权重占 140GB
 - H100 有 80GB HBM → **单卡装不下**，需要 TP=2（两卡共享 140GB 权重，剩余显存放 KV cache）
-- 假设每请求 context 2k token，KV cache 约 1.2 GB/请求
-- 两卡剩余显存 ~20GB ÷ 1.2 GB = **~16 个并发请求**
-- 如果 context 升到 32k，KV cache 变 19.2GB/请求 → **并发跌到 1**
+- 假设每请求 context 2k token，KV cache 约 0.65 GB/请求（用 §2 的公式可复算）
+- 两卡剩余显存扣掉 activation 等预留后约 12 GB（逐项账见 §3）÷ 0.65 GB = **~18 个并发请求**
+- 如果 context 升到 32k，KV cache 变 10.5 GB/请求 → **并发跌到 1**
 
 这就是为什么**"1M context"在实际部署中基本用不满**——显存扛不住。
 
@@ -119,19 +119,21 @@ flowchart TD
 KV cache size per token
   = 2 (K + V)
   × num_layers
-  × num_heads
+  × num_kv_heads
   × head_dim
   × bytes_per_element
 ```
 
+注意是 `num_kv_heads` 不是 attention heads：MHA 模型两者相等；GQA 模型（Llama 3 等）的 KV heads 远少于 Q heads——这正是下面 TIP 讲的省钱秘诀。
+
 ### 典型模型的 KV cache 大小
 
-| 模型 | 层数 | Heads | Head Dim | 每 token (bf16) |
-|---|---|---|---|---|
-| Llama 3 8B | 32 | 32 (KV=8 GQA) | 128 | ~0.13 MB |
-| Llama 3 70B | 80 | 64 (KV=8 GQA) | 128 | ~0.32 MB |
-| Llama 3 405B | 126 | 128 (KV=8 GQA) | 128 | ~0.50 MB |
-| GPT-NeoX 20B | 44 | 64 | 96 | ~1.1 MB |
+| 模型 | 层数 | Q Heads | KV Heads | Head Dim | 每 token (bf16) |
+|---|---|---|---|---|---|
+| Llama 3 8B | 32 | 32 | 8 (GQA) | 128 | ~0.13 MB |
+| Llama 3 70B | 80 | 64 | 8 (GQA) | 128 | ~0.32 MB |
+| Llama 3 405B | 126 | 128 | 8 (GQA) | 128 | ~0.50 MB |
+| GPT-NeoX 20B | 44 | 64 | 64 (MHA) | 96 | ~1.1 MB |
 
 > [!TIP]
 > **GQA（Grouped Query Attention）是 KV cache 省钱的秘诀**。Llama 3 用 `KV heads = 8`（不是 64/128），KV cache 立即缩 8-16×。现代模型几乎都用 GQA。
@@ -187,7 +189,7 @@ KV cache 可用    : 12 GB
 - 相同前缀（system prompt + tools + CLAUDE.md，约 14k token）**只占一份**
 - 假设 100 个活跃请求共享 **14k × 0.32 MB = 4.5 GB** 前缀
 - 剩余显存 `12 - 4.5 = 7.5 GB` 服务**独立部分**
-- 每请求独立 context 2k：7.5 / 0.65 ≈ **11-12 并发**
+- 每请求独立 context 2k：7.5 / 0.65 ≈ **11-12 并发**（只算输入 KV；输出 KV 也要占位，那笔账见 §7 步骤 4）
 - **有效吞吐提升 2-3×**（看场景）
 
 > [!IMPORTANT]
@@ -214,13 +216,14 @@ KV cache 可用    : 12 GB
 
 - **瓶颈**：HBM 带宽
 - **公式**：`tokens/s ≤ HBM bandwidth / model size`
-- Llama 3 70B bf16 / H100 TP=2：`3.35 × 2 / 140 ≈ 48 tokens/s 聚合上限`
-- 加上 continuous batching，可以让多个请求共享这个带宽
+- Llama 3 70B bf16 / H100 TP=2：`3.35 × 2 / 140 ≈ 48 tokens/s`——这是**单流（batch=1）理论上限**，因为每生成一个 token 都要把 140 GB 权重完整读一遍
+- Continuous batching 下权重每步只读一次、被整个 batch 共享，**聚合吞吐 ≈ 48 × batch size**——直到每步还要读的 KV cache（batch 内每请求各一份）逐渐吃掉带宽，或显存装不下更多并发（回到 §3 的 KV 上限）。这就是 [深入 01 · §4.4](01-首包延迟与吞吐的影响因素.md) 讲的"单请求 vs 总吞吐"
 
 **容量含义**：
 - 如果每个用户需要 20 tokens/s 的感知速度
-- 单实例最多同时服务 **~2 个用户 decode**（聚合 48 tokens/s 分给 2 个）
-- 想要更高并发 → 开 speculative decoding 或加实例
+- batch ≈ 12（§3 的 KV cache 并发上限）时：每步读 140 GB 权重 + ~12 GB KV ≈ 152 GB，6.7 TB/s 带宽 → ~23 ms/步 → **每用户理论 ~44 tokens/s**——KV 读取会随并发增长缓慢拉低这个数，但 20 tokens/s 的目标全员可满足
+- decode 并发的真正上限是 §3 的 KV cache 并发（显存），**不是把 48 tokens/s 分账**
+- 想提升**单用户速度** → speculative decoding；想提升**并发容量** → 加显存或加实例
 
 ### Prefill ≠ Decode 的意义
 
@@ -399,22 +402,23 @@ on request:
 ### 步骤 1：prefill 容量（按 cache-miss 等效计算）
 
 - **工具循环放大**：5 顶层 QPS × 平均 3 轮 = **15 prefill QPS**
-- 单卡 H100 prefill：70B × 16k 约 2.2s × 2 TP = ~1.1s → **每秒 ~0.9 请求**（按完全无缓存的最坏情况）
-- 实例数（无 cache）：`15 / 0.9 ≈ 17 个 TP=2 实例` = **34 张 H100**
+- 单卡 H100 prefill：70B × 16k 理论约 2.3s，按 §4 的 80-90% 效率折损 ≈ 2.8s；TP=2 含通信折损 ≈ 1.5-1.6s → **每秒 ~0.6 请求**（按完全无缓存的最坏情况）
+- 实例数（无 cache）：`15 / 0.6 = 25 个 TP=2 实例` = **50 张 H100**
 
 > 这一步最容易掉的坑：直接用顶层 5 QPS 算，会少买 2/3 的容量。**Agent workload 的真实 QPS = 顶层 QPS × 工具循环深度**。这个数字是"未开 prefix caching"的上限——步骤 3 会用真实命中率修正。
 
-### 步骤 2：decode 容量
+### 步骤 2：decode 容量与 KV 并发
 
 - 高峰期总 decode：`100 并发 × 25 tokens/s = 2500 tokens/s 聚合`
-- 单实例 decode：48 tokens/s（见 §3）
-- 实例数：`2500 / 48 ≈ 52 个` = **104 张 H100**
+- 单实例聚合 decode：48 tokens/s 是单流上限（见 §4），continuous batching 下 ≈ 48 × batch；本场景每实例能挂 ~8-9 并发（显存账含输出 KV，见步骤 4），扣掉 KV 读取的带宽损耗后聚合 ≈ **350-400 tokens/s**
+- decode 腿实例数：`2500 / 375 ≈ 7 个`
+- **KV 并发腿**：100 并发 ÷ ~8-9 并发每实例 ≈ **11-12 个实例**
 
-> Decode 比 prefill 贵得多——这就是 [深入 03 PD 解耦](03-模型与工具场景化最佳实践.md#16-推理基础设施的三个关键演化) 的现实驱动力。SRE 助手场景下，**decode 是真正的成本中心**。
+> 这个场景的绑定约束不是 decode 带宽，而是 **KV 并发（显存）**——每实例能同时挂多少个活跃请求，由显存装得下多少份 KV cache 决定。顺带核对速度 SLO：batch ≈ 8-9 时每用户理论 ~44 tokens/s（§4 的算法），但含 TP 通信折损与批内 KV 读取后，实际不会高于单流实测的 20-30（[深入 01 · §4.1](01-首包延迟与吞吐的影响因素.md) 的口径），估 ~20-28——25 tokens/s 处于达标边缘，需灰度实测确认；不够就降每实例并发换速度，或上 speculative decoding（§4）。
 
-**取 max(prefill 实例数, decode 实例数) = max(17, 52) = 52 个实例 = 104 张 H100**
+**取 max(prefill 25（无 cache）→ 6（有 cache，见步骤 3）, decode ~7, KV 并发 11-12) ≈ 12 个实例 = 24 张 H100**
 
-> 后面 §3 prefix cache 会进一步压低 prefill 实例需求，但 max() 仍由 decode 主导——所以**最终账单按 decode 算**。Decode 占主导，是 SRE 助手这种"输入长、需要细致解释"工作负载的典型形态。如果场景换成日志摘要（输入大、输出短），结论会倒过来。
+> KV 并发占主导，是 SRE 助手这种"长共享前缀 + 多用户短独立上下文"工作负载的典型形态。如果场景换成输出重的负载（实时语音、超长生成，每用户要 60+ tokens/s），decode 带宽那条腿才会主导——PD 解耦（[深入 03 · 1.6](03-模型与工具场景化最佳实践.md#16-推理基础设施的三个关键演化)）就是为那类分化准备的。
 
 ### 步骤 3：Prefix Cache 校验（只压低 prefill 那条腿）
 
@@ -426,32 +430,33 @@ SRE 助手有一个明显的"高重复前缀"特征：
 - 共享前缀长度：14k token
 - 用户独立部分：2k token
 - 缓存命中率（实测灰度期）：**~85%**（剩 15% 因 runbook 索引随事故新数据周期性更新而破缓）
-- 每请求的等效 prefill token：
-    - 共享前缀部分：`14k × (0.15 + 0.85 × 0.10) ≈ 3.3k`（命中部分按 cache-miss 价格的 ~10% 折算等效成本——见 [深入 02 · §3 Anthropic 价格模型](02-Prompt-Caching原理.md)）
+- 每请求的等效 prefill token（算的是自建 GPU 的算力消耗）：
+    - 共享前缀部分：`14k × 0.15 ≈ 2.1k`——命中的前缀在自建 vLLM 里几乎不消耗 prefill 算力（只是显存读取），按 ≈0 计。注意别把 [深入 02 · §1 Anthropic 价格模型](02-Prompt-Caching原理.md#1-一个具体场景rag-客服的账单为什么差-8-倍) 的"cache 命中按 cache-miss 价格的 ~10% 计费"拿来算算力——那是托管 API 的计费口径，不是物理模型
     - 用户独立部分：`2k`（每次都全 prefill）
-    - 合计：~5.3k token 等效，约为原 16k 的 33%
+    - 合计：~4.1k token 等效，约为原 16k 的 26%
 
 **修正后的 prefill 容量**：
-- 等效 prefill 时间：`1.1s × 0.33 ≈ 0.36s`
-- 单实例：~2.7 请求/s → 15 QPS 只需 **6 个实例**
+- 等效 prefill 时间：`1.55s × 0.26 ≈ 0.4s`
+- 单实例：~2.5 请求/s → 15 QPS 只需 **6 个实例**
 
-> 没开 prefix caching 的容量规划会比真实需求高 3 倍（17 vs 6）。但**这只影响 prefill 那条腿**——decode 实例数 52 不变，所以 max() 仍是 52，最终账单不变。Prefix cache 真正的省钱效应在 token 计费（少付 90% 的 cached portion）而不是实例数。
+> 没开 prefix caching 时，prefill 腿的 25 个实例是全局瓶颈；开了之后 prefill 腿压到 6（差 4 倍），绑定约束移到 KV 并发那条腿（~11-12 实例，见步骤 2）——实例数的地板是显存给的，prefix cache 压不穿它。而 prefix cache 在 token 计费上的省钱效应（少付 90% 的 cached portion）只与托管 API 账单相关，与自建实例数是两本账。
 
-### 步骤 4：KV cache 校验（按"用户独立部分 + 一份共享前缀"算）
+### 步骤 4：KV cache 校验（按"用户独立部分 + 输出 + 一份共享前缀"算）
 
 - 高峰同时活跃请求 ≈ 100
-- 实例数 52 → 平均 **1.9 并发/实例**
+- 实例数 ~11-12 → 平均 **8-9 并发/实例**
 - **每实例的 KV cache 占用**：
     - 一份共享前缀（14k token）：14k × 0.32 MB = **4.5 GB**（实例内所有并发共享一份）
-    - 每并发的用户独立部分（2k token）：2k × 0.32 MB ≈ 0.65 GB，× 2 并发 ≈ **1.3 GB**
-    - 合计：~5.8 GB
-- 单实例可用 KV cache：12 GB → **safety margin ~50%** ✓
+    - 每并发的用户独立部分（2k token）：2k × 0.32 MB ≈ **0.65 GB**
+    - 每并发的输出 KV（输出 1k token，边生成边涨）：平均在途 ~0.5k ≈ 0.16 GB，收尾时 0.32 GB——**这一项最容易被漏算**
+    - 每并发合计 ~0.8-1.0 GB；扣掉前缀后可用 `12 - 4.5 = 7.5 GB` → 并发上限 `7.5 / (0.8~1.0) ≈ 8-9`
+- 按平均在途输出算，单实例总占用 `4.5 + 8.5 × 0.81 ≈ 11.4 GB`，对 12 GB 预算 **margin 已贴地**；批内长输出同时收尾时会越过 12 GB，靠 preemption 和排队兜底——漏算输出 KV 会把每实例并发高估到 10-11、把贴地误当富余。KV 就是决定实例数的那条腿，实例数不能再往下压
 
-> 这里勘正一个常见误算：很多人把"每请求 16k × KV cache per token"当作并发占用，但**共享前缀只占一份**——这是 prefix caching 在显存维度的另一个收益。
+> 这一步不是走过场：正是这次校验确认了 KV 并发是绑定约束——prefill 腿可以压到 6 个实例，但显存装不下更多并发，实例数就停在 ~11-12。另外勘正一个常见误算：很多人把"每请求 16k × KV cache per token"当作并发占用，但**共享前缀只占一份**——这是 prefix caching 在显存维度的另一个收益。
 
 ### 步骤 5：余量和韧性
 
-- 高峰 decode 实例 52，+30% 长尾冗余 → **68 个实例 = 136 张 H100**
+- 高峰实例数 ~11-12（KV 并发腿），+30% 长尾冗余 → **15 个实例 = 30 张 H100**
 - 多 AZ 部署（至少 2 个 AZ，每 AZ 取 60% 容量上线，避免单 AZ 故障击穿）
 - minReadySeconds ≥ 90s（70B 冷启动），PodDisruptionBudget 保留 80% 容量
 - Scale-down 冷却期 ≥ 10 分钟（避免 prefix cache 失效）
@@ -460,12 +465,12 @@ SRE 助手有一个明显的"高重复前缀"特征：
 
 | 方案 | 月度成本（估算） | 备注 |
 |---|---|---|
-| 自建 136× H100 on-demand | ~$294k/月 | 没规模优势 |
-| 自建 136× H100 1-year reserved | ~$120k/月 | 占用 1 年期 |
+| 自建 30× H100 on-demand | ~$65k/月 | 没规模优势 |
+| 自建 30× H100 1-year reserved | ~$27k/月 | 占用 1 年期 |
 | Anthropic Claude Sonnet 4.6 托管 | ~$15k/月 | 按真实 token 流量估算，含工具循环 |
 | 自建小模型（Qwen 32B）+ Claude 兜底 | ~$8k/月 | 80% 走小模型，20% 难案升级 |
 
-> SRE 事故助手的规模（100 用户）显然达不到自建经济性临界点。**这本身就是一个容量规划的产出**——规划过程证明"该用托管"，而不是先决定再算。
+> SRE 事故助手的规模（100 用户）仍未越过自建经济性临界点，但 reserved 与托管的差距已经在 2 倍以内——这个规模处在决策灰区的边缘。**算出你离临界点多远，这本身就是容量规划的产出**——规划过程证明"该用托管"，而不是先决定再算。
 
 ### 步骤 7：监控指标埋点（与练习 Unit 3 的 SLO 对齐）
 

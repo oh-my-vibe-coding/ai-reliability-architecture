@@ -1,6 +1,6 @@
 ---
 title: 附录 E · 模板库
-updated: 2026-05-10
+updated: 2026-07-04
 tags: [appendix, templates, reusable]
 ---
 
@@ -66,7 +66,7 @@ tags: [appendix, templates, reusable]
 - 告警 SRE + ML 双方
 - 暂停所有**自动**基于 eval 的决策
 - 转人工 review 模式
-- 超 1 小时 = 扣 10% error budget
+- 超 1 小时 ≈ 烧掉月度 error budget 的 28%（99.5% → 216 分钟/月）
 ```
 
 ---
@@ -75,7 +75,7 @@ tags: [appendix, templates, reusable]
 
 **来源**：[深入 06 · §1](../深入/06-Eval-Pipeline设计.md)、[Unit 2 · Week 2](../练习/Unit2-TraceEval统一可观测性/Week2-三层Eval体系设计.md)
 
-```markdown
+````markdown
 ## Eval 设计 · <capability 名>
 
 ### L1 · Assertion（硬规则）
@@ -88,32 +88,32 @@ tags: [appendix, templates, reusable]
 | 引用的 source 存在 | 查已知 source 表 | 虚构来源 | 拒绝 |
 
 ### L2 · Judge 模型评分
-**维度**（不超过 3 个）：
-- relevance（0-10）
-- faithfulness（0-10）— 尤其 RAG 场景
-- completeness（0-10）
+**维度**（不超过 3 个，每维 binary pass/fail + 一句话理由——0-10 连续分是反模式，见[深入 06 · §2.1](../深入/06-Eval-Pipeline设计.md)）：
+- relevance（pass/fail）
+- faithfulness（pass/fail）— 尤其 RAG 场景
+- completeness（pass/fail）
 
 **Judge 模型**：<选型>（建议用**不同家族**，如主模型 Claude 则 Judge 用 GPT-mini）
 
 **Judge Prompt 骨架**：
-\```
-你是一个严格的评委。根据以下维度给 0-10 分：
+```
+你是一个严格的评委。逐维度判定是否合格（每项先写一句话理由，再给 pass 或 fail）：
 - relevance: ...
 - faithfulness: ...
 - completeness: ...
 
-输出 JSON：{"relevance": int, "faithfulness": int, "completeness": int, "reasoning": str}
+输出 JSON：{"relevance": {"reason": str, "verdict": "pass|fail"}, "faithfulness": {"reason": str, "verdict": "pass|fail"}, "completeness": {"reason": str, "verdict": "pass|fail"}}
 
 只输出 JSON。
 
 Question: {question}
 Context: {context}
 Response: {response}
-\```
+```
 
 **校准机制**：
 - 每周抽 50-100 条让人工打分
-- 算 Cohen's κ 或 agreement rate（|human - judge| ≤ 1 的比例）
+- 算 Cohen's κ 或 agreement rate（标签一致的比例；若用多档 rubric 则 |human - judge| ≤ 1）
 - 目标：κ ≥ 0.6 / agreement ≥ 70%
 - 不达标 → 暂停自动决策 + 换 Judge / 改 rubric
 
@@ -130,7 +130,7 @@ Response: {response}
 - **分流**：用户级 / 请求级（每种的理由）
 - **样本量**：<估算> + confidence level
 - **触发上量**：主指标显著好 + guardrail 不劣化
-```
+````
 
 ---
 
@@ -169,10 +169,10 @@ Response: {response}
 
 ### Error Budget Policy
 - 月度 budget：SLO 目标对应的允许"坏时间"
-- **超预算触发**：
-  - 10% 超：通知 ML 团队，暂停新 feature rollout
-  - 30% 超：回滚最近变更，所有自动决策转人工
-  - 50% 超：事故升级，产品方案考虑 degrade
+- **按预算消耗比例分级触发**（烧穿前就行动，不是烧穿后）：
+  - 消耗 50%：通知 ML 团队，审视变更节奏
+  - 消耗 90%：冻结新 feature rollout
+  - 消耗 100%：回滚最近变更，所有自动决策转人工，事故升级，产品方案考虑 degrade
 ```
 
 ---
@@ -196,7 +196,7 @@ Response: {response}
 
 ### 硬件与模型
 - 模型：<name + bf16/int8/int4>
-- 单参数量 × 精度 = <权重 GB>
+- 参数量 × 每参数字节数（bf16=2B、int8=1B、int4=0.5B）≈ <权重 GB>
 - GPU：<型号 + HBM GB + 带宽 TB/s>
 - TP / PP / EP 策略
 
@@ -243,13 +243,13 @@ Response: {response}
 
 **来源**：[第 4 章](../知识/04-系统架构与复合AI可靠性数学.md)、[Unit 4](../练习/Unit4-复合AI可靠性数学/总览.md)
 
-```markdown
+````markdown
 ## <Agent 名> · 复合可靠性评审
 
 ### Step 拆解图
-\```
+```
 [输入] → Step 1: <名> → Step 2: <名> → ... → Step N → [输出]
-\```
+```
 
 ### 每 Step 正确率估算
 | Step | 类型 | p_i | 依据 | 失败模式 |
@@ -279,7 +279,7 @@ Response: {response}
 
 ### 失效放大分析
 **场景 1**：RAG 错 → 生成错 → Tool 验证只校语法不校语义 → 用户得到错答
-- 起点：Step 2（20% 概率）
+- 起点：Step 2（15% 概率，即 1 − 0.85）
 - 放大路径：Step 3 错 → Step 4 "通过" → Step 5 合理化
 - 缓解：Step 2 加 retrieval gate；Step 4 改用语义验证
 
@@ -297,7 +297,7 @@ Response: {response}
 1. 输入超长时会怎样？
 2. Tool 所依赖的外部 API 慢 / 挂时会怎样？
 3. 模型升级 p_3 从 0.80 变 0.70 时整个链路变什么样？
-```
+````
 
 ---
 
@@ -305,20 +305,20 @@ Response: {response}
 
 **来源**：[第 9 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](../练习/Unit5-数值与编译器级调试/Week2-Runbook产出.md)
 
-```markdown
+````markdown
 ## <服务名> · 数值级故障排查 Runbook
 
 ### 触发条件（on-call 5 秒扫）
 满足 2 条以上走本 runbook：
 - [ ] 可用性正常 + 延迟正常 + **质量明显降**
-- [ ] 按任务类型 L2 分一个类掉 > 5
+- [ ] 按任务类型分桶的 L2 均分一个类掉 > 1.5-2 分，或跌出该类近 30 天波动带（p5）
 - [ ] 输出长度分布突变
 - [ ] 数字/结构化输出错误率涨 3×+
 - [ ] 最近有硬件换 / CUDA 升级 / 量化变化 / kernel 库升级
 - [ ] 长 context 劣化比短 context 严重
 
 ### 分层 Triage
-\```
+```
 质量降了？
 ├─ 最近有变更？
 │  └─ 有 → 先 rollback 再分析
@@ -330,36 +330,36 @@ Response: {response}
 │  └─ 是 → KV cache / attention 精度
 └─ 某 batch size 才差？
    └─ 是 → Kernel 非确定性 / padding
-\```
+```
 
 ### 诊断命令集
 
 **A. bf16 vs fp32 差异**
-\```bash
+```bash
 python scripts/test_precision.py \
   --model $MODEL --samples golden.jsonl
 # 看哪类 sample bf16 vs fp32 输出不一致
-\```
+```
 
 **B. Kernel 确定性**
-\```bash
+```bash
 python scripts/test_determinism.py \
   --prompt "..." --runs 10 --batch-sizes 1,4,16
 # 全一致 = OK；有分歧 = kernel 问题
-\```
+```
 
 **C. 量化漂移**
-\```bash
+```bash
 python scripts/test_quantization.py \
   --quant int4 --reference bf16 --tasks task_A,task_B,task_C
 # 按任务类型分桶看分差
-\```
+```
 
 **D. 版本 pin**
-\```bash
+```bash
 pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 # 和已知稳定 baseline 对比
-\```
+```
 
 ### 根因库
 | 症状 | 可能根因 | 验证 | 缓解 |
@@ -382,7 +382,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 - 定位耗时
 - 根因层级（应用 / kernel / CUDA / 硬件）
 - Action items（监控 / 流程 / 工具）
-```
+````
 
 ---
 
@@ -461,7 +461,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 
 给项目 repo 的 `README.md` 用。每个 Unit 结束都应**更新"当前状态"** 节——这是 Capstone 的天然雏形。
 
-```markdown
+````markdown
 # SRE 事故助手（RAG + Tool-use Agent）
 
 基于《AI 时代的 SRE 架构师之路》贯穿项目。本项目**不是玩具**，是作者学习 AI SRE 的实战载体。
@@ -485,7 +485,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 
 ## 如何运行
 
-\```bash
+```bash
 # 安装
 pip install -e .
 cp .env.example .env  # 填 ANTHROPIC_API_KEY 等
@@ -498,7 +498,7 @@ python -m app.agent "生产数据库 CPU 100% 怎么排查？"
 
 # 跑 smoke eval
 python -m app.eval data/eval/smoke.jsonl
-\```
+```
 
 ## 数据来源
 
@@ -547,7 +547,7 @@ python -m app.eval data/eval/smoke.jsonl
 ## 免责
 
 本项目使用的 runbook 和 postmortem **已脱敏**。模型定价 / 能力**截至 <YYYY-MM>**，实际以厂商官方为准。
-```
+````
 
 ---
 
@@ -646,8 +646,8 @@ python -m app.eval data/eval/smoke.jsonl
 
 | 模板 | 最近更新 | 对应章节版本 |
 |---|---|---|
-| 1 Trace-Eval | 2026-05-05 | 深入 06 v1 |
-| 2 三层 Eval | 2026-05-05 | Unit 2 W2 v1 |
+| 1 Trace-Eval | 2026-07-04 | 深入 06 v2 |
+| 2 三层 Eval | 2026-07-04 | 深入 06 v2 / Unit 2 W2 v1 |
 | 3 推理 SLO | 2026-05-05 | Unit 3 W1 v1 |
 | 4 容量规划 | 2026-05-05 | 深入 05 v1 |
 | 5 复合可靠性 | 2026-05-05 | Unit 4 v1 |

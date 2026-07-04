@@ -1,6 +1,6 @@
 ---
 title: Unit 2 · Week 3 · Judge 模型选型与校准
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [part-4, practice, unit2, week]
 ---
 
@@ -16,7 +16,7 @@ tags: [part-4, practice, unit2, week]
 
 ### 准备（15 分钟）
 - [ ] 用上周设计的 L2 Judge prompt
-- [ ] 从你的 10-20 条样例里挑 20 条（这次只要 20）
+- [ ] 把上周的样例补齐到 20 条（不足就新增几条同分布的），本周校准只用这 20 条
 
 ### 阅读 · B3 · 45 分钟（无 AI）
 
@@ -37,6 +37,9 @@ tags: [part-4, practice, unit2, week]
 
 **关键步骤**：你**亲自**给 20 条样例打分（只打 L2 的主维度，比如 relevance 0-10）。
 
+> [!NOTE]
+> [深入 06 · §2.1](../../深入/06-Eval-Pipeline设计.md) 的生产建议是 binary / 少档 rubric，而不是 0-10。本练习故意从 0-10 出发，让你在第 3 步亲手撞见它的问题（κ 系统性偏低）、再自己完成向档位制的迁移——这正是那条建议的由来。
+
 - 用 **纸笔或纯 spreadsheet**，不要让 AI 看
 - 打完之后**封存**你的分数
 
@@ -50,11 +53,12 @@ tags: [part-4, practice, unit2, week]
 
 1. **Agreement rate**：`|human - judge| ≤ 1` 的比例
 2. **Cohen's κ**（可选，更严格）
+   - 注意：0-10 分直接算未加权 κ 会系统性偏低——11 档细分下，人和 Judge 差 ±1 的"近似一致"全被算作不一致。先把分数分箱成 high/mid/low 三档再算，或改用加权 κ / Spearman
 3. **Bias**：`mean(judge) - mean(human)`——正则 Judge 比你松；负则严
 
 目标参考：
 - Agreement rate ≥ 70% = 可用
-- κ ≥ 0.6 = 适度一致
+- κ 0.4-0.6 = 中度一致；≥ 0.6 = 高度一致（生产可用线，口径见[深入 06 · §2.3](../../深入/06-Eval-Pipeline设计.md)）
 - |bias| < 1 = 无系统偏移
 
 #### Part 4 · 选型决策（20 分钟）

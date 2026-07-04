@@ -1,6 +1,6 @@
 ---
 title: 代码 01 · Claude Prompt Caching · 教学指南
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [code, guide, prompt-caching]
 ---
 
@@ -9,7 +9,7 @@ tags: [code, guide, prompt-caching]
 > [← 代码索引](README.md)  ·  主代码：[01-claude-caching.py](01-claude-caching.py)  ·  关联章节：[深入 02](../深入/02-Prompt-Caching原理.md)、[深入 04](../深入/04-为什么简单你好也消耗数万token.md)
 
 > [!WARNING]
-> 本文包含**价格、模型名、厂商能力**等快变信息。内容**快照日期为 2026-05-05**；实际选型或上线前，请以厂商官方 pricing 和当前生产验证为准。
+> 本文包含**价格、模型名、厂商能力**等快变信息。内容**快照日期为 2026-07-04**；实际选型或上线前，请以厂商官方 pricing 和当前生产验证为准。
 >
 > 官方 pricing 入口：
 > - Anthropic: https://www.anthropic.com/pricing
@@ -46,6 +46,9 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 ## 2. 预期输出
 
+> [!IMPORTANT]
+> 先把主代码里的 `SYSTEM_PROMPT` / `LARGE_CONTEXT` 替换为真实长文本（合计数千 token 以上）再跑。仓库里放的是几十 token 的占位文本，低于最小可缓存前缀，直接运行时两次调用的 cache 字段都会是 0，对不上下面的数字。
+
 第一次运行（缓存写入）：
 
 ```
@@ -76,6 +79,7 @@ Cache hit rate: 99.8%
 
 **如果你看到的不是这样**：
 - 第二次仍然 `cache_creation` 高 → 看[常见报错 B](#b--缓存未命中)
+- 两次调用的 cache 字段全为 0 → 前缀低于最小可缓存长度（占位文本没替换），看[常见报错 B](#b--缓存未命中) 第 3 条
 
 ---
 
@@ -88,8 +92,9 @@ anthropic.AuthenticationError: Error code: 401
 ```
 
 - ✅ 确认 `ANTHROPIC_API_KEY` 环境变量设了：`echo $ANTHROPIC_API_KEY`
-- ✅ Key 是否有效（去 console.anthropic.com 查）
-- ✅ 账号是否有余额（试用额度耗尽也会 401）
+- ✅ Key 是否有效（去 console.anthropic.com 查）——401 基本只有 key 未设 / 无效 / 被吊销这几种情况
+
+额度耗尽不是 401：返回的是 400 加 "credit balance is too low"。去 console 充值，或换有余额的 key。
 
 ### B · 缓存未命中
 
@@ -97,11 +102,11 @@ anthropic.AuthenticationError: Error code: 401
 
 **排查**：
 1. **两次间隔 > 5 分钟**？Anthropic cache TTL 默认 5 分钟
-   - 解决：缩短间隔，或开启 1h extended cache（beta）
+   - 解决：缩短间隔，或改用 1h TTL（已 GA）
 2. **SYSTEM_PROMPT 或 LARGE_CONTEXT 变了**？改任何字符都会失效
    - 解决：确认完全相同（可以 `hash(text)` 对比）
-3. **内容 < 1024 token**？Sonnet/Opus 的最小 cache size
-   - 解决：加长系统提示到 ≥ 1024 token
+3. **内容低于最小可缓存前缀**？阈值随模型 512–4096 token 不等且会调整（低于阈值不会报错，只是静默不缓存）——以官方文档 Cache limitations 表为准
+   - 解决：加长可缓存前缀到所用模型的阈值以上
 4. **路由到了不同后端实例**？
    - Anthropic 云端通常会路由亲和，但不保证
 
@@ -158,7 +163,7 @@ messages=[{
 
 给代码加上实时成本计算：
 
-- 用 [深入 02 · §3 的定价表](../深入/02-Prompt-Caching原理.md)
+- 用 [深入 02 · §4.4 的对照表](../深入/02-Prompt-Caching原理.md)
 - 每次调用后打印：**"本次节省 $X"** vs 如果没用 caching
 
 ### 任务 3 · Cache-miss 监控（中等）
@@ -170,7 +175,7 @@ messages=[{
 
 ### 任务 4 · 跨 session 共享 Cache（较难）
 
-Anthropic cache 以 API key 为界。写一个多用户场景，比较：
+Anthropic cache 以 workspace 为界（同 workspace 内跨 API key 共享，但前缀不同就各自为营）。写一个多用户场景，比较：
 - 每个用户独立 session（cache 不共享）
 - 共享 prefix（cache 共享）
 
@@ -178,11 +183,11 @@ Anthropic cache 以 API key 为界。写一个多用户场景，比较：
 
 ### 任务 5 · 迁移到 1h TTL（较难）
 
-当前默认 5 min TTL。Anthropic 有 beta 的 1h extended cache：
+当前默认 5 min TTL。Anthropic 支持 1h TTL（已 GA，无需 beta header）：
 
-- 查文档：https://platform.claude.com/docs/en/docs/build-with-claude/prompt-caching
+- 查文档：https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 - 加 `cache_control: {"type": "ephemeral", "ttl": "1h"}`
-- 对比 5 min vs 1h 的**成本 / TTL trade-off**
+- 对比 5 min vs 1h 的**成本 / TTL trade-off**——1h 的写入成本是 2x（5 min 为 1.25x），需要更多次命中才回本
 
 ---
 
@@ -254,7 +259,7 @@ Cache hit rate 从 95% 掉到 30%，你会怎么排查？列出至少 4 步。
 - [ ] 监控告警（cache hit rate < 阈值）
 - [ ] 成本预算上限（单用户 / 单 org / 单天）
 
-这些都是 [深入 10 · Pattern 2 Cache Miss Storm](../深入/10-AI系统事故模式库.md#pattern-2--cache-miss-storm) 的预防。
+这些都是 [深入 10 · Pattern 2 Cache Miss Storm](../深入/10-AI系统事故模式库.md#pattern-2--cache-miss-storm缓存风暴) 的预防。
 
 ---
 
@@ -263,7 +268,7 @@ Cache hit rate 从 95% 掉到 30%，你会怎么排查？列出至少 4 步。
 - **OpenAI 版本**（自动 caching，无需显式标记）：[01-openai-caching.py](01-openai-caching.py)
 - **本地 vLLM 版本**（Automatic Prefix Caching）：[01-local-vllm-caching.py](01-local-vllm-caching.py)
 
-三种机制的对比见 [深入 02 · §3](../深入/02-Prompt-Caching原理.md)。
+三家托管 API 机制的对比见 [深入 02 · §4](../深入/02-Prompt-Caching原理.md)；自建 vLLM 前缀缓存见同章 §6.2 与 §9。
 
 ---
 

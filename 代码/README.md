@@ -1,6 +1,6 @@
 ---
 title: 参考代码 · README
-updated: 2026-05-24
+updated: 2026-07-02
 tags: [code, reference, templates]
 ---
 
@@ -56,7 +56,7 @@ tags: [code, reference, templates]
 ## 运行环境
 
 ```bash
-# Python 3.11+
+# Python 3.10+
 python -m venv venv
 source venv/bin/activate
 

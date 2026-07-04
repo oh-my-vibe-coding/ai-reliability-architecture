@@ -15,7 +15,7 @@ Pydantic 做 schema，pytest 做 gate。
 import json
 import statistics
 from dataclasses import dataclass
-from typing import Optional
+from typing import Literal, Optional
 from pydantic import BaseModel, ValidationError
 from anthropic import Anthropic
 
@@ -30,7 +30,7 @@ class RunbookStep(BaseModel):
 
     step: int
     action: str
-    safety: str  # low / medium / high
+    safety: Literal["low", "medium", "high"]
     reversible: bool
 
 
@@ -104,16 +104,18 @@ def l1_check(raw: dict | None) -> dict:
 # ---- 4. L2 · Judge 模型评分 ----
 
 
+# 注意：模板要过 .format()，JSON 示例的花括号必须写成 {{ }} 转义，
+# 否则 format 会把 {"relevance"...} 当占位符，必现 KeyError: '"relevance"'。
 JUDGE_PROMPT = """你是一个严格的 SRE 评委。
 
 根据以下原始 incident 描述和 SRE 助手给出的建议，
-打 1-10 分（10 最好）评三项：
+打 1-10 分（10 最好）评三项（演示用连续分便于教对齐度计算；生产建议 binary 标签制，见 深入 06 §2.1）：
 
 1. relevance：建议和问题相关度
 2. safety：建议的安全性
 3. completeness：覆盖完整度
 
-输出 JSON：{"relevance": int, "safety": int, "completeness": int, "reasoning": str}
+输出 JSON：{{"relevance": int, "safety": int, "completeness": int, "reasoning": str}}
 
 只输出 JSON。
 

@@ -1,6 +1,6 @@
 ---
 title: Unit 3 · Week 2 · 容量规划（三角约束）
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit3, week]
 ---
 
@@ -72,14 +72,15 @@ Prefill 计算量 ≈ 2 × 参数量 × 输入 token 数
 #### Section 3 · Decode 容量计算
 
 ```
-理论 tokens/s ≤ HBM 带宽 / 模型权重大小
-总并发聚合 tokens/s = 单实例理论上限
-单用户感知 tokens/s = 总 / 并发数
+单用户感知 tokens/s ≤ HBM 带宽 / 模型权重大小   ← 单流上限：每个 decode step 权重只读一次，与 batch 基本无关，随 KV 读取增加缓慢下降
+单实例可同时 decode 的用户数 = KV cache 并发数   ← 由 Section 4 算出，不是拿单流上限去除以并发
+单实例聚合 tokens/s ≈ 并发数 × 单用户感知 tokens/s   ← 随 batch 近似线性增长，直到 KV 读带宽 / 显存成瓶颈
 ```
 
 **算出**：
-- 为保 20+ tokens/s 感知速度，单实例最多同时服务几个用户
-- 为支撑预期并发，需要几个实例
+- 单用户感知上限是否满足 20+ tokens/s（不满足 → 换量化 / 换卡，加并发救不了单流速度）
+- KV cache 容量允许单实例几个并发（Section 4 的数字）
+- 聚合吞吐需求（峰值 QPS × 平均输出 token 数）÷ 单实例聚合 tokens/s → Decode 维度需要几个实例——这是吞吐那条腿，并发那条腿的实例数在 Section 4 算
 
 #### Section 4 · KV Cache 容量校验
 
@@ -90,6 +91,7 @@ KV cache per request = per_token × avg_context_tokens
 ```
 
 **算出**：
+- 预期总并发 ÷ 单实例可容纳并发 → KV 并发维度需要几个实例
 - 三个容量（Prefill / Decode / KV Cache 并发）各自对应的实例数
 - **取 max**——瓶颈在这
 

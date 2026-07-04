@@ -1,6 +1,6 @@
 ---
 title: 共同语言 03 · Research-level Evaluation
-updated: 2026-05-24
+updated: 2026-07-02
 tags: [shared-language, evaluation, benchmark, research]
 ---
 
@@ -19,7 +19,7 @@ tags: [shared-language, evaluation, benchmark, research]
 
 你会在这些地方遇到：
 
-- 新模型发布 model card 时："MMLU 82%, GPQA 45%, HumanEval 88% pass@1"
+- 新模型发布 model card 时："MMLU 88%, GPQA Diamond 86%, HumanEval 92% pass@1"
 - ML 团队讨论 ablation 时："这版本在 GSM8K 涨了但 MATH 没动"
 - 客户或老板问："这个模型比 GPT-5 好吗"
 
@@ -44,6 +44,9 @@ tags: [shared-language, evaluation, benchmark, research]
 ---
 
 ## 2. 必须知道的主流 Benchmark
+
+> [!WARNING]
+> 本节的具体分数为 **2026-07-02 快照**——只给量级，不给精确值。分数随新模型发布持续漂移，上会引用前请校对最新 model card 与 leaderboard。
 
 ### 2.1 通用知识与理解
 
@@ -72,17 +75,17 @@ tags: [shared-language, evaluation, benchmark, research]
 
 **MATH**
 - 竞赛级数学（AIME、AMC 难度）
-- 仍有区分度（frontier ~85%）
-- **常被用作 reasoning 能力指标**
+- 已被推理模型打饱和（o1 时代即 95%+）
+- **前沿报告已转向 AIME / HMMT / MATH-500**
 
 **AIME**
 - 美国数学邀请赛真题
 - o1/o3/R1 推理模型主打战场
-- Frontier 60-90%
+- Frontier 90%+，靠每年换新题维持区分度
 
 **MATH-500 / GPQA Diamond**
 - 更干净的子集，污染少
-- 当前首选测数学 / 推理硬核度
+- 曾是测数学 / 推理硬核度的首选；随推理模型逼近 90%，正被更难的集（AIME 新题、HLE / Humanity's Last Exam 等）接替
 
 ### 2.3 代码能力
 
@@ -110,10 +113,10 @@ tags: [shared-language, evaluation, benchmark, research]
 
 ### 2.4 推理与逻辑
 
-**GPQA (Graduate-level Physics, Chemistry, Biology)**
-- 博士级 STEM 问题
-- Frontier ~55%（人类博士 65%）
-- **污染较少，仍有区分度**
+**GPQA (Graduate-Level Google-Proof Q&A)**
+- 博士级理化生问题，特点是 Google 搜不到答案（Google-proof）
+- Frontier（Diamond 子集）~85-90%，已越过人类博士的 65%
+- **曾以污染少著称，区分度正在耗尽**
 
 **BIG-Bench Hard (BBH)**
 - Google 挑出 23 个困难子任务
@@ -127,7 +130,7 @@ tags: [shared-language, evaluation, benchmark, research]
 
 **GAIA**
 - 通用助理基准（需要多工具、多步）
-- 人类 92% vs frontier ~50%
+- 人类基线 92%（2023 论文）；frontier 分数漂移快，本书未钉快照——上会前查 leaderboard（入口见 [深入 03 · §1.4](../深入/03-模型与工具场景化最佳实践.md)）
 
 **SWE-bench Verified**
 - 见 2.3
@@ -139,10 +142,10 @@ tags: [shared-language, evaluation, benchmark, research]
 
 **OSWorld**
 - 真桌面 computer use
-- Frontier 仅 **12%**（人类 72%）—— 见 [深入 03 · §1.4](../深入/03-模型与工具场景化最佳实践.md)
+- 2024 论文基线仅 12% → 2026-06 头部（OSWorld-Verified）~85%，已反超人类 72%—— 见 [深入 03 · §1.4](../深入/03-模型与工具场景化最佳实践.md)
 
 **Vending-Bench**
-- 长时程决策（Anthropic）
+- 长时程决策（Andon Labs；Anthropic Project Vend 采用）
 
 ### 2.6 主观对比
 
@@ -313,10 +316,11 @@ Paper 里报告"我们赢的 10 个 benchmark"，没提"我们输的 5 个"。
 
 ## 9. 会议室对话实例
 
-> **ML**：新版本 MMLU 85、GPQA 48、pass@1 HumanEval 92，比上版全面涨。准备上线。
+> **ML**：新版本 MMLU 85、GPQA Diamond 87、pass@1 HumanEval 92，比上版全面涨。准备上线。
 > **老 SRE**：嗯……好。
 > **懂了的 SRE**：等等：
 > - MMLU 到 85 已经接近饱和，意义不大，LiveBench 或 MMLU-Pro 呢？
+> - GPQA Diamond 都到 87 了，还剩多少区分度？有没有跑更难的替代集？
 > - HumanEval 92 是 pass@1 还是 pass@10？我们生产场景等同 pass@1 吗？
 > - LM Arena 你们跑了吗？分差多少？
 > - Private eval（你们自己 held-out 的）动了多少？
@@ -333,7 +337,7 @@ Paper 里报告"我们赢的 10 个 benchmark"，没提"我们输的 5 个"。
 | **MMLU** | 57 学科选择题，通用知识 |
 | **MMLU-Pro** | MMLU 升级版，更难 |
 | **GPQA** | 博士级 STEM 问题 |
-| **GSM8K / MATH / AIME** | 数学 benchmark 三档（饱和/中/难）|
+| **GSM8K / MATH / AIME** | 数学 benchmark 三档（前两档已饱和，AIME 靠新题保持难度）|
 | **HumanEval / MBPP / BigCodeBench / LiveCodeBench** | Code benchmark |
 | **SWE-bench Verified** | 真实 GitHub issue 修复 |
 | **GAIA / OSWorld / τ-bench / Vending-Bench** | Agent benchmark |

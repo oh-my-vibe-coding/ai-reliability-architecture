@@ -1,6 +1,6 @@
 ---
 title: 复习系统 · 如何使用
-updated: 2026-05-05
+updated: 2026-07-04
 tags: [meta, review, spaced-repetition, active-recall]
 ---
 
@@ -21,6 +21,9 @@ tags: [meta, review, spaced-repetition, active-recall]
 | [anki-import.csv](anki-import.csv) | Anki 兼容格式，可导入使用 |
 | [Active-Recall题库.md](Active-Recall题库.md) | 开放式自测题（Feynman-style） |
 | [Bloom分级说明.md](Bloom分级说明.md) | 本书练习的认知层级标注 |
+
+> [!NOTE]
+> 当前覆盖范围：概念卡覆盖引章、第 4-7 章、第 10-16 章（架构篇）、深入 01-08 与 17-21、科学与共同语言专题；题库覆盖引章、第 4-9 章、深入 01-16、科学与共同语言。尚待补充：概念卡的第 8-9 章与深入 09-16，题库的第 10-16 章与深入 17-21——在后续版本补充。
 
 ---
 
@@ -46,8 +49,8 @@ tags: [meta, review, spaced-repetition, active-recall]
 ```markdown
 | 卡片范围 | 上次读 | 下次读 |
 |---|---|---|
-| Unit 0 (Q1-Q10) | 2026-05-15 | 2026-05-22 |
-| Unit 1 (Q11-Q25) | 2026-05-19 | 2026-05-22 |
+| 引章卡（Q1-Q6） | 2026-05-15 | 2026-05-22 |
+| 第 4-5 章卡 | 2026-05-19 | 2026-05-22 |
 ```
 
 **或者**：直接把 `anki-import.csv` 喂给任何 SR 软件（Anki Desktop / AnkiDroid / Mochi / RemNote / Apple Shortcuts + ChatGPT），让算法替你排。**强烈不推荐用 Excel 排间隔**——会忘。

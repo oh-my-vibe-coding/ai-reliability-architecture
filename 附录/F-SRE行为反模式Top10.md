@@ -1,6 +1,6 @@
 ---
 title: SRE 行为反模式 Top 10（自查清单）
-updated: 2026-06-01
+updated: 2026-07-02
 tags: [reference, anti-patterns, checklist, sre-behavior]
 ---
 
@@ -48,7 +48,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 
 **为什么是反模式**：
 - 模型悄悄升级（厂商不会通知你）、prompt 累积改动、输入分布漂移——六个月后你的 eval 结果已经和线上表现没关系了
-- 这是 Anthropic 2026 三连事故的核心教训——"你的 eval 会骗你"
+- 这是 Anthropic 2025 三连事故的核心教训——"你的 eval 会骗你"
 
 **正确做法**：Eval 是持续运行的生产监控，不是上线前的 checkpoint。给它定 SLO（覆盖率、延迟、Judge κ、pipeline uptime）。Eval 挂了 = 质量盲眼。
 
@@ -77,7 +77,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 
 **为什么是反模式**：
 - 每多一个 tool call，就多一次 latency + token 成本 + 错误概率乘积
-- Context window 名义上 1M 但实际有效 ~64K——加了也没用（Lost in the Middle）
+- Context window 的名义值 ≠ 有效值——RULER 实测的有效长度普遍远小于宣称值（快照数值见深入 03 的"宣称值 vs 实际可用"表），换更大的窗口救不了中间塌陷（Lost in the Middle）
 - 步数预算和 P99 latency budget 是同一类工程约束——不列出来它就不存在
 
 **正确做法**：给每条业务链路定 **step budget**（最多 N 步）。每多一步要有边际收益交代。超预算的 step 裁剪或合并。Context 超过"有效拐点"时触发 compaction 而非加长。

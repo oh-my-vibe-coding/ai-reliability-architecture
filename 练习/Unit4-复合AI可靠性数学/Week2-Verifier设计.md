@@ -1,6 +1,6 @@
 ---
 title: Unit 4 · Week 2 · Verifier / Gate 设计
-updated: 2026-05-05
+updated: 2026-07-02
 tags: [part-4, practice, unit4, week]
 ---
 
@@ -72,9 +72,13 @@ Step X · <步骤名>
 用新的 p_i 算一次：
 
 ```
-原始: p1 × p2 × ... × pN
-加 gate: p1 × max(p2, verifier_2) × ... 
+原始:   p1 × p2 × ... × pN
+加 gate: p1 × p2' × ... × pN
+其中 p2' = p2 + (1 − p2) × c2 × r2
+（c2 = verifier 捕获率，r2 = 重试成功率）
 ```
+
+注意：这条公式的前提是**有重试机制**（verifier 拦下错误后重走该步）。无重试时，verifier 自身的误判率会让这一步的实际正确率低于 p2——加了反而更差。推导见[第 4 章 · 一笔具体的账](../../知识/04-系统架构与复合AI可靠性数学.md)。Section 3 里"预期把 p_i 提升到多少"的数字，就应该用这条公式从你估的 c 和 r 推出来，而不是拍脑袋。
 
 对比：
 - 改进了多少？

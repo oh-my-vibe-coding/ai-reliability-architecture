@@ -91,7 +91,7 @@ tags: [part-4, practice, unit2, week]
 
 ## 周末自检（5 分钟）
 
-- [ ] 能用 2 分钟对同事解释"trace ＝ eval dataset"这个洞察
+- [ ] 能用 2 分钟对同事解释"trace = eval dataset"这个洞察
 - [ ] 两张图画完了
 - [ ] 重叠分析经过至少 1 轮 AI 挑错 + 自己改
 - [ ] 本周 B1 预测"猜不到"的占比知道

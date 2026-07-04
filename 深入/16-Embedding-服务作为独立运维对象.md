@@ -1,6 +1,6 @@
 ---
 title: 深入 16 · Embedding 服务作为独立运维对象
-updated: 2026-05-24
+updated: 2026-07-02
 tags: [deep-dive, embedding, rag, vector-db, sre]
 ---
 
@@ -12,7 +12,7 @@ tags: [deep-dive, embedding, rag, vector-db, sre]
 
 ## 0. 为什么 Embedding 值得单独一章
 
-RAG 系统在 SRE 视角下不是"一个东西"，是**三个独立服务**的组合：
+RAG 系统在 SRE 视角下不是"一个东西"，是**四个独立服务**的组合：
 
 ```mermaid
 flowchart LR
@@ -50,7 +50,7 @@ flowchart LR
 | **吞吐瓶颈** | HBM 带宽 | GPU FLOPs |
 | **典型 batch size** | 16-64 | 256-1024（短文本可塞更多）|
 | **模型规模** | 7B-700B | 通常 100M-7B |
-| **量化敏感性** | 中等（int8 通常 OK）| **极敏感**（int8 量化常显著降低 retrieval 质量）|
+| **量化敏感性** | 中等（int8 通常 OK）| 较敏感（模型权重与存储向量量化是两回事，均须 gold-set 验证，见 §4.2）|
 | **升级影响** | 文本生成行为可能漂移 | **全部历史向量作废** |
 
 这些差异决定了 embedding 服务的 SRE 工作和 LLM 服务**不是同一个 playbook**。
@@ -155,18 +155,18 @@ Embedding 算出来的向量存在 vector DB 里。Vector DB 本身是另一个 
 
 ```
 存储 = 向量数 × (维度 × 4 bytes + metadata 大小)
-索引内存 = HNSW 索引大小 ≈ 向量数 × 维度 × 8 bytes（含 graph 链接）
+索引内存 = HNSW 内存 ≈ 向量数 × (维度 × 4 + M × 2 × 4) bytes，M 常取 16-64
 ```
 
-> HNSW（Hierarchical Navigable Small World）是向量库最常见的索引结构——把向量组织成多层图加速相似搜索，代价是额外占用内存（约原始向量的 2×）。
+> HNSW（Hierarchical Navigable Small World）是向量库最常见的索引结构——把向量组织成多层图加速相似搜索，代价是额外占用内存（约原始向量的 1.1-1.5×）。图链接的开销与维度无关，每个向量约 M × 2 × 4 bytes。
 
 **Worked example**：1 亿条文档 × 1024 维 float32：
 - 原始向量：100M × 4096 byte = **400 GB**
-- HNSW 索引（在内存）：~800 GB
-- 单机 RAM 不够 → **必须分片或量化**
+- HNSW 索引（在内存）：~450-550 GB
+- 单机 RAM 紧张 → **分片或量化**
 
 **两种解决方案**：
-- **量化向量**（int8 / 二值化）：精度损失换 4-32× 内存节省
+- **量化向量**（int8 / 二值化）：精度损失换 4-32× 内存节省。int8 标量量化典型 recall 损失仅 1-3%，二值化损失更大；上线前必须用 gold set 跑 hit@k 对比
 - **分片**：多机分区 + 路由
 
 ### 4.3 Vector DB SLO
@@ -387,7 +387,7 @@ spans:
 >
 > 把 RAG 当成一个整体来盯，等于没盯。
 >
-> 这一章是 [深入 06 Eval Pipeline](06-Eval-Pipeline设计.md) 的 RAG 视角补充——eval 是出口，但出口前的三个独立服务每一个都要被 SRE 严肃运维。
+> 这一章是 [深入 06 Eval Pipeline](06-Eval-Pipeline设计.md) 的 RAG 视角补充——eval 是出口，但出口前 LLM 之外的三个服务（Embedding / Vector DB / Reranker）每一个都要被 SRE 严肃运维。
 
 ---
 

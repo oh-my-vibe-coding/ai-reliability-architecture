@@ -1,6 +1,6 @@
 ---
 title: 科学 04 · Tokenization 的坑
-updated: 2026-06-14
+updated: 2026-07-02
 tags: [science, tokenization, cost, multilingual]
 ---
 
@@ -65,12 +65,12 @@ tags: [science, tokenization, cost, multilingual]
 
 | 单位 | GPT-4o tokenizer | Claude tokenizer | Qwen tokenizer | Llama 3 |
 |---|---|---|---|---|
-| **英文每词平均 token** | 0.73 | 0.75 | 0.80 | 0.80 |
+| **英文每词平均 token** | ~1.35 | ~1.33 | ~1.25 | ~1.25 |
 | **中文每字平均 token** | 1.5-2.0 | 1.3-1.8 | **0.6-1.0** | 1.0-1.5 |
 
 **结论**：
-- 英文：1 词 ≈ 1 token（几乎所有 tokenizer 都差不多）
-- 中文：**Qwen 中文最省**（专门训了中文），OpenAI 中文**比英文贵 2-3 倍**
+- 英文：1 词 ≈ 1.3 token（即 1 token ≈ 0.75 个英文词，各家 tokenizer 差异不大）
+- 中文：**Qwen 中文最省**（专门训了中文），OpenAI 中文**比英文贵约 3 倍**
 
 ### 2.3 成本影响（真实账单）
 
@@ -78,13 +78,13 @@ tags: [science, tokenization, cost, multilingual]
 - 英文 1000 词
 - 中文 2500 字（等价信息量）
 
-用 GPT-4：
-- 英文：1000 × 0.73 = **730 token**
-- 中文：2500 × 1.8 = **4500 token**（贵 6.2 倍）
+用 GPT-4o：
+- 英文：1000 × 1.35 = **1350 token**
+- 中文：2500 × 1.8 = **4500 token**（贵约 3.3 倍）
 
 用 Qwen：
-- 英文：1000 × 0.80 = **800 token**
-- 中文：2500 × 0.8 = **2000 token**（比英文只贵 2.5 倍）
+- 英文：1000 × 1.25 = **1250 token**
+- 中文：2500 × 0.8 = **2000 token**（比英文只贵 1.6 倍）
 
 > [!IMPORTANT]
 > **SRE 含义**：如果你做中文业务，**模型选型要把 tokenization 纳入成本账**。Qwen / DeepSeek / Kimi 等国产模型在中文 token 效率上有显著优势，这不是"国产情怀"，是**纯粹的工程优势**。
@@ -238,7 +238,7 @@ tokens = enc.encode("你好")
 
 # Qwen
 from transformers import AutoTokenizer
-tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-27B")
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen3-32B")
 tokens = tok.encode("你好")
 ```
 
