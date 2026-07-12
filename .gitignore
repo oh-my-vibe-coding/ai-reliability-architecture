@@ -47,6 +47,9 @@ Desktop.ini
 *.bak
 *.log
 
+# --- AI 工具调试产物（playwright-mcp 页面/控制台快照等）---
+.playwright-mcp/
+
 # --- 贯穿项目（如果读者在本仓库里起项目，不跟踪）---
 sre-incident-agent/
 
