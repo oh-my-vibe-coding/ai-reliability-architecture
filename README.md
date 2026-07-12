@@ -8,7 +8,7 @@ tags: [handbook, index]
 
 > 写给已经懂传统 SRE、正在进入 AI 系统现场，并希望从"会用工具"走向"能做架构判断"的工程师。
 >
-> **版本**：v1.11.2 · 2026-07-12 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
+> **版本**：v1.11.3 · 2026-07-12 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
 
 ---
 

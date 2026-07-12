@@ -21,6 +21,33 @@ tags: [meta, changelog]
 
 ---
 
+## v1.11.3 — 2026-07-12
+
+**月度快照更新（深入 03）**：按[月度更新清单](月度更新清单.md) Part A 走了一轮实时扫描（`r.jina.ai` 连续第二轮 SSL 失败，改用直连 + Playwright 浏览器渲染的备用路径）。本轮最大发现是**两款新旗舰在快照间隙同周落地**（OpenAI GPT-5.6 家族 2026-07-09 GA、xAI Grok 4.5 2026-07-08/09），已入表。按 SemVer（快照数据 / 新模型入表 = patch）提升 v1.11.2 → v1.11.3。
+
+### 深入 03 · 模型榜单与新旗舰月更（2026-07-12）
+
+- **§3.2 OpenAI 新增 GPT-5.6 家族**：Sol（旗舰，$5/$30，1.05M/128K）、Terra（$2.50/$15）、Luna（$1/$6），6-26 preview / 7-9 GA；GPT-5.5 降为"上一代旗舰"。定价经 Techmeme / Finout / OpenRouter / NYT / CNBC 多源交叉验证（platform.openai.com 与 openai.com/index 复测仍 403）。GPT-5.6 Sol 与 GPT-5.5 同为 $5/$30，是"同价换代"。
+- **§3.4 xAI 新增 Grok 4.5**：新旗舰，500K ctx（>200K 单价翻倍）、$2/$6 per MTok、Cursor 训练、约 2× token 效率、自称"Opus-4.7 级"；官方 docs URL 由 `docs.x.ai/docs/models` 迁到 `/developers/models`（附录 D 同步）。新增 `[^grok45]` 引用。
+- **§1.5 OpenRouter 周榜刷新**：小米 MiMo-V2.5 登顶 #1（5.4T），DeepSeek V4 Flash 退 #2；上月匿名实验模型 Owl Alpha 退场；**NVIDIA Nemotron 3 Ultra 免费档新进 #9**，腾讯 Hy3 免费档升 #3——Top 10 首现 2 个 `:free` 档，旧的"Top 10 无 :free"口径作废并改写。TL;DR 第 3 句"DeepSeek V4 Flash 稳居 #1"随之修正。中国系仍占 7/10。
+- **§3.11 LM Arena 刷新**：chat Top 10 新增 Muse Spark 1.1（#6）、GPT-5.6 Sol xHigh（#8，±14 宽），Opus 4.8 Thinking / GPT-5.5 High 退到 #11/#12；WebDev Top 5 新增 GPT-5.6 Sol（#2）、Grok 4.5（#4）——**上月"唯一非 Anthropic 是 GLM-5.2"一月即破**，现三席非 Anthropic，但 Fable 5 仍 #1。chat 表因 overview 视图不再逐行暴露票数，改用置信区间宽度（±）作信心信号（去掉票数列）；Coding Top 5 排名复核未变、Score 沿用 07-03。
+- **§3.11 SWE-bench 第四次校对零变动**：2026-05-24 → 06-13 → 07-03 → 07-12 头部纹丝未动（最新提交仍在 2026-02），两款新旗舰均未在此榜提交——头部角力已转移到 LM Arena WebDev。
+- **§3.7 DeepSeek 价格复测未变**（v4-flash/v4-pro cache-hit/miss/output 与 07-03 完全一致）；`deepseek-chat`/`deepseek-reasoner` alias **2026-07-24 15:59 UTC 停服倒计时收窄到约 12 天**，警示升级为"时间已迫近"。
+- **§4.1 六个 CLI stars/release 月更**（2026-07-12 `gh` 实测，括号为较 07-03 变化）：Claude Code 137.5k · v2.1.207，Codex 97.3k · rust-v0.144.1，Gemini CLI 105.9k · v0.50.0，opencode 184.9k（+3.2k，增速仍第一）· v1.17.18，Cline 64.6k · v4.0.8，Aider 47.3k · 仍停在 v0.86.0（续停更、最后提交 2026-05-22）。
+- **派生处同步**：§2.2 场景 A/E 的 OpenAI 首选 GPT-5.5 → GPT-5.6（避免"源改派生烂"）；全篇快照日期 07-03 → 07-12（frontmatter / WARNING / §3 / §3.11 / 更新日志表 / `[^arena]` `[^openrouter]` `[^swe]` 脚注）。
+
+### 本轮"发现但未纳入"
+
+- **Batch API / Embedding（深入 13 / 16，Part A2c）**：三家 Batch 仍官方 50%、DeepSeek pricing 页无折扣窗口变动；MTEB / embedding 榜单属缓变（🔩 季度项），本轮无变化信号，深度核对推迟到季度审查。
+- **Muse Spark 1.1 / Nemotron 3 Ultra / GPT-Live 语音**：仅在榜单出现，未见需要进正文的机制级变化，先观察。
+- **复习卡 / 附录 B**：本轮新模型发布不触发任何机制卡改写（复习卡遵循"问机制不问数字"）；附录 B 以命名引用为主、无裸 URL，链接存活检查在深入 03 脚注 URL（arena / openrouter / swebench / deepseek / gemini docs 均通，openai platform 仍 403）中隐式完成。
+
+### 元 · 维护流程发现
+
+- **`r.jina.ai` 连续两轮（07-03、07-12）SSL 连接失败**，均靠直连 + Playwright 浏览器渲染兜底。建议下次修订[月度更新清单](月度更新清单.md)时，把"代理失效 → 浏览器渲染回退"正式写成一条分支，而非临时处理。
+
+---
+
 ## v1.11.2 — 2026-07-12
 
 **借鉴《一个 Token 的旅程》分享**：把三处框架与比喻织入机制层——知识 06 提级 `Agent = 模型 + Harness` 等式 + 三类风险映射表；深入 04 加行囊比喻、N² 平方级成本框架与"一个事实，四个后果"枢纽；深入 17 §3.1 命名 `M×N→M+N` 结构母题、术语表补 MCP 条。均为概念增补 / 可读性，未改机制结论与快照数字。按 SemVer（可读性 / 概念增补 = patch）提升 v1.11.1 → v1.11.2。
