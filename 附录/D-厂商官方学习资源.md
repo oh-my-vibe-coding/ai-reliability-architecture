@@ -1,6 +1,6 @@
 ---
 title: 附录 D · 厂商官方学习资源（📊 每季度校对）
-updated: 2026-05-24
+updated: 2026-07-12
 tags: [appendix, training, vendor-official, 📊]
 ---
 
@@ -133,7 +133,7 @@ tags: [appendix, training, vendor-official, 📊]
 - 官方博客：https://qwenlm.github.io/
 
 ### xAI Grok
-- **URL**：https://docs.x.ai/docs/models
+- **URL**：https://docs.x.ai/developers/models
 
 ---
 
