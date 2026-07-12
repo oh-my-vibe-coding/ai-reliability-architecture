@@ -1,6 +1,6 @@
 ---
 title: 深入 17 · LLM 网关的 SRE 视角
-updated: 2026-07-04
+updated: 2026-07-12
 tags: [deep-dive, gateway, sre, multi-provider, observability]
 ---
 
@@ -98,6 +98,10 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 | MCP | Messages API 的 MCP connector 需要声明远端 server 与对应 toolset；鉴权/可用性是协议边界 | Responses API 支持 remote MCP / connectors；会出现 MCP list / approval / call 相关 items | 不应把 Chat Completions 当 MCP 主路径 |
 
 **网关侧的最低工程要求**：不要把任何一家供应商的请求/响应格式直接暴露成公司内部标准。内部应该先定义一套 canonical schema，再由 provider adapter 做双向翻译。
+
+这条要求的价值可以用一个形状说清：M 个调用方直连 N 家上游、各接各的协议，是 **M×N** 份互不复用的胶水；中间插一层 canonical schema，调用方只对内部协议编程、每家上游只被 adapter 对接一次，M×N 就塌成 **M+N**。像 USB-C——一个统一口，两端换任何设备都不用重接线。
+
+同一个 `M×N→M+N` 的形状在别处也出现：**MCP**（Model Context Protocol）之于"应用 × 工具"，就是 canonical schema 之于"调用方 × 模型厂商"——写一次 MCP Server，所有支持 MCP 的客户端都能用；跨 Agent 通信（Agent × Agent）也是同一回事。认得这个形状，接入层很多设计就不必死记。
 
 最小 canonical schema 至少要包含：
 

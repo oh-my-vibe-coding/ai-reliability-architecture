@@ -1,6 +1,6 @@
 ---
 title: 代码 02 · 最小 Agent · 教学指南
-updated: 2026-07-02
+updated: 2026-07-12
 tags: [code, guide, agent, tool-use]
 ---
 
@@ -100,6 +100,8 @@ devfs          196K  196K     0 100% /dev
 换成 OpenAI 也一样。`02-openai-agent.py` 里字段名变成 `tool_calls`、`tool_call_id`、`finish_reason`，但循环结构没有变。生产系统真正要抽象的是这层 harness：工具注册、权限执行、超时、取消、审计、脱敏、budget，而不是某一家 API 的字段名。
 
 这也是为什么本 demo 的白名单、`max_iterations`、timeout 和 tool result 清洗，比"模型会不会调用工具"更值得学。模型只是在协议里表达"我想做什么"；宿主 harness 才决定它能不能做。
+
+这段 loop 正是 [知识 06](../知识/06-AI自治与上下文架构约束.md) 里那个等式 **Agent = 模型 + Harness** 中 Harness 的最小可运行形态。
 
 ---
 

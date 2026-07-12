@@ -1,6 +1,6 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-07-04
+updated: 2026-07-12
 tags: [appendix]
 ---
 
@@ -54,13 +54,15 @@ tags: [appendix]
 | Capability-scoped Credentials | 权限按操作范围细分、最小化的凭证 |
 | Blast Radius | 一个操作失败时可能影响的范围 |
 | Reversibility | 操作可回滚的程度，自治分级的核心判据 |
-| Harness（宿主运行时） | 包在模型外面、把工具调用意图变成受控系统动作的那层：负责工具注册、权限执行、沙箱/egress、上下文管理、审计与预算/中断。模型负责"提出下一步"，harness 负责"决定下一步是否被允许"。Agent 的真实安全边界在这里，不在 prompt 里 |
-| Canonical Schema（内部规范协议） | 多上游网关自定义的统一请求/响应结构。各厂商协议先经 provider adapter 翻译成它，再对外暴露。原则是字段取"所有上游的并集，不是交集" |
+| Agent | 带工具的模型泡在"提出动作 → 执行 → 回灌结果"的循环里，直到任务完成或触达预算/轮数上限。构成上 **Agent = 模型 + Harness**（见下一条 / [第 6 章](../知识/06-AI自治与上下文架构约束.md)）——能力与边界由 Harness 决定，不由 prompt 决定 |
+| Harness（宿主运行时） | 包在模型外面、把工具调用意图变成受控系统动作的那层：负责工具注册、权限执行、沙箱/egress、上下文管理、审计与预算/中断。模型负责"提出下一步"，harness 负责"决定下一步是否被允许"。Agent 的真实安全边界在这里，不在 prompt 里。此为运行时/执行边界视角；从组装视角看，harness = 系统提示 + 工具与权限 + 记忆 + 子 Agent + 验证回路，即 **Agent = 模型 + Harness**，两视角的调和见 [第 6 章](../知识/06-AI自治与上下文架构约束.md) |
+| Canonical Schema（内部规范协议） | 多上游网关自定义的统一请求/响应结构。各厂商协议先经 provider adapter 翻译成它，再对外暴露。原则是字段取"所有上游的并集，不是交集"。作用是把"调用方 × 模型厂商"的 M×N 份适配胶水塌成 M+N（同 MCP 之于"应用 × 工具"），详见 [深入 17 · §3.1](../深入/17-LLM网关的SRE视角.md) |
 
 ## 架构
 
 | 术语 | 含义 |
 |---|---|
+| MCP（Model Context Protocol） | Anthropic 开源的上下文接入标准协议：写一次 MCP Server，任意支持 MCP 的客户端都能用它暴露的工具 / 资源 / 提示。把"应用 × 工具"的 M×N 份集成胶水塌成 M+N——和网关 canonical schema 是同一形状的两层（工具层 vs 模型厂商层，见 [深入 17 · §3.1](../深入/17-LLM网关的SRE视角.md)）。也是供应链攻击面，见 [深入 07](../深入/07-Agent-Prompt-Injection红队实战.md) |
 | Compound AI System | 由多步推理、工具调用、检索组成的复合系统 |
 | Step Budget | 一条 Agent 链路允许的最大推理步数 |
 | Verifier / Gate | 在链路中插入的校验节点，用于截断错误累积 |
