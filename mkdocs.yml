@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────
 # MkDocs Material 站点配置
-# 源文件：《AI 时代的 SRE 架构师之路》v1.11.3
+# 源文件：《AI 时代的可靠性架构》v1.11.3
 # 目标：在线阅读站点
 #
 # 重要：MkDocs 要求 docs_dir ≠ mkdocs.yml 所在目录。
@@ -8,8 +8,8 @@
 # 源文件位置不变。执行 build-site.sh 会自动建立 symlinks。
 # ────────────────────────────────────────────────────────────
 
-site_name: AI 时代的 SRE 架构师之路
-site_description: 写给不被 AI 替代、且能与算法工程师并肩的 SRE
+site_name: AI 时代的可靠性架构
+site_description: 写给 SRE 架构师的智能系统运维指南
 site_author: SRE to AI SRE Learning Project
 site_url: ""
 
@@ -126,7 +126,7 @@ extra:
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的 SRE 架构师之路》 · v1.11.3 · 2026-07-12 ·
+  《AI 时代的可靠性架构》 · v1.11.3 · 2026-07-12 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ nav:
           - 总览: 练习/Unit5-数值与编译器级调试/总览.md
           - Week 1 · 数值级原理: 练习/Unit5-数值与编译器级调试/Week1-数值级原理.md
           - Week 2 · Runbook 产出: 练习/Unit5-数值与编译器级调试/Week2-Runbook产出.md
-      - 第 20 章 · Capstone · AI 生产架构评审包: 练习/Capstone-AI生产架构评审包.md
+      - 第 20 章 · Capstone · AI 可靠性架构评审包: 练习/Capstone-AI生产架构评审包.md
 
   - 收束:
       - 结语 · 置身事内: 99-结语.md

@@ -1,10 +1,10 @@
 ---
-title: 第 20 章 · Capstone：AI 生产架构评审包
+title: 第 20 章 · Capstone：AI 可靠性架构评审包
 updated: 2026-07-02
 tags: [part-4, practice, capstone, architecture-review]
 ---
 
-# 第 20 章 · Capstone：AI 生产架构评审包
+# 第 20 章 · Capstone：AI 可靠性架构评审包
 
 > [← 返回目录](../README.md)  ·  [← 周循环总览](周循环总览.md)
 
@@ -18,7 +18,7 @@ tags: [part-4, practice, capstone, architecture-review]
 把整本书的学习成果整合成**一份可对外评审的架构文档**：
 
 - 对**你自己**：系统化检验 4.5 个月的学习是否扎根（终极 Mastery Gate）
-- 对**你的团队**：作为真实架构评审的起点模板
+- 对**你的团队**：作为真实可靠性架构评审的起点模板
 - 对**你的事业**：作为简历 / 面试 / 晋升的硬产出
 
 **不是抄书**。是用**你自己系统的真实信息**，把从书里学到的概念填进一份完整的评审文档。
@@ -35,9 +35,9 @@ tags: [part-4, practice, capstone, architecture-review]
 > **最推荐的 Capstone 对象**就是 [🛠️ 贯穿项目 · SRE 事故助手](贯穿项目-SRE事故助手.md)。
 >
 > 如果你从 Unit 0 就在做贯穿项目，Capstone **不需要重新选题**——直接把项目沉淀为架构评审包：
-> - docs/ 里已有 threat-model / slo / step-budget / runbook 等雏形
+> - docs/ 里已有 threat-model / slo / step-budget / runbook / gateway / rollout 决策树等雏形
 > - Capstone 的工作是"**合并 + 打磨 + 写决策建议**"，而不是从零写
-> - 14 节大部分素材已经积累，1 周可完成
+> - 15 节大部分素材已经积累，1 周可完成
 
 ### 软条件（强烈建议）
 - 完成 Unit 0（API 上手）—— 否则某些讨论会停在纸面
@@ -50,7 +50,7 @@ tags: [part-4, practice, capstone, architecture-review]
 
 ## 最终产出
 
-**一份《AI 生产架构评审包》**，格式不限（Confluence / Notion / Markdown / Google Doc），但结构见下。
+**一份《AI 可靠性架构评审包》**，格式不限（Confluence / Notion / Markdown / Google Doc），但结构见下。
 
 **长度参考**：15-30 页（Markdown 约 800-1500 行）。**不要更长**——评审会上没人会读。
 
@@ -105,14 +105,23 @@ tags: [part-4, practice, capstone, architecture-review]
 - L3 A/B 分流策略
 - Judge 偏见自检
 
-### 6. 推理服务 SLO
+### 6. 推理服务 / 模型服务层 SLO
 
-> **参考**：[第 5 章](../知识/05-AI推理服务的可靠性工程.md)、[Unit 3 · Week 1](Unit3-推理SLO与静默降级/Week1-SLI定义.md)、[附录 E · 模板 3](../附录/E-模板库.md)
+> **参考**：[第 5 章](../知识/05-AI推理服务的可靠性工程.md)、[深入 15](../深入/15-模型注册表与上线流程.md)、[深入 16](../深入/16-Embedding-服务作为独立运维对象.md)、[Unit 3 · Week 1](Unit3-推理SLO与静默降级/Week1-SLI定义.md)、[附录 E · 模板 3](../附录/E-模板库.md)
 
 - 三类 SLI（延迟 / 容量 / 质量），每个有目标值 + 测量点
 - Error budget policy
+- 推理、Embedding、Judge 等模型服务的职责边界与 owner
 
-### 7. 容量规划
+### 7. 统一网关 / 路由 / 成本归因
+
+> **参考**：[深入 17](../深入/17-LLM网关的SRE视角.md)、[深入 18](../深入/18-LLM成本工程.md)
+
+- 是否存在统一网关 / 模型服务层
+- 多上游路由、鉴权、限流、计费与 canonical schema 设计
+- 成本归因与通道级观测面
+
+### 8. 容量规划
 
 > **参考**：[深入 05](../深入/05-LLM推理服务的容量规划.md)、[Unit 3 · Week 2](Unit3-推理SLO与静默降级/Week2-容量规划.md)、[附录 E · 模板 4](../附录/E-模板库.md)
 
@@ -120,7 +129,7 @@ tags: [part-4, practice, capstone, architecture-review]
 - 三个容量分别计算（Prefill / Decode / KV cache）
 - 实例数 + 冗余 + 预算
 
-### 8. 复合系统 Step 预算
+### 9. 复合系统 Step 预算
 
 > **参考**：[第 4 章](../知识/04-系统架构与复合AI可靠性数学.md)、[Unit 4 · Week 1](Unit4-复合AI可靠性数学/Week1-Step预算与端到端正确率.md)、[附录 E · 模板 5](../附录/E-模板库.md)
 
@@ -129,7 +138,7 @@ tags: [part-4, practice, capstone, architecture-review]
 - 端到端正确率（**必须有数字**）
 - Step 数硬上限
 
-### 9. Verifier / Gate 设计
+### 10. Verifier / Gate 设计
 
 > **参考**：[Unit 4 · Week 2](Unit4-复合AI可靠性数学/Week2-Verifier设计.md)
 
@@ -137,15 +146,16 @@ tags: [part-4, practice, capstone, architecture-review]
 - 每个 gate 的类型、成本、预期提升
 - False positive 风险
 
-### 10. 灰度 / 回滚 / Shadow 流量
+### 11. 模型注册表 / 灰度 / 回滚 / Shadow 流量
 
-> **参考**：[Unit 3 · Week 4](Unit3-推理SLO与静默降级/Week4-灰度回滚决策树.md)
+> **参考**：[深入 15](../深入/15-模型注册表与上线流程.md)、[Unit 3 · Week 4](Unit3-推理SLO与静默降级/Week4-灰度回滚决策树.md)
 
+- 是否有 Model Registry 与 pinned model / channel 视图
 - 灰度决策树（1% → 5% → 25% → 100%）
 - Rollback signal（立即 / 需人工 / 观察期）
 - Shadow 流量机制
 
-### 11. 数值级故障 Runbook
+### 12. 数值级故障 Runbook
 
 > **参考**：[第 9 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](Unit5-数值与编译器级调试/Week2-Runbook产出.md)、[附录 E · 模板 6](../附录/E-模板库.md)
 
@@ -153,20 +163,23 @@ tags: [part-4, practice, capstone, architecture-review]
 - 分层诊断流程 + 具体命令
 - 常见根因库
 
-### 12. 事故模式映射
+### 13. 事故模式映射
 
 > **参考**：[深入 10](../深入/10-AI系统事故模式库.md)
 
 - 把本系统的**已知风险**对照 [深入 10 的全部 Pattern](../深入/10-AI系统事故模式库.md)
 - 每个 Pattern：是否存在、已做什么预防、还缺什么
 
-### 13. 遗留风险
+### 14. 外部契约与遗留风险
+
+> **参考**：[第 16 章](../架构/07-与外部世界的契约.md)
 
 - 这套方案扛不住什么？
 - 什么情况会 degrade 到不可用？
 - 组织协作风险（和 ML / 安全 / 业务的接口）
+- 上游模型版本、供应商、SLA/SLO 与数据边界的契约缺口
 
-### 14. 决策建议
+### 15. 决策建议
 
 **给评审会议的总结**（1 页）：
 
@@ -191,9 +204,9 @@ tags: [part-4, practice, capstone, architecture-review]
 达到以下标准才算 Capstone mastered：
 
 ### 内容完整度
-- [ ] 14 节**全部有内容**（不能留空节）
+- [ ] 15 节**全部有内容**（不能留空节）
 - [ ] **数字 / 指标都有具体值**（不是"很重要"这种抽象词）
-- [ ] **图 ≥ 3 张**（至少 Trifecta + Data Flywheel + Step 预算图）
+- [ ] **图 ≥ 4 张**（至少 Trifecta + Data Flywheel + Step 预算图 + 网关 / 模型服务层图）
 
 ### 深度与可操作性
 - [ ] 每节**引用本书对应章节**（不是抽象理论）
@@ -220,7 +233,7 @@ tags: [part-4, practice, capstone, architecture-review]
 ### 第一轮 · AI 挑错
 
 ```
-我刚完成了一份 AI 生产架构评审包，请按以下维度挑错：
+我刚完成了一份 AI 可靠性架构评审包，请按以下维度挑错：
 
 1. **技术漏洞**：数字不一致、计算错误、指标缺失
 2. **逻辑漏洞**：某节说 A 但另一节暗示 not A

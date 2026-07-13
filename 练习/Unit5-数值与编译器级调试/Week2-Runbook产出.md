@@ -174,7 +174,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 
 **完成 Unit 5 = 完成整本书训练主线的闭环**。
 
-**下一步（强烈建议）** → [🏆 Capstone · AI 操作生产架构评审包](../Capstone-AI生产架构评审包.md)
+**下一步（强烈建议）** → [🏆 Capstone · AI 可靠性架构评审包](../Capstone-AI生产架构评审包.md)
 
 把你从 Unit 0-5 学到的所有内容整合成一份**可用于真实架构评审的文档**。这是你整本书学习的终极 Mastery Gate，也是最有对外价值的产出。
 
