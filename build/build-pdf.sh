@@ -2,7 +2,7 @@
 # ═══════════════════════════════════════════════════════════════════
 # 构建 PDF · Pandoc + XeLaTeX
 # 从书根目录执行：bash build/build-pdf.sh
-# 输出：output/AI时代SRE架构师之路-v${VERSION}.pdf
+# 输出：output/AI时代的可靠性架构-v${VERSION}.pdf
 # ═══════════════════════════════════════════════════════════════════
 
 set -euo pipefail
@@ -10,7 +10,7 @@ set -euo pipefail
 # --- 配置 ---
 VERSION="${VERSION:-v1.11.3}"
 OUTPUT_DIR="output"
-OUTPUT_FILE="${OUTPUT_DIR}/AI时代SRE架构师之路-${VERSION}.pdf"
+OUTPUT_FILE="${OUTPUT_DIR}/AI时代的可靠性架构-${VERSION}.pdf"
 BUILD_DIR="build"
 METADATA="${BUILD_DIR}/pdf-metadata.yaml"
 STYLE="${BUILD_DIR}/pdf-style.tex"

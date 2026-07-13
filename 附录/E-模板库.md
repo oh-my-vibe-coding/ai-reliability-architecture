@@ -11,7 +11,7 @@ tags: [appendix, templates, reusable]
 > [!NOTE]
 > **定位**：本书最有复用价值的 9 份模板，集中在一处。**直接 copy 用**，不必翻章节抄。
 >
-> **配合 [Capstone · 架构评审包](../练习/Capstone-AI生产架构评审包.md) 使用**——Capstone 的 14 节里，有 6 节可以用下列模板起步。
+> **配合 [Capstone · AI 可靠性架构评审包](../练习/Capstone-AI生产架构评审包.md) 使用**——Capstone 的 15 节里，有 6 节可以用下列模板起步。
 >
 > **配合 [🛠️ 贯穿项目 · SRE 事故助手](../练习/贯穿项目-SRE事故助手.md) 使用**——项目的 `docs/` 目录可以**直接填充这些模板**（slo.md / threat-model.md / step-budget.md / runbook-numeric.md 等都对应到下面的模板编号）。
 
@@ -464,7 +464,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 ````markdown
 # SRE 事故助手（RAG + Tool-use Agent）
 
-基于《AI 时代的 SRE 架构师之路》贯穿项目。本项目**不是玩具**，是作者学习 AI SRE 的实战载体。
+基于《AI 时代的可靠性架构》贯穿项目。本项目**不是玩具**，是作者学习 AI 可靠性架构的实战载体。
 
 ## 项目目标
 
@@ -481,7 +481,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 - ⬜ Unit 3：SLO / 容量 / 灰度
 - ⬜ Unit 4：Step 预算 / Verifier
 - ⬜ Unit 5：数值 Runbook
-- ⬜ Capstone：架构评审包
+- ⬜ Capstone：AI 可靠性架构评审包
 
 ## 如何运行
 
@@ -638,7 +638,7 @@ python -m app.eval data/eval/smoke.jsonl
 >
 > 3. **引用本书章节**：模板里的 `[深入 XX]` 等链接**保留**，这让你的产出可溯源，评审时有参考。
 >
-> 4. **对照 [Capstone](../练习/Capstone-AI生产架构评审包.md) 使用**：Capstone 的 14 节里，6 节可以直接拼这些模板。
+> 4. **对照 [Capstone](../练习/Capstone-AI生产架构评审包.md) 使用**：Capstone 的 15 节里，6 节可以直接拼这些模板。
 
 ---
 

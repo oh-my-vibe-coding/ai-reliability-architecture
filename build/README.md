@@ -56,7 +56,7 @@ tags: [meta, build, pdf, pandoc, xelatex]
 
 ```bash
 bash build/build-pdf.sh
-# 输出：output/AI时代SRE架构师之路-v1.11.3.pdf
+# 输出：output/AI时代的可靠性架构-v1.11.3.pdf
 ```
 
 **改版本号**：
@@ -175,7 +175,7 @@ pip install mkdocs-with-pdf
 cp build/build-pdf.sh build/build-pdf-deep.sh
 # 编辑，把 FILES 改成 深入/*.md
 # 跑：bash build/build-pdf-deep.sh
-# 输出：output/AI时代SRE架构师之路-v1.11.3-深入卷.pdf
+# 输出：output/AI时代的可靠性架构-v1.11.3-深入卷.pdf
 ```
 
 同理做科学卷、共同语言卷、复习卷。每本 50-100 页较舒适。

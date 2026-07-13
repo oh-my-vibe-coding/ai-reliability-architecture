@@ -2,10 +2,10 @@
 # Pandoc metadata for XeLaTeX PDF build
 # Used by: build/build-pdf.sh
 
-title: AI 时代的 SRE 架构师之路
-subtitle: 写给不被 AI 替代、且能与算法工程师并肩的工程师
+title: AI 时代的可靠性架构
+subtitle: 写给 SRE 架构师的智能系统运维指南
 author: SRE to AI SRE Learning Project
-date: 2026-06-07
+date: 2026-07-12
 lang: zh-CN
 
 # PDF 设置（Pandoc 识别的标准字段）

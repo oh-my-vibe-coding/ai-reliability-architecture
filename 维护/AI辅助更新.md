@@ -32,7 +32,7 @@ tags: [meta, maintenance, ai-assisted, prompts]
 复制以下 prompt 到 Claude Code（在项目根目录运行）：
 
 ````markdown
-你正在帮我维护《AI 时代的 SRE 架构师之路》这本书的月度更新。
+你正在帮我维护《AI 时代的可靠性架构》这本书的月度更新。
 
 请完成以下工作，**但不要直接修改任何文件**——只生成建议清单让我 review：
 
@@ -105,7 +105,7 @@ tags: [meta, maintenance, ai-assisted, prompts]
 ## 3. 新章节起草 · 标准 Prompt
 
 ```markdown
-我要为《AI 时代的 SRE 架构师之路》写一篇新章节，主题是 [X]。
+我要为《AI 时代的可靠性架构》写一篇新章节，主题是 [X]。
 
 **阅读以下文件了解书的风格**：
 - `/path/to/样式指南.md`（排版规范）
