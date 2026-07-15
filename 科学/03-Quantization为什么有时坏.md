@@ -208,7 +208,7 @@ PTQ 算法要选 `scale factor`（每个离散级别代表多大的值）。
 
 **结果**：int4 质量接近 bf16，广泛采用。
 
-### 4.3 SmoothQuant（2023）
+### 4.3 SmoothQuant（2022）
 
 核心思想：**把 outlier 的"难"从激活转移到权重**。
 
