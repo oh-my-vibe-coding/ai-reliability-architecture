@@ -168,7 +168,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 ## 学习科学标注
 
 - **Bloom 层级**：**综合（Create）**——产出一份可迁移的 runbook
-- **关联章节**：[第 9 章](../../知识/09-工程底座.md)、[科学 03](../../科学/03-Quantization为什么有时坏.md)、[深入 10 · Pattern 1 / 12](../../深入/10-AI系统事故模式库.md)
+- **关联章节**：[第 10 章](../../知识/09-工程底座.md)、[科学 03](../../科学/03-Quantization为什么有时坏.md)、[深入 10 · Pattern 1 / 12](../../深入/10-AI系统事故模式库.md)
 
 ---
 

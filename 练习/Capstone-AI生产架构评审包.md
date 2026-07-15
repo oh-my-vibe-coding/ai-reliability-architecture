@@ -1,10 +1,10 @@
 ---
-title: 第 20 章 · Capstone：AI 可靠性架构评审包
+title: 第 21 章 · Capstone：AI 可靠性架构评审包
 updated: 2026-07-02
 tags: [part-4, practice, capstone, architecture-review]
 ---
 
-# 第 20 章 · Capstone：AI 可靠性架构评审包
+# 第 21 章 · Capstone：AI 可靠性架构评审包
 
 > [← 返回目录](../README.md)  ·  [← 周循环总览](周循环总览.md)
 
@@ -90,7 +90,7 @@ tags: [part-4, practice, capstone, architecture-review]
 
 ### 4. Trace-Eval 一体化方案
 
-> **参考**：[第 7 章](../知识/07-质量可观测性与DataFlywheel.md)、[深入 06](../深入/06-Eval-Pipeline设计.md)、[Unit 2](Unit2-TraceEval统一可观测性/总览.md)、[附录 E · 模板 1](../附录/E-模板库.md)
+> **参考**：[第 8 章](../知识/07-质量可观测性与DataFlywheel.md)、[深入 06](../深入/06-Eval-Pipeline设计.md)、[Unit 2](Unit2-TraceEval统一可观测性/总览.md)、[附录 E · 模板 1](../附录/E-模板库.md)
 
 - 统一数据流图（trace = eval dataset）
 - Data Flywheel 流程图 + 每步 owner
@@ -157,7 +157,7 @@ tags: [part-4, practice, capstone, architecture-review]
 
 ### 12. 数值级故障 Runbook
 
-> **参考**：[第 9 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](Unit5-数值与编译器级调试/Week2-Runbook产出.md)、[附录 E · 模板 6](../附录/E-模板库.md)
+> **参考**：[第 10 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](Unit5-数值与编译器级调试/Week2-Runbook产出.md)、[附录 E · 模板 6](../附录/E-模板库.md)
 
 - 触发条件（Quick Check）
 - 分层诊断流程 + 具体命令
@@ -172,7 +172,7 @@ tags: [part-4, practice, capstone, architecture-review]
 
 ### 14. 外部契约与遗留风险
 
-> **参考**：[第 16 章](../架构/07-与外部世界的契约.md)
+> **参考**：[第 17 章](../架构/07-与外部世界的契约.md)
 
 - 这套方案扛不住什么？
 - 什么情况会 degrade 到不可用？
@@ -219,7 +219,7 @@ tags: [part-4, practice, capstone, architecture-review]
 - [ ] **没做 AI reward hacking**（不要把书里的好例子抄一遍交差）
 
 ### 流程完整
-- [ ] 经过**至少 1 轮 AI 挑错 + 自己修改**（B2 方式，见 [第 17 章](10-三个核心训练动作.md)）
+- [ ] 经过**至少 1 轮 AI 挑错 + 自己修改**（B2 方式，见 [第 18 章](10-三个核心训练动作.md)）
 - [ ] 经过**至少 1 轮红队测试**（见下一节）
 - [ ] 让**至少 1 位同事读过**并给反馈
     - **自学者替代**：首选用[深入 12](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)讲的"两家 judge 投票"——让 Claude + GPT/Gemini 各挑一遍，比单家更接近"同事 review"；也可以脱敏后发到 Hacker News / 微博 / 公司外部 SRE 群盲 review——外发前先泛化服务名 / 规模数字，未修复缺口只写类别不写细节（评审包里含威胁模型和"扛不住的情形"，不脱敏外发等于公开攻击路线图）

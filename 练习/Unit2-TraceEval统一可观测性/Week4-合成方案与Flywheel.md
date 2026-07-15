@@ -147,7 +147,7 @@ Eval 挂了 = 瞎。所以 eval 也需要 SLO：
 ## 学习科学标注
 
 - **Bloom 层级**：**综合 + 评估（Create + Evaluate）**
-- **关联章节**：[深入 06 · Eval Pipeline](../../深入/06-Eval-Pipeline设计.md)、[第 7 章](../../知识/07-质量可观测性与DataFlywheel.md)
+- **关联章节**：[深入 06 · Eval Pipeline](../../深入/06-Eval-Pipeline设计.md)、[第 8 章](../../知识/07-质量可观测性与DataFlywheel.md)
 
 ---
 

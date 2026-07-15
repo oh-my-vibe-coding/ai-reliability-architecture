@@ -6,7 +6,7 @@ tags: [deep-dive, embedding, rag, vector-db, sre]
 
 # 深入 16 · Embedding 服务作为独立运维对象
 
-> [← 返回目录](../README.md)  ·  对应知识章节：[第 7 章 · 质量可观测性 ＋ Data Flywheel](../知识/07-质量可观测性与DataFlywheel.md)  ·  相关：[深入 06 · Eval Pipeline](06-Eval-Pipeline设计.md)、[深入 15 · Model Registry](15-模型注册表与上线流程.md)
+> [← 返回目录](../README.md)  ·  对应知识章节：[第 8 章 · 质量可观测性 ＋ Data Flywheel](../知识/07-质量可观测性与DataFlywheel.md)  ·  相关：[深入 06 · Eval Pipeline](06-Eval-Pipeline设计.md)、[深入 15 · Model Registry](15-模型注册表与上线流程.md)
 
 ---
 

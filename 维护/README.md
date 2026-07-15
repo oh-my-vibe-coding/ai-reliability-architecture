@@ -1,6 +1,6 @@
 ---
 title: 维护系统 · README
-updated: 2026-07-12
+updated: 2026-07-15
 tags: [meta, maintenance, changelog]
 ---
 
@@ -54,7 +54,7 @@ tags: [meta, maintenance, changelog]
 - **Minor** (v1.1 → v1.2)：新增深入 / 科学 / 共同语言章节
 - **Patch** (v1.1.0 → v1.1.1)：快照数据更新、模型 / 工具更新、勘误
 
-**当前版本**：`v1.11.3` · 2026-07-12
+**当前版本**：`v1.12.0` · 2026-07-15
 
 > 版本同步原则：改了 README 的版本号，**必须**同步更新此行。否则读者困惑。
 

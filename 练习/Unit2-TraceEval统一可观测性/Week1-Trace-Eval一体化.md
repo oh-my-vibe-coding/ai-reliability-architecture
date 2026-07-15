@@ -106,7 +106,7 @@ tags: [part-4, practice, unit2, week]
 
 - **Bloom 层级**：**分析 + 综合**（不是记忆/理解）
 - **对应训练动作**：[B2 主产出] + [B3 无 AI 阅读] + [B1 日常预测]
-- **关联章节**：[第 7 章 · 质量可观测性](../../知识/07-质量可观测性与DataFlywheel.md)、[深入 06 · Eval Pipeline](../../深入/06-Eval-Pipeline设计.md)
+- **关联章节**：[第 8 章 · 质量可观测性](../../知识/07-质量可观测性与DataFlywheel.md)、[深入 06 · Eval Pipeline](../../深入/06-Eval-Pipeline设计.md)
 
 ---
 

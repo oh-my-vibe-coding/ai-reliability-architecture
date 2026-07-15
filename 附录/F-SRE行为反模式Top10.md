@@ -52,7 +52,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 
 **正确做法**：Eval 是持续运行的生产监控，不是上线前的 checkpoint。给它定 SLO（覆盖率、延迟、Judge κ、pipeline uptime）。Eval 挂了 = 质量盲眼。
 
-**来源**：[第 7 章 · 质量可观测性](../知识/07-质量可观测性与DataFlywheel.md)、[深入 06 · Eval Pipeline](../深入/06-Eval-Pipeline设计.md)
+**来源**：[第 8 章 · 质量可观测性](../知识/07-质量可观测性与DataFlywheel.md)、[深入 06 · Eval Pipeline](../深入/06-Eval-Pipeline设计.md)
 
 ---
 

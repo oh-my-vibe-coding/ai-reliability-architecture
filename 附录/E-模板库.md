@@ -303,7 +303,7 @@ Response: {response}
 
 ## 模板 6 · 数值级故障 Runbook
 
-**来源**：[第 9 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](../练习/Unit5-数值与编译器级调试/Week2-Runbook产出.md)
+**来源**：[第 10 章](../知识/09-工程底座.md)、[科学 03](../科学/03-Quantization为什么有时坏.md)、[Unit 5 · Week 2](../练习/Unit5-数值与编译器级调试/Week2-Runbook产出.md)
 
 ````markdown
 ## <服务名> · 数值级故障排查 Runbook
