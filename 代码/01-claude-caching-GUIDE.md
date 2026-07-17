@@ -39,7 +39,7 @@ export ANTHROPIC_API_KEY=sk-ant-...
 ### 一次性成本预估
 
 - 跑两次 demo ≈ 消耗 20k 输入 token + 1k 输出 token
-- Sonnet 4.6 定价下约 **$0.08**
+- Sonnet 5 定价下约 **$0.08**
 - 第二次**缓存命中**大部分，成本 < $0.01
 
 ---

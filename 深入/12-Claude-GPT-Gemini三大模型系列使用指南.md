@@ -1,6 +1,6 @@
 ---
 title: 深入 12 · Claude / GPT / Gemini 三大模型系列使用指南
-updated: 2026-07-02
+updated: 2026-07-17
 tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 ---
 
@@ -9,7 +9,7 @@ tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 > [← 返回目录](../README.md)
 
 > [!WARNING]
-> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
+> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
 >
 > 本章不追榜单，不给"谁最强"这种很快过期的结论。它只讲三件更耐用的东西：**怎么理解三大系列、怎么选、怎么用才能少踩坑**。
 
@@ -39,7 +39,7 @@ Claude、GPT、Gemini 都不是"一个模型"，而是**一组按能力、速度
 Claude 的命名基本可以这样理解：
 
 - **Opus**：最强、最贵、最适合高难推理 / 复杂代码 / 架构分析。**当前旗舰：Opus 4.8**（2026-05-28 发布；Opus 4.7 / 4.6 已进 Migrating 文档）。
-- **Sonnet**：主力平衡档，通常是生产和日常工程任务的默认首选。**当前：Sonnet 4.6**。
+- **Sonnet**：主力平衡档，通常是生产和日常工程任务的默认首选。**当前：Sonnet 5**（2026-06-30 接棒 Sonnet 4.6，官方定位"最 agentic 的 Sonnet"、agentic 基准逼近 Opus 4.8；首发价 $2/$10 per MTok 至 2026-08-31，之后 $3/$15。Sonnet 4.6 转上一代，仍可用。定价与代际见 [深入 03 · §3.1](03-模型与工具场景化最佳实践.md)）。
 - **Haiku**：轻量快速档，适合分类、抽取、批处理、低延迟链路。**当前：Haiku 4.5**（`claude-haiku-4-5-20251001`）。
 - **Fable / Mythos（研究分支）**：2026-06-09 起 Anthropic 在 Opus/Sonnet/Haiku 主线之外开了 Fable 5（通用研究形态）和 Mythos Preview（Project Glasswing 防御性安全研究，邀请制）；不是日常生产线的默认选择，是 SRE 评估"前沿能力 / 安全研究"时才纳入的分支。
 

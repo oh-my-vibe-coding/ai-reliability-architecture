@@ -81,7 +81,7 @@ tags: [appendix]
 
 | 术语 | 含义 |
 |---|---|
-| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 Opus 4.8，2026-05-28），Sonnet 偏平衡主力（4.6），Haiku 偏轻量快速（4.5）。**注意**：Opus 4.8 起 `effort` 默认 `high`，调用方不显式 override 会一次性吃掉 3-10× token 预算 |
+| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 Opus 4.8，2026-05-28），Sonnet 偏平衡主力（当前 Sonnet 5，2026-06-30 接棒 4.6），Haiku 偏轻量快速（4.5）。**注意**：Opus 4.8 起 `effort` 默认 `high`，调用方不显式 override 会一次性吃掉 3-10× token 预算 |
 | Claude Fable / Mythos | 在 Opus/Sonnet/Haiku 主线之外的研究分支：Fable 5（2026-06-09）通用研究形态、Mythos Preview 是 Project Glasswing 防御性安全研究专用（邀请制）。不是日常生产首选 |
 | GPT flagship / mini / nano / reasoning | OpenAI GPT 系列的常见分层：旗舰做复杂任务，mini/nano 做低成本高频任务，reasoning 档用于复杂推理 |
 | Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定档为 Gemini 3.5 Flash，旗舰为 Gemini 3.1 Pro Preview（Gemini 3 Pro Preview 已于 2026-03-09 关停）|

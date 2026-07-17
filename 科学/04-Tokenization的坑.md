@@ -1,6 +1,6 @@
 ---
 title: 科学 04 · Tokenization 的坑
-updated: 2026-07-02
+updated: 2026-07-17
 tags: [science, tokenization, cost, multilingual]
 ---
 
@@ -95,11 +95,12 @@ tags: [science, tokenization, cost, multilingual]
 
 ### 3.1 "数 r 问题"的根因
 
-问 GPT "strawberry 里有几个 r"，它常答错（2 个）。
+让**不开思考**的模型快速回答"strawberry 里有几个 r"，它至今仍会答错（经典错误是 2 个，正确是 3 个）。
 
-**真相**：模型看到的不是 `s-t-r-a-w-b-e-r-r-y`，而是 `["straw", "berry"]`（2 个 token）。
+**真相**：模型看到的不是 `s-t-r-a-w-b-e-r-r-y`，而是 `["str", "aw", "berry"]` 这样的几个 token（具体切法随 tokenizer 而变）。字符级的统计在 token 层面**看不到**。模型要"数 r"必须先在输出里把词**逐字符拆开**，这是额外的推理步。
 
-字符级的统计在 token 层面**看不到**。模型要"数 r"必须先**拆 token**，这是额外推理步。
+> [!NOTE]
+> **2026 的实况**：这道题今天已经从"能不能做"退化成"愿不愿意花算力做"。**推理 / thinking 模型**基本都能答对——因为它们会在思考阶段显式把词拼成 `s-t-r-a-w-b-e-r-r-y` 再逐个数，正好补上了上面那"额外的推理步"。**但根因一点没变**：底层仍然看不到字符，靠的是"把 token 拆回字符"这个动作，而不是模型真的具备字符视觉。所以① 非推理 / 快速档仍会栽；② 换更长的词、生造词、或要求"别想直接答"时，推理模型也会重新翻车。**别把"旗舰能数对 strawberry"当成"字符级能力已解决"**——它只是学会了绕路。
 
 ### 3.2 数字 tokenization 的不稳定性
 
@@ -230,7 +231,7 @@ Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同
 import anthropic
 client = anthropic.Anthropic()
 count = client.messages.count_tokens(
-    model="claude-opus-4-7",
+    model="claude-opus-4-8",
     messages=[{"role": "user", "content": "你好"}]
 )
 

@@ -320,7 +320,7 @@ flowchart TB
 ## 5. Worked Example：对一个 SRE 运维 Agent 做红队
 
 ### 目标 Agent
-- 用 Claude Sonnet 4.6
+- 用 Claude Sonnet 5
 - Tools：`run_shell`（白名单：`ps`, `df`, `kubectl get`）、`read_file`（/var/log）、`send_message`（Slack）
 - 输入面：工程师的 prompt + 从 Loki 读的日志
 
