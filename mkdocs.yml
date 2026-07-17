@@ -1,6 +1,6 @@
 # ────────────────────────────────────────────────────────────
 # MkDocs Material 站点配置
-# 源文件：《AI 时代的可靠性架构》v1.12.7
+# 源文件：《AI 时代的可靠性架构》v1.12.8
 # 目标：在线阅读站点
 #
 # 重要：MkDocs 要求 docs_dir ≠ mkdocs.yml 所在目录。
@@ -119,14 +119,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.12.7
+    default: v1.12.8
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的可靠性架构》 · v1.12.7 · 2026-07-17 ·
+  《AI 时代的可靠性架构》 · v1.12.8 · 2026-07-17 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────
