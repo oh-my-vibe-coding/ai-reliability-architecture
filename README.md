@@ -10,7 +10,7 @@ tags: [handbook, index]
 >
 > 覆盖 LLMOps、AgentOps、模型服务、统一网关、Trace-Eval、预算治理与外部契约。
 >
-> **版本**：v1.12.4 · 2026-07-17 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
+> **版本**：v1.12.5 · 2026-07-17 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
 
 ---
 
