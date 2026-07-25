@@ -105,7 +105,7 @@ GPTQ 和 AWQ 的核心思想分别是？,GPTQ 用 Hessian 信息决定哪些权�
 量化静默降级的典型症状？,整体 eval 通过但某类任务崩（数字/结构化输出对量化特别敏感）。必须按任务类型分桶监控。,science-03
 同样信息量，中文在 GPT tokenizer 下的 token 数比 Qwen 多多少？,~2-3×（GPT 对中文每字 1.5-2 token，Qwen 每字 0.6-1 token）。,science-04
 LLM 数学差的根因？,Tokenization 不稳定——"17234" 可能切成 [17｜234] 也可能 [1｜7｜2｜3｜4]。数字不是位值表示。,science-04
-Opus 4.7+（含 4.8）换 tokenizer 对账单的影响？,同样内容 token 数比 Sonnet 4.6 多约 35%（1.35× 体积，源自 1M context 对应 ~555k 词 vs Sonnet 4.6 的 ~750k 词）。单价相同时实际成本高 ~35%。Opus 4.8 还把 effort 默认设为 high，预算再叠加 3-10×。,science-04
+Opus 4.7+（含 4.8 / 5）换 tokenizer 对账单的影响？,同样内容 token 数比 Sonnet 4.6 多约 35%（1.35× 体积，源自 1M context 对应 ~555k 词 vs Sonnet 4.6 的 ~750k 词）。单价相同时实际成本高 ~35%。Opus 4.8 起还把 effort 默认设为 high（Opus 5 延续），预算再叠加 3-10×。Opus 5 与 4.8 同 tokenizer 同单价，换代本身不改这两项。,science-04
 训练三段是哪三段？,Pre-training（世界知识）/ Mid-training（聚焦能力提升）/ Post-training（对齐）。,shared-lang-01
 SFT 和 RLHF/DPO 的区别？,SFT 教格式（被问就答），RLHF/DPO 教偏好（两个都对的回答里选更好的）。,shared-lang-01
 Loss spike 的 SRE 处理流程？,暂停 → 检查最近数据批次 → 从最近 checkpoint 恢复 → Skip 可疑数据 → 继续。,shared-lang-01

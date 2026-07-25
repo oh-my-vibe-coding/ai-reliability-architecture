@@ -1,6 +1,6 @@
 ---
 title: AI 时代的可靠性架构
-updated: 2026-07-15
+updated: 2026-07-25
 tags: [handbook, index]
 ---
 
@@ -10,7 +10,7 @@ tags: [handbook, index]
 >
 > 覆盖 LLMOps、AgentOps、模型服务、统一网关、Trace-Eval、预算治理与外部契约。
 >
-> **版本**：v1.12.8 · 2026-07-17 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
+> **版本**：v1.12.9 · 2026-07-25 · [CHANGELOG](维护/CHANGELOG.md) · [维护系统](维护/README.md)
 
 ---
 

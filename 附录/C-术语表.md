@@ -1,6 +1,6 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-07-12
+updated: 2026-07-25
 tags: [appendix]
 ---
 
@@ -19,7 +19,7 @@ tags: [appendix]
 | 术语 | 含义 |
 |---|---|
 | Token | 模型的最小处理单位。英文约 0.75 词/token；中文通常每字 1-2 个 token——tokenizer 差异大，中文友好的 tokenizer 可低至 1 token/字以下，分厂商数字见 [科学 04](../科学/04-Tokenization的坑.md) |
-| Tokenizer 代际差异 | 同一厂商不同代模型可能换 tokenizer，相同字符的 token 数会变，按 token 计账时要对每代单独估。例（2026-06 快照 🕒，详见 [科学 04 · §5](../科学/04-Tokenization的坑.md)）：Claude Opus 4.7 起换了新 tokenizer，1M context 对应 ~555k 词，而同 1M context 的 Sonnet 4.6 对应 ~750k 词——意味着 Opus 4.7+（含 4.8）的 token 体积比 Sonnet 4.6 大约 1.35× |
+| Tokenizer 代际差异 | 同一厂商不同代模型可能换 tokenizer，相同字符的 token 数会变，按 token 计账时要对每代单独估。例（2026-07 快照 🕒，详见 [科学 04 · §5](../科学/04-Tokenization的坑.md)）：Claude Opus 4.7 起换了新 tokenizer，1M context 对应 ~555k 词，而同 1M context 的 Sonnet 4.6 对应 ~750k 词——意味着 Opus 4.7+（含 4.8 / 5，三代同 tokenizer）的 token 体积比 Sonnet 4.6 大约 1.35× |
 | Context Window | 一次对话能容纳的最大 token 数 |
 | System Prompt | 贯穿整个对话的指令 / 规则 |
 | Temperature / top-p | 控制输出随机性的采样参数 |
@@ -74,17 +74,17 @@ tags: [appendix]
 
 ---
 
-## 当前产品 / 参数名词（2026-06 快照 🕒）
+## 当前产品 / 参数名词（2026-07 快照 🕒）
 
 > [!WARNING]
-> 这一层是**查用即可、不要背**的快变信息：模型名、档位、默认参数行为随厂商版本月度漂移。下表是 **2026-06 快照**，实际选型 / 调用前以厂商官方文档为准。完整选型口径见 [深入 12 · 三大模型系列使用指南](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)。
+> 这一层是**查用即可、不要背**的快变信息：模型名、档位、默认参数行为随厂商版本月度漂移。下表是 **2026-07-25 快照**，实际选型 / 调用前以厂商官方文档为准。完整选型口径见 [深入 12 · 三大模型系列使用指南](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)。
 
 | 术语 | 含义 |
 |---|---|
-| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 Opus 4.8，2026-05-28），Sonnet 偏平衡主力（当前 Sonnet 5，2026-06-30 接棒 4.6），Haiku 偏轻量快速（4.5）。**注意**：Opus 4.8 起 `effort` 默认 `high`，调用方不显式 override 会一次性吃掉 3-10× token 预算 |
+| Claude Opus / Sonnet / Haiku | Anthropic Claude 系列的常见分层：Opus 偏最强（当前旗舰 **Opus 5，2026-07-24**，同价接棒 Opus 4.8；4.8 仍在服务），Sonnet 偏平衡主力（当前 Sonnet 5，2026-06-30 接棒 4.6），Haiku 偏轻量快速（4.5，仍是该线最新一代）。**注意**：Opus 4.8 起 `effort` 默认 `high`（Opus 5 延续），调用方不显式 override 会一次性吃掉 3-10× token 预算 |
 | Claude Fable / Mythos | 在 Opus/Sonnet/Haiku 主线之外的研究分支：Fable 5（2026-06-09）通用研究形态、Mythos Preview 是 Project Glasswing 防御性安全研究专用（邀请制）。不是日常生产首选 |
 | GPT flagship / mini / nano / reasoning | OpenAI GPT 系列的常见分层：旗舰做复杂任务，mini/nano 做低成本高频任务，reasoning 档用于复杂推理 |
-| Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定档为 Gemini 3.5 Flash，旗舰为 Gemini 3.1 Pro Preview（Gemini 3 Pro Preview 已于 2026-03-09 关停）|
+| Gemini Pro / Flash / Flash-Lite | Google Gemini 系列的常见分层：Pro 偏复杂和长上下文，Flash 偏速度成本平衡，Flash-Lite 偏轻量高吞吐。当前稳定主力档为 **Gemini 3.6 Flash**（2026-07-21 接棒 3.5 Flash，且是降价换代），Pro 线最新可用为 Gemini 3.1 Pro Preview（3 Pro Preview 已于 2026-03-09 关停；3.5 Pro 截至 2026-07-25 仍未发布）。**Flash-Lite 选价别按版本号**：2.5（$0.10/$0.40）比 3.1（$0.25/$1.50）和 3.5（$0.30/$2.50）都便宜 |
 | Computer Use Preview | 让 LLM 直接驱动浏览器/桌面操作的能力。当前可用：Anthropic Claude Computer Use、OpenAI Codex/Operator、Google Gemini 2.5 Computer Use Preview。**SRE 警示**：启用即把模型同时拉到 "私有数据 + 不受信内容 + 外部行动" 三条线上，必须按致命三角扩展防御 |
-| `effort` 参数（reasoning effort） | Anthropic / OpenAI / Google 推理模型上控制"思考深度"的统一参数，档位通常为 `none/low/medium/high/xhigh`。每升一档延迟与 token 成本可放大数倍。**Claude Opus 4.8 起在 API/Claude Code 上默认 `high`**，是 4.7 → 4.8 升级的最大坑 |
+| `effort` 参数（reasoning effort） | Anthropic / OpenAI / Google 推理模型上控制"思考深度"的统一参数，档位通常为 `none/low/medium/high/xhigh`。每升一档延迟与 token 成本可放大数倍。**Claude Opus 4.8 起在 API/Claude Code 上默认 `high`，Opus 5 延续该默认**——曾是 4.7 → 4.8 升级的最大坑，4.8 → 5 升级同样不会自动帮你修好 |
 | Messages API / Responses API / Chat Completions | 当前三种主流 LLM 调用协议：Anthropic **Messages API**（block-structured、默认无状态、`tool_use`/`tool_result`、`stop_reason`）；OpenAI **Responses API**（OpenAI 新项目推荐的统一 agentic 面，input/output item、内置工具、remote MCP、可选状态延续）；OpenAI **Chat Completions**（经典兼容层，`messages`/`choices[]`/`finish_reason`/`tool_calls`）。差异不只在字段名，更在状态、工具循环、流式与计费语义，详见 [深入 17](../深入/17-LLM网关的SRE视角.md) |

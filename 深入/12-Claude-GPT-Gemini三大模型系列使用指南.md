@@ -1,6 +1,6 @@
 ---
 title: 深入 12 · Claude / GPT / Gemini 三大模型系列使用指南
-updated: 2026-07-17
+updated: 2026-07-25
 tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 ---
 
@@ -9,7 +9,7 @@ tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 > [← 返回目录](../README.md)
 
 > [!WARNING]
-> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
+> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
 >
 > 本章不追榜单，不给"谁最强"这种很快过期的结论。它只讲三件更耐用的东西：**怎么理解三大系列、怎么选、怎么用才能少踩坑**。
 
@@ -25,7 +25,7 @@ Claude、GPT、Gemini 都不是"一个模型"，而是**一组按能力、速度
 |---|---|---|---|
 | Claude | Opus / Sonnet / Haiku | 长文理解、代码代理、写作质量、谨慎推理 | 用 Sonnet 做主力，Opus 做难题，Haiku 做高频便宜任务 |
 | GPT | flagship / mini / nano / reasoning / codex | 通用能力、工具生态、结构化输出、Agent 与产品 API | 用旗舰做复杂任务，用 mini/nano 做路由和批处理，用 reasoning effort 控成本 |
-| Gemini | 3.1 Pro Preview / 3.5 Flash（稳定）/ 3.1 Flash-Lite / Live / Embedding | 长上下文、多模态、Google 生态、低延迟 Flash | 用 3.1 Pro Preview 吃长上下文和复杂多模态，用 3.5 Flash 做高性价比线上链路 |
+| Gemini | 3.1 Pro Preview / 3.6 Flash（稳定）/ Flash-Lite / Live / Embedding | 长上下文、多模态、Google 生态、低延迟 Flash | 用 3.1 Pro Preview 吃长上下文和复杂多模态，用 3.6 Flash 做高性价比线上链路 |
 
 > [!IMPORTANT]
 > 选模型时不要先问"哪个模型最好"。先问：**任务是否需要推理、是否需要长上下文、是否需要多模态、是否能接受延迟、单次错误代价多大、月度成本上限是多少**。
@@ -38,7 +38,7 @@ Claude、GPT、Gemini 都不是"一个模型"，而是**一组按能力、速度
 
 Claude 的命名基本可以这样理解：
 
-- **Opus**：最强、最贵、最适合高难推理 / 复杂代码 / 架构分析。**当前旗舰：Opus 4.8**（2026-05-28 发布；Opus 4.7 / 4.6 已进 Migrating 文档）。
+- **Opus**：最强、最贵、最适合高难推理 / 复杂代码 / 架构分析。**当前旗舰：Opus 5**（2026-07-24 发布，`claude-opus-5`，沿用 Opus 4.8 的 $5/$25 per MTok "同价换代"；Opus 4.8 转上一代但仍在服务，4.7 / 4.6 已进 Migrating 文档）。
 - **Sonnet**：主力平衡档，通常是生产和日常工程任务的默认首选。**当前：Sonnet 5**（2026-06-30 接棒 Sonnet 4.6，官方定位"最 agentic 的 Sonnet"、agentic 基准逼近 Opus 4.8；首发价 $2/$10 per MTok 至 2026-08-31，之后 $3/$15。Sonnet 4.6 转上一代，仍可用。定价与代际见 [深入 03 · §3.1](03-模型与工具场景化最佳实践.md)）。
 - **Haiku**：轻量快速档，适合分类、抽取、批处理、低延迟链路。**当前：Haiku 4.5**（`claude-haiku-4-5-20251001`）。
 - **Fable / Mythos（研究分支）**：2026-06-09 起 Anthropic 在 Opus/Sonnet/Haiku 主线之外开了 Fable 5（通用研究形态）和 Mythos Preview（Project Glasswing 防御性安全研究，邀请制）；不是日常生产线的默认选择，是 SRE 评估"前沿能力 / 安全研究"时才纳入的分支。
@@ -54,7 +54,7 @@ Claude 的工程气质是：**长上下文读写、代码代理、自然语言�
 - 对固定长上下文使用 prompt caching，尤其是系统提示、工具说明、长规范文档。
 
 > [!WARNING]
-> **Opus 4.8 起 `effort` 参数默认 `high`**——Claude API 和 Claude Code 都生效。意味着你**不显式传 `effort`，每次调用都走最深思考档**，对延迟敏感、批处理、路由层这些场景会一次性烧掉 3-10× 的 token 预算。SRE 的动作：在网关 / SDK 包装层显式 `effort=medium` / `low`，再按任务白名单升档；不要把"和 Opus 4.7 一样的调用模板"原样上线。
+> **Opus 4.8 起 `effort` 参数默认 `high`，Opus 5 延续该默认**——Claude API 和 Claude Code 都生效。意味着你**不显式传 `effort`，每次调用都走最深思考档**，对延迟敏感、批处理、路由层这些场景会一次性烧掉 3-10× 的 token 预算。SRE 的动作：在网关 / SDK 包装层显式 `effort=medium` / `low`，再按任务白名单升档；不要把"和 Opus 4.7 一样的调用模板"原样上线。**注意 4.8 → 5 升级不会自动帮你修好这件事**——同价换代（$5/$25 未变）意味着换代本身不涨单价，但"更强的模型倾向于想更久"，迁移后要重新基线化实测 token 消耗。
 
 
 ### GPT 系列：旗舰 / 轻量 / 推理 / Codex
@@ -96,12 +96,13 @@ GPT 的工程气质是：**API 产品能力完整、结构化输出成熟、工�
 > [!WARNING]
 > **2026-03-09 起 Gemini 3 Pro Preview 已关停**，生产环境必须迁移到 **Gemini 3.1 Pro Preview**。本节模型名按官方 2026-05-19 状态写。
 
-Gemini 当前的分层（2026-06 快照）：
+Gemini 当前的分层（2026-07-25 快照）：
 
-- **Gemini 3.1 Pro Preview**：复杂推理、长上下文、多模态理解的主力档；目前是预览态，Anthropic Opus 4.8 之外的另一旗舰候选。
-- **Gemini 3.5 Flash（稳定）**：当前的稳定生产首选；智能体与编码任务上"以远低于大模型的成本提供 Frontier 级表现"是 Google 的口径，OpenRouter 用量验证它确实是高频生产档。
-- **Gemini 3 Flash（预览）**：上一代 Flash，仍在 OpenRouter Top 10 用量榜上，但新项目应优先用 3.5 Flash。
-- **Gemini 3.1 Flash-Lite**：成本/吞吐档，超高频字段抽取、分类、routing 类任务。
+- **Gemini 3.6 Flash（稳定，2026-07-21 发布）**：**当前主力档**，接棒 3.5 Flash。$1.50/$7.50 per MTok——**输出价比 3.5 Flash 低 17%**，官方另称 DeepSWE 上 token 用量最多省 65%，是少见的"换代即省钱"。
+- **Gemini 3.5 Flash（稳定）**：上一代主力（$1.50/$9.00），仍可用；新链路优先 3.6。
+- **Gemini 3.1 Pro Preview**：复杂推理、长上下文、多模态理解的主力档；目前是预览态，Anthropic Opus 5 之外的另一旗舰候选。**Gemini 3.5 Pro 截至 2026-07-25 仍未发布**（官方口径"正在与合作方测试、准备好即开放"，未给日期）。
+- **Gemini 3 Flash（预览）**：更早一代 Flash，仍在 OpenRouter 用量榜上，但新项目应优先用 3.6 Flash。
+- **Flash-Lite 线（成本/吞吐档）**：超高频字段抽取、分类、routing 类任务。**注意选价不要按版本号**——2.5 Flash-Lite（$0.10/$0.40）< 3.1 Flash-Lite（$0.25/$1.50）< **新出的 3.5 Flash-Lite（$0.30/$2.50）**，版本越新反而越贵。
 - **Gemini 3.1 Flash Live / TTS**：语音、视频、实时双向交互。
 - **Gemini Deep Research / Antigravity Agent / Computer Use Preview**：Google 体系下的"托管式 Agent"分支，对应 Anthropic 的 computer use、OpenAI 的 Codex。
   - **Computer Use Preview**（`gemini-2.5-computer-use-preview-10-2025`）：让 Gemini 直接驱动浏览器/操作系统。
@@ -128,7 +129,7 @@ Gemini 的工程气质是：**长上下文、多模态、Google 生态整合、F
 |---|---|---|---|---|
 | 代码库重构 / Agent 编码 | Sonnet / Opus | GPT flagship / Codex | 3.1 Pro Preview / 3.5 Flash | 先测 repo 理解、测试修复率、工具误用率 |
 | 事故分析 / 根因推理 | Opus / Sonnet + thinking | reasoning effort 高档 | 3.1 Pro Preview + thinking | 看是否能引用证据，不看文风 |
-| 工单分类 / 字段抽取 | Haiku | mini / nano | 3.1 Flash-Lite / 3.5 Flash | 成本、延迟、schema 通过率优先 |
+| 工单分类 / 字段抽取 | Haiku | mini / nano | Flash-Lite（比价选档）/ 3.6 Flash | 成本、延迟、schema 通过率优先 |
 | 长文档 RAG | Sonnet | flagship / mini 组合 | 3.1 Pro Preview / 3.5 Flash | 长上下文必须测"引用支持率" |
 | 多模态文档 / 图片 / 视频 | Sonnet / Opus vision | GPT multimodal | 3.1 Pro Preview / 3.5 Flash | Gemini 常是强候选，但仍按任务 eval |
 | 平台 API 集成 | Sonnet + Messages API | Responses API | Gemini API / Vertex AI | 看团队既有云、审计、网络和合规约束 |
