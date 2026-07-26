@@ -111,6 +111,8 @@ Context: {context}
 Response: {response}
 ```
 
+> 注：骨架首行"你是一个严格的评委"是角色注入型**能力脚手架**，强模型上多半可删；真正起作用的是逐维度 rubric + binary + 只输出 JSON 的契约结构（可靠性脚手架，保留）。判据见 [第 13 章 · §1](../架构/03-架构师的决策框架.md)。
+
 **校准机制**：
 - 每周抽 50-100 条让人工打分
 - 算 Cohen's κ 或 agreement rate（标签一致的比例；若用多档 rubric 则 |human - judge| ≤ 1）
