@@ -15,16 +15,16 @@ tags: [meta, changelog]
 
 ---
 
-## 未发布（Unreleased）
+## v1.13.0 — 2026-07-26
 
-**新增全书元原则「两种脚手架」+ 句子级技巧腐坏审计**：起因是读者提问"模型迭代（Opus 5 砍掉约 80% 系统提示词、GPT-5.6 让 Superpowers 类 skill 失效）会不会抹掉本书价值"。核实为厂商亲自动手的真实趋势（[Anthropic · The new rules of context engineering for Claude 5](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models)、[Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)）后，判断这对本书是"缺的拼图送上门"而非威胁，落三处改动：
+**新增全书元原则「两种脚手架」+ 句子级技巧腐坏审计**：起因是读者提问"模型迭代（Opus 5 砍掉约 80% 系统提示词、GPT-5.6 让 Superpowers 类 skill 失效）会不会抹掉本书价值"。核实为厂商亲自动手的真实趋势（[Anthropic · The new rules of context engineering for Claude 5](https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models)、[Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)）后，判断这对本书是"缺的拼图送上门"而非威胁，落四处改动：
 
 - **`架构/03`（第 13 章）§1 新增「四条规则共用的那条根：两种脚手架，半衰期完全不同」**——把"苦涩的教训 vs 可靠性脚手架"这条元原则成文（路线图 v2 §五既定落点，"'何时不再适用'触发器的哲学根"）：**能力脚手架**（补模型此刻做不到的事，随代际作废，该搭成可一把删除）对 **可靠性脚手架**（权限/沙箱/预算/回滚/审计，模型越强越需要），分辨判据是"模型明天聪明十倍还需不需要它"；并首次把"模型 / harness 边界随模型变强向内迁移、好 harness 让这次迁移是删除而非重写"写成命名式陈述（Anthropic 砍约 80% 系统提示词为活例）。它成为全书自失效触发器（样式指南 §15）的哲学根。
 - **句子级技巧腐坏审计（5 处）**：`深入/03` §2.2（顶部加两类"关键考虑"辨析 + 标注"先结构化再推理""先 describe 再 reason"为能力脚手架）、`深入/06` 与 `附录/E` 的 judge"你是严格评委"角色注入、`深入/12` §4 Claude 的 `<role>`/`<constraints>` 脚手架、`知识/06` NOTES.md"永远是最小工作集"——均标为能力脚手架并 `→ 第 13 章 §1`，同时保留其中属契约层的部分（rubric / 分区 / 落盘思路）。
 - **`维护/漂移度表` 立"能力级漂移"为独立一类**：区别于"型号级漂移"（换型号名），补上章级漂移度漏掉的**句子级技巧腐坏盲区**（技巧藏在 🧱/🔩 稳定章里、半衰期比章短），并列出已知集中点供月更复查。
 - **`附录/C` 术语表「## 架构」段登记「能力脚手架 vs 可靠性脚手架」为第一性术语**：该词已跨 6 个文件使用，收进 SSOT（含定义、分辨判据、`→ 第 13 章 §1`），归入"建议背下来"的第一性层而非快照层。
 
-未 bump 版本，待下次 release 归并。
+**另附（开放权重 license 线，独立于「两种脚手架」）：`深入/15` §2.1 新增「base-model 的 license 追踪」**——区分**开放权重与开源**的许可证差异，按**约束形状**分四类（宽松许可 / 厂商社区许可 / 限制性研究许可 / 权重待发），给出注册表 YAML 的可判定字段与三条实践规则（以官方 LICENSE 为准、许可随版本变不随模型名变、权重开放 ≠ 可审计）；base-model 表行"开源权重"改称"开放权重"并交叉引用本节。
 
 ---
 
