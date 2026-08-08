@@ -216,6 +216,7 @@ nav:
       - 质量与评估:
           - 06 · Eval Pipeline 设计: 深入/06-Eval-Pipeline设计.md
           - 10 · AI 系统事故模式库: 深入/10-AI系统事故模式库.md
+          - 30 · 环境漂移与配置可移植: 深入/30-环境漂移与配置可移植.md
       - 安全与自治:
           - 07 · Agent Prompt Injection 红队实战: 深入/07-Agent-Prompt-Injection红队实战.md
           - 08 · 大模型的"记忆"是怎么回事: 深入/08-大模型的记忆是怎么回事.md

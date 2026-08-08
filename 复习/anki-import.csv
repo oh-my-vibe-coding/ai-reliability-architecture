@@ -10,6 +10,7 @@ RAG 是什么？,Retrieval-Augmented Generation。查询 → embedding → 向�
 LLM 推理服务必须分开定 SLO 的两个指标？,TTFT（首 token 延迟）和 tokens/s（输出速度）。,knowledge
 容量规划新三角？,GPU 显存 × 上下文长度 × QPS，三者互相约束。,knowledge
 静默降级（Silent Degradation）是什么？,指标全绿但系统数学已经坏了（bf16/fp32 失配、XLA 怪癖、kernel 非确定性）。,knowledge
+静默降级是「时间维」漂移，那「空间维」漂移是什么？,环境漂移——同一套系统换个环境（客户内网/区域/租户）行为就变，症状一样是全绿却偷偷掉，根因是两个环境的配置从头就分叉。靠跨环境黄金脚本回放（parity）抓，不是 canary。详见深入 30。,knowledge
 Lethal Trifecta 三个组成？,不受信输入 + 工具访问 + 外泄通道。三者共存 = 攻击可行。,knowledge
 Prompt injection 的正确防御层在哪？,基础设施层（沙箱 / egress 白名单 / capability-scoped 凭证），不是 prompt 层。,knowledge
 Agent 的一句话构成？Harness 包含哪些工程件？,Agent = 模型 + Harness。Harness 是你亲手组装的工程件：系统提示 + 工具与权限 + 记忆 + 子 Agent + 验证回路。模型只负责"描述下一步"，Harness 决定它能看到什么、能做什么、被谁验证——能力与边界由架构（Harness）决定，不由 prompt 决定。（同一 harness 从执行视角看，就是执行工具调用的宿主运行时 / 执行边界；见引章 Q4。）,knowledge

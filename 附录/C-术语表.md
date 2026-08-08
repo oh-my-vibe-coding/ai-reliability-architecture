@@ -1,6 +1,6 @@
 ---
 title: 附录 C · 术语表
-updated: 2026-07-26
+updated: 2026-08-08
 tags: [appendix]
 ---
 
@@ -43,6 +43,7 @@ tags: [appendix]
 |---|---|
 | TTFT | Time To First Token，推理服务延迟的关键 SLI |
 | Silent Degradation | 指标全绿但系统已经数学出错的静默故障 |
+| Environment Drift（环境漂移）| 同一套系统换个环境（客户内网 / 区域 / 租户）行为就变、症状同样"全绿却偷偷掉"的故障。它是"行为漂移"的**空间维**，与 Silent Degradation 的**时间维**互为孪生；根因是两个环境的配置从一开始就分叉，靠跨环境黄金脚本回放（parity）而非 canary 抓。详见 [深入 30](../深入/30-环境漂移与配置可移植.md) |
 | Judge Model | 用模型评估另一个模型输出质量的评估方法 |
 | Data Flywheel | 生产 trace → 标注 → eval → 改进 → rollout 的反馈回路 |
 | Assertion Battery | 任务专属的硬规则校验集（替代"全局幻觉率"这类不可操作指标） |
