@@ -530,16 +530,16 @@ Agent 侧另加：工具调用 schema 校验、退款金额 ≤ 授权上限断�
 
 ## 14. 参考资料
 
-- Hamel Husain · 《Your AI Product Needs Evals》与 Evals FAQ（binary 评分立场的原始出处）— https://hamel.dev/blog/posts/evals/
-- Anthropic · 《Adding Error Bars to Evals》（arXiv 2411.00640，§7 的五条统计建议）
-- Anthropic · 《Demystifying evals for AI agents》（2026-01，"grade the outcome, not the path"）
-- Anthropic · Postmortem of three recent issues（"你的 eval 会骗你"的原始来源）
-- Sierra · τ-bench（arXiv 2406.12045，pass^k 与用户模拟器）；τ²/τ³-bench 见[深入 03](03-模型与工具场景化最佳实践.md) 快照
-- Dorner et al. · 《Limits to Scalable Evaluation at the Frontier: LLM as Judge Won't Beat Twice the Data》（ICLR 2025，§2.5 的理论依据）
-- Panickssery et al. · LLM Evaluators Recognize and Favor Their Own Generations（NeurIPS 2024，self-preference）
-- LangSmith / Langfuse · Agent evaluation 文档（final response / trajectory / single step 三分法）
-- promptfoo · CI/CD 集成（OpenAI 官方指定的 Evals 迁移目标）
-- OpenTelemetry · GenAI 语义约定 `gen_ai.evaluation.result`（Development 状态）
+- Hamel Husain · [《Your AI Product Needs Evals》与 Evals FAQ](https://hamel.dev/blog/posts/evals/)（binary 评分立场的原始出处）
+- Anthropic · [《Adding Error Bars to Evals》](https://arxiv.org/abs/2411.00640)（arXiv 2411.00640，§7 的五条统计建议）
+- Anthropic · [《Demystifying evals for AI agents》](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)（2026-01，"grade the outcome, not the path"）
+- Anthropic · [Postmortem of three recent issues](https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues)（"你的 eval 会骗你"的原始来源）
+- Sierra · [τ-bench](https://arxiv.org/abs/2406.12045)（arXiv 2406.12045，pass^k 与用户模拟器）；τ²/τ³-bench 见[深入 03](03-模型与工具场景化最佳实践.md) 快照
+- Dorner et al. · [《Limits to Scalable Evaluation at the Frontier: LLM as Judge Won't Beat Twice the Data》](https://arxiv.org/abs/2410.13341)（ICLR 2025，§2.5 的理论依据）
+- Panickssery et al. · [LLM Evaluators Recognize and Favor Their Own Generations](https://arxiv.org/abs/2404.13076)（NeurIPS 2024，self-preference）
+- LangSmith / Langfuse · Agent evaluation 文档（final response / trajectory / single step 三分法）：[LangSmith](https://docs.langchain.com/langsmith) · [Langfuse](https://langfuse.com/docs/evaluation/overview)
+- promptfoo · [CI/CD 集成](https://github.com/promptfoo/promptfoo)（OpenAI 官方指定的 Evals 迁移目标）
+- OpenTelemetry · [GenAI 语义约定 `gen_ai.evaluation.result`](https://opentelemetry.io/docs/specs/semconv/gen-ai/)（Development 状态）
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

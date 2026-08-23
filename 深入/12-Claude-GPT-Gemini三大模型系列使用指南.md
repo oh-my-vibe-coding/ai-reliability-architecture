@@ -9,7 +9,7 @@ tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 > [← 返回目录](../README.md)
 
 > [!WARNING]
-> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5；2026-08-23 更新 Gemini 分层）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
+> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5；2026-08-23 更新 Gemini 分层）；实际生产选型前，请以 [Anthropic](https://docs.claude.com/en/docs/about-claude/models/overview) / [OpenAI](https://platform.openai.com/docs) / [Google](https://ai.google.dev/gemini-api/docs/models) 官方文档和你自己的 eval 为准。
 >
 > 本章不追榜单，不给"谁最强"这种很快过期的结论。它只讲三件更耐用的东西：**怎么理解三大系列、怎么选、怎么用才能少踩坑**。
 
@@ -470,9 +470,9 @@ flowchart TB
 
 本章只用三类来源校准：厂商官方文档、厂商官方 cookbook / academy、生产系统工程经验。
 
-- Anthropic / Claude Docs · Models、Prompt engineering、Extended thinking、Tool use、Prompt caching
-- OpenAI Platform Docs · Models、Responses API、Function calling、Structured outputs、Reasoning、Prompt caching
-- Google Gemini API Docs · Models、Text generation、Long context、Thinking、Function calling、Live API
+- [Anthropic / Claude Docs](https://docs.claude.com/en/docs/about-claude/models/overview) · Models、Prompt engineering、Extended thinking、Tool use、Prompt caching
+- [OpenAI Platform Docs](https://platform.openai.com/docs) · Models、Responses API、Function calling、Structured outputs、Reasoning、Prompt caching
+- [Google Gemini API Docs](https://ai.google.dev/gemini-api/docs/models) · Models、Text generation、Long context、Thinking、Function calling、Live API
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

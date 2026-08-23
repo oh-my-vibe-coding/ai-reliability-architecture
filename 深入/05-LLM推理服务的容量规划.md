@@ -542,10 +542,10 @@ SRE 助手有一个明显的"高重复前缀"特征：
 
 - vLLM · Scheduler & PagedAttention 设计文档 — https://docs.vllm.ai/en/latest/
 - SGLang · RadixAttention 论文 — https://arxiv.org/abs/2312.07104
-- NVIDIA · H100 / H200 / B200 架构白皮书
+- NVIDIA · [H100 / H200 / B200 架构白皮书](https://www.nvidia.com/en-us/data-center/h100/)
 - 《Efficient Memory Management for LLM Serving with PagedAttention》(vLLM) — https://arxiv.org/abs/2309.06180
-- Anyscale · LLM inference benchmarking 系列博客
-- Character.AI · Optimizing inference (blog) — 讲如何把单用户成本降到 $0.0001
+- Anyscale · [LLM inference benchmarking 系列博客](https://www.anyscale.com/blog)
+- [Character.AI · Optimizing inference (blog)](https://research.character.ai/optimizing-inference/) — 讲如何把单用户成本降到 $0.0001
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

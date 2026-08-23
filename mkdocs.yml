@@ -67,6 +67,9 @@ theme:
 extra_css:
   - stylesheets/extra.css
 
+extra_javascript:
+  - stylesheets/external-links.js
+
 markdown_extensions:
   # 标准
   - abbr
@@ -97,6 +100,9 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
+  - pymdownx.magiclink:
+      repo_url_shorthand: false
+      social_url_shorthand: false
   - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:

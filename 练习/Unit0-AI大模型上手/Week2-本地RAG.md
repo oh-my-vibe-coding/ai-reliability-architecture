@@ -39,7 +39,7 @@ tags: [part-4, practice, unit0, week]
 - [ ] 故意在某份文档里埋一个错误事实，看它会不会被误导
 
 ## 阅读 · B3 · 45 分钟（无 AI）
-**Simon Willison · 《Embeddings: What they are and why they matter》**（simonwillison.net/2023/Oct/23/embeddings/）
+**Simon Willison · [《Embeddings: What they are and why they matter》](https://simonwillison.net/2023/Oct/23/embeddings/)**
 
 读的时候拿笔记下三件事：
 - 向量空间里"相似"到底是什么数学概念

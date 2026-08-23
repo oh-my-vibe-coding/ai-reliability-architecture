@@ -37,7 +37,7 @@ tags: [part-4, practice, unit0, week]
 - [ ] 观察它对你"没给工具权限"的请求的行为
 
 ## 阅读 · B3 · 45 分钟（无 AI）
-**Anthropic API 文档 · Tool use 章节**（anthropic.com/docs → Tool use）
+**Anthropic API 文档 · [Tool use 章节](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview)**
 
 不开 AI、不要让 AI 帮你读。自己一字一句过一遍，特别注意：
 - `tool_use` 和 `tool_result` 两种消息类型的结构

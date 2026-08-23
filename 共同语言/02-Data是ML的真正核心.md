@@ -407,7 +407,7 @@ SRE 能帮上什么：
 - Lee et al · Deduplicating training data makes LMs better — https://arxiv.org/abs/2107.06499
 - Hinton et al · Distilling the Knowledge in a Neural Network — https://arxiv.org/abs/1503.02531
 - DeepSeek-AI · DeepSeek-R1（含中文 PDF 与开源蒸馏小模型）— https://github.com/deepseek-ai/DeepSeek-R1 · arXiv https://arxiv.org/abs/2501.12948
-- OpenAI / Anthropic · 数据 policy & safety 文档
+- OpenAI / Anthropic · 数据 policy & safety 文档：[OpenAI](https://openai.com/policies/usage-policies) · [Anthropic](https://www.anthropic.com/legal/usage-policy)
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

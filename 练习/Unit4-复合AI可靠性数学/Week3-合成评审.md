@@ -20,7 +20,7 @@ tags: [part-4, practice, unit4, week]
 
 - 你自己 W1 的 step 拆解 + 正确率估算
 - 你自己 W2 的 verifier 设计
-- Chip Huyen《Agents》关于 error amplification 的段落
+- Chip Huyen [《Agents》](https://huyenchip.com/2025/01/07/agents.html)关于 error amplification 的段落
 
 **找**：W1 的估算现在看是否太乐观或悲观？
 

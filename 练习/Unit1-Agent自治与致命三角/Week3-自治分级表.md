@@ -12,8 +12,7 @@ tags: [part-4, practice, unit1, week]
 为你的场景，画出 **Auto / Confirm / Forbidden** 三档自治分级表，每行给出判断依据。
 
 ## 阅读 · B3 · 45 分钟（无 AI）
-**Simon Willison · 《Designing Agentic Loops》（2025）**
-（simonwillison.net/2025/Sep/30/designing-agentic-loops/）
+**Simon Willison · [《Designing Agentic Loops》](https://simonwillison.net/2025/Sep/30/designing-agentic-loops/)（2025）**
 
 重点关注：
 - 他怎么定义 LLM agent（"runs tools in a loop to achieve a goal"），以及无人值守的 YOLO mode 有哪三个风险（误删改坏文件、源码与密钥被窃、机器被当成攻击跳板）

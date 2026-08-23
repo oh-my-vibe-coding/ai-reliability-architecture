@@ -293,7 +293,7 @@ flowchart TB
 - Xiao et al · 《Efficient Streaming LLMs with Attention Sinks》— https://arxiv.org/abs/2309.17453
 - Peng et al · 《YaRN: Efficient Context Window Extension》— https://arxiv.org/abs/2309.00071
 - Press et al · 《Train Short, Test Long (ALiBi)》— https://arxiv.org/abs/2108.12409
-- Anthropic · Context Engineering 博客（对应 "attention budget" 概念）
+- Anthropic · [Context Engineering 博客](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)（对应 "attention budget" 概念）
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

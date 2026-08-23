@@ -229,14 +229,14 @@ Registry 自身的最小 SLO 表：
 
 ## 11. 参考资料
 
-- Langfuse · Prompt Management 文档（版本 / label / config 与 prompt 同版本化）
-- LangSmith · Manage Prompts 与 Backtesting 文档（commit 模型、生产 trace 回放）
-- PromptLayer · Release Labels / A-B Releases 文档（按流量百分比分流的产品化实现）
-- promptfoo · GitHub Action（prompt 变更的 CI before/after 评估）
-- OpenTelemetry · GenAI Semantic Conventions（`gen_ai.prompt.name` / `gen_ai.prompt.version`，Development 状态）
-- xAI · 2025-05 与 2025-07 两次 Grok 系统提示事故的官方声明与公开系统提示仓库（xai-org/grok-prompts）
-- OpenAI · Migrate from prompt objects（托管 prompt 对象 2026-11-30 关停的迁移指南——"prompt 回代码库"的官方论据）
-- Google Vertex AI · Prompt management SDK（云厂商中最完整的原生 prompt 版本资源模型，作对照）
+- [Langfuse · Prompt Management 文档](https://langfuse.com/docs/prompts)（版本 / label / config 与 prompt 同版本化）
+- [LangSmith · Manage Prompts 与 Backtesting 文档](https://docs.langchain.com/langsmith)（commit 模型、生产 trace 回放）
+- [PromptLayer · Release Labels / A-B Releases 文档](https://docs.promptlayer.com/)（按流量百分比分流的产品化实现）
+- [promptfoo · GitHub Action](https://github.com/promptfoo/promptfoo)（prompt 变更的 CI before/after 评估）
+- [OpenTelemetry · GenAI Semantic Conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/)（`gen_ai.prompt.name` / `gen_ai.prompt.version`，Development 状态）
+- xAI · 2025-05 与 2025-07 两次 Grok 系统提示事故的官方声明与[公开系统提示仓库 xai-org/grok-prompts](https://github.com/xai-org/grok-prompts)
+- OpenAI · [Migrate from prompt objects](https://platform.openai.com/docs/guides/prompt-objects)（托管 prompt 对象 2026-11-30 关停的迁移指南——"prompt 回代码库"的官方论据）
+- [Google Vertex AI · Prompt management SDK](https://cloud.google.com/vertex-ai/docs)（云厂商中最完整的原生 prompt 版本资源模型，作对照）
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

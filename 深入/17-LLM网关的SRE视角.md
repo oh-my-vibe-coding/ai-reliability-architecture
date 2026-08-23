@@ -84,7 +84,7 @@ tags: [deep-dive, gateway, sre, multi-provider, observability]
 ### 3.1 先把协议翻译成 canonical schema
 
 > [!NOTE]
-> 本节协议事实以 Anthropic Claude Messages API、OpenAI Responses API / Chat Completions 官方文档为准，快照日期为 2026-06-30。协议会变；网关设计要假设它会继续漂移。
+> 本节协议事实以 [Anthropic Claude Messages API](https://docs.claude.com/en/api/messages)、[OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) / [Chat Completions](https://platform.openai.com/docs/api-reference/chat) 官方文档为准，快照日期为 2026-06-30。协议会变；网关设计要假设它会继续漂移。
 
 多上游网关最大的错觉，是以为 Claude / OpenAI / Gemini 的差别只是字段名不同。真正的差别在**协议语义**：谁保存状态、工具调用如何回灌、流式事件如何结束、usage 字段代表什么、MCP 工具由谁连接、错误是否是 HTTP 错误。
 

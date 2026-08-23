@@ -171,11 +171,11 @@ Unit 是"必须做到"的层级（mastery gate），非 Unit 章节是"读到就
 
 ## 8. 参考资料
 
-- Bloom et al · 《Taxonomy of Educational Objectives》(1956)
-- Anderson & Krathwohl · Revised taxonomy (2001)
-- Vanderbilt University · Bloom's Taxonomy — https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/
-- Scott Young · 《Ultralearning》(相关概念)
-- Barbara Oakley · 《Learning How to Learn》（Coursera 课程）
+- Bloom et al · [《Taxonomy of Educational Objectives》](https://en.wikipedia.org/wiki/Bloom%27s_taxonomy)(1956)
+- Anderson & Krathwohl · [Revised taxonomy](https://en.wikipedia.org/wiki/Bloom%27s_taxonomy#Revised_taxonomy)(2001)
+- Vanderbilt University · [Bloom's Taxonomy](https://cft.vanderbilt.edu/guides-sub-pages/blooms-taxonomy/)
+- Scott Young · [《Ultralearning》](https://www.scotthyoung.com/ultralearning/)(相关概念)
+- Barbara Oakley · [《Learning How to Learn》](https://www.coursera.org/learn/learning-how-to-learn)（Coursera 课程）
 
 ---
 

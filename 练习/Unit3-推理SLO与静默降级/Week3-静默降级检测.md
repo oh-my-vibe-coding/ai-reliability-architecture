@@ -16,7 +16,7 @@ tags: [part-4, practice, unit3, week]
 
 ### 阅读 · B3 · 45 分钟（无 AI）
 
-**主读**：Anthropic · 《A postmortem of three recent issues》**第三次精读**
+**主读**：Anthropic · [《A postmortem of three recent issues》](https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues)**第三次精读**
   - 这次**只关注"他们怎么发现的"**
   - 哪些指标提前报了？哪些报了但没人注意？哪些根本没监控？
 

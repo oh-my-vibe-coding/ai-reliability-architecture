@@ -341,7 +341,7 @@ tags: [deep-dive, cost, finops, token-economics]
 
 - Anthropic · Prompt Caching 定价与文档 — https://docs.claude.com/en/docs/about-claude/prompt-caching
 - OpenAI · Batch API 定价 — https://platform.openai.com/docs/guides/batch
-- Google · Gemini Batch 与缓存定价
+- Google · [Gemini Batch 与缓存定价](https://ai.google.dev/gemini-api/docs/batch-api)
 - [深入 02 · Prompt Caching 原理](02-Prompt-Caching原理.md)
 - [深入 04 · 为什么"你好"消耗数万 Token](04-为什么简单你好也消耗数万token.md)
 - [深入 13 · 离线批量推理的成本结构](13-离线批量推理.md)

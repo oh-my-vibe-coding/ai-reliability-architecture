@@ -371,12 +371,12 @@ Token 成本会体现在账单上，错误信任会体现在事故里。一个�
 
 本章观点主要来自以下一手材料和生产经验抽象：
 
-- BAIR · The Shift from Models to Compound AI Systems
-- Anthropic · A postmortem of three recent issues
-- Anthropic · An update on recent Claude Code quality reports
-- OWASP · Top 10 for LLM Applications 2025
-- NIST · AI 600-1: Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile
-- Google SRE Book · SLO、Postmortem、Cascading Failures 相关章节
+- BAIR · [The Shift from Models to Compound AI Systems](https://bair.berkeley.edu/blog/2024/02/18/compound-ai-systems/)
+- Anthropic · [A postmortem of three recent issues](https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues)
+- Anthropic · [An update on recent Claude Code quality reports](https://www.anthropic.com/engineering/april-23-postmortem)
+- OWASP · [Top 10 for LLM Applications 2025](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
+- NIST · [AI 600-1: Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile](https://www.nist.gov/itl/ai-risk-management-framework)
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/) · SLO、Postmortem、Cascading Failures 相关章节
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

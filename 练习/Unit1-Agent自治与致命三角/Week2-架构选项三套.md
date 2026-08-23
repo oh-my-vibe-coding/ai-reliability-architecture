@@ -14,8 +14,8 @@ tags: [part-4, practice, unit1, week]
 ## 阅读 · B3 · 45 分钟（无 AI）
 选两篇读：
 
-1. **Anthropic · Agent 架构相关官方文章**（anthropic.com/engineering 下找 "agent" 相关）
-2. **OpenAI · Function calling 安全文档**（platform.openai.com 搜 function calling best practices）
+1. **Anthropic · [Agent 架构相关官方文章](https://www.anthropic.com/engineering)**（在 engineering 栏目下找 "agent" 相关）
+2. **OpenAI · [Function calling 安全文档](https://platform.openai.com/docs/guides/function-calling)**（搜 function calling best practices）
 
 重点关注：
 - 他们自己设计的**信任边界**在哪（谁是 trusted，谁不是）

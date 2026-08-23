@@ -45,7 +45,7 @@ tags: [part-4, practice, unit5, week]
 
 ### 阅读 · B3 · 45 分钟（无 AI）
 
-**主读**：Anthropic · 《A postmortem of three recent issues》**第四次重读**
+**主读**：Anthropic · [《A postmortem of three recent issues》](https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues)**第四次重读**
   - **这次专注"bf16 / kernel / 数值"的那几段**
   - 理解他们如何**定位到 kernel 层面** bug
 

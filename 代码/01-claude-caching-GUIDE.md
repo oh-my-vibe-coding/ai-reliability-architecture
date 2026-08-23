@@ -105,7 +105,7 @@ anthropic.AuthenticationError: Error code: 401
    - 解决：缩短间隔，或改用 1h TTL（已 GA）
 2. **SYSTEM_PROMPT 或 LARGE_CONTEXT 变了**？改任何字符都会失效
    - 解决：确认完全相同（可以 `hash(text)` 对比）
-3. **内容低于最小可缓存前缀**？阈值随模型 512–4096 token 不等且会调整（低于阈值不会报错，只是静默不缓存）——以官方文档 Cache limitations 表为准
+3. **内容低于最小可缓存前缀**？阈值随模型 512–4096 token 不等且会调整（低于阈值不会报错，只是静默不缓存）——以[官方文档 Cache limitations 表](https://docs.claude.com/en/docs/about-claude/prompt-caching)为准
    - 解决：加长可缓存前缀到所用模型的阈值以上
 4. **路由到了不同后端实例**？
    - Anthropic 云端通常会路由亲和，但不保证

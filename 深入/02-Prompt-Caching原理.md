@@ -458,14 +458,14 @@ TTL 不全是承诺：Anthropic 的口径是"**至少** 5 分钟、命中续期"
 
 ## 10. 参考资料
 
-- Anthropic · Prompt Caching 官方文档（cache_control 语义、定价倍率、失效级联矩阵、自动缓存与 `max_tokens: 0` 预热）
-- OpenAI · Prompt Caching 指南（自动缓存、`prompt_cache_key` 路由、24 小时延长保留）
-- Google · Gemini Context Caching 文档（隐式/显式两种机制、存储计费）
-- vLLM · Prefix Caching 设计文档（block 级 hash、V1 引擎默认开启、cache_salt）
-- SGLang · RadixAttention 论文（radix tree 前缀缓存的最早实现）
-- 《Efficient Memory Management for Large Language Model Serving with PagedAttention》（vLLM 论文）
-- 《Mooncake: Trading More Storage for Less Computation》（USENIX FAST'25 Best Paper，Kimi 生产推理平台）
-- 《Auditing Prompt Caching in Language Model APIs》（arXiv 2502.07776，ICML 2025——缓存计时侧信道审计）
+- [Anthropic · Prompt Caching 官方文档](https://docs.claude.com/en/docs/about-claude/prompt-caching)（cache_control 语义、定价倍率、失效级联矩阵、自动缓存与 `max_tokens: 0` 预热）
+- [OpenAI · Prompt Caching 指南](https://platform.openai.com/docs/guides/prompt-caching)（自动缓存、`prompt_cache_key` 路由、24 小时延长保留）
+- [Google · Gemini Context Caching 文档](https://ai.google.dev/gemini-api/docs/caching)（隐式/显式两种机制、存储计费）
+- [vLLM · Prefix Caching 设计文档](https://docs.vllm.ai/)（block 级 hash、V1 引擎默认开启、cache_salt）
+- SGLang · [RadixAttention 论文](https://arxiv.org/abs/2312.07104)（radix tree 前缀缓存的最早实现）
+- [《Efficient Memory Management for Large Language Model Serving with PagedAttention》](https://arxiv.org/abs/2309.06180)（vLLM 论文）
+- [《Mooncake: Trading More Storage for Less Computation》](https://arxiv.org/abs/2407.00079)（USENIX FAST'25 Best Paper，Kimi 生产推理平台）
+- [《Auditing Prompt Caching in Language Model APIs》](https://arxiv.org/abs/2502.07776)（ICML 2025——缓存计时侧信道审计）
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 

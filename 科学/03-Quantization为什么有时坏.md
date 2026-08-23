@@ -335,7 +335,7 @@ H100 / H200 / B200 硬件直接支持 fp8 计算：
 - Dettmers et al · 《QLoRA: Efficient Finetuning of Quantized LLMs》(2023) — https://arxiv.org/abs/2305.14314
 - NVIDIA · FP8 formats for deep learning 白皮书 — https://arxiv.org/abs/2209.05433
 - llama.cpp · GGUF quantization formats — https://github.com/ggml-org/llama.cpp/blob/master/docs/build.md
-- Anthropic · Postmortem of three recent issues（数值级事故典型案例）
+- Anthropic · [Postmortem of three recent issues](https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues)（数值级事故典型案例）
 
 🔄 复习：[核心概念卡](../复习/核心概念卡.md) · [Active Recall 题库](../复习/Active-Recall题库.md)
 
