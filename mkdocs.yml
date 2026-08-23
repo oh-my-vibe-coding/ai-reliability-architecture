@@ -170,6 +170,7 @@ nav:
       - 第 18 章 · 三个核心训练动作: 练习/10-三个核心训练动作.md
       - 第 19 章 · 周循环与 19 周路线: 练习/周循环总览.md
       - 第 20 章 · 贯穿项目 · SRE 事故助手: 练习/贯穿项目-SRE事故助手.md
+      - 贯穿部署线 · H20 推理服务: 练习/贯穿部署-H20推理服务.md
       - Unit 0 · AI 大模型上手:
           - 总览: 练习/Unit0-AI大模型上手/总览.md
           - Week 1 · API 与工具调用: 练习/Unit0-AI大模型上手/Week1-API与工具调用.md
@@ -260,6 +261,7 @@ nav:
           - 01 · Claude Caching GUIDE: 代码/01-claude-caching-GUIDE.md
           - 02 · 最小 Agent GUIDE: 代码/02-minimal-agent-GUIDE.md
           - 04 · Eval Skeleton GUIDE: 代码/04-eval-skeleton-GUIDE.md
+          - 贯穿部署脚本: 代码/贯穿部署/README.md
       - 附录:
           - A · 每月自检表: 附录/A-每月自检表.md
           - B · 一手材料与参考文献: 附录/B-参考文献.md

@@ -59,6 +59,9 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 | Metrics | Prometheus | 简单 metrics 文件（起步够用） |
 | 权限配置 | YAML / JSON 文件 | OPA（成熟后）|
 
+> [!NOTE]
+> **自备 H20 的读者**：跑通 [贯穿部署线 · H20 推理服务](贯穿部署-H20推理服务.md) 后，把这里的 `LLM API` 换成你本地 vLLM 端点（`http://localhost:8000/v1`）——贯穿项目就长在你亲手部署的底座上。
+
 > [!TIP]
 > **不要在选型上纠结**。起步选**最小组合**（CLI + SQLite + Anthropic），要暴露 HTTP 接口时再换 FastAPI，其余跑起来再考虑替换。选型本身不是学习目标。
 

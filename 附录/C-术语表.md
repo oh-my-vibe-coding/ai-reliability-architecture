@@ -42,6 +42,7 @@ tags: [appendix]
 | 术语 | 含义 |
 |---|---|
 | TTFT | Time To First Token，推理服务延迟的关键 SLI |
+| Prefix Caching（前缀缓存） | 推理引擎按 token 前缀哈希匹配，命中即复用已算好的 KV cache、跳过重复 prefill。自建侧 vLLM（block 级哈希）与 SGLang（RadixAttention）默认开启；托管 API 侧是同一机制的另两层产品化，失效七形态见 [深入 02](../深入/02-Prompt-Caching原理.md)。可观测信号：同前缀二次请求 TTFT 断崖下降、`prefix_cache_hit_rate` 上升。亲手实验见 [贯穿部署线 · Stage 4](../练习/贯穿部署-H20推理服务.md) |
 | Silent Degradation | 指标全绿但系统已经数学出错的静默故障 |
 | Environment Drift（环境漂移）| 同一套系统换个环境（客户内网 / 区域 / 租户）行为就变、症状同样"全绿却偷偷掉"的故障。它是"行为漂移"的**空间维**，与 Silent Degradation 的**时间维**互为孪生；根因是两个环境的配置从一开始就分叉，靠跨环境黄金脚本回放（parity）而非 canary 抓。详见 [深入 30](../深入/30-环境漂移与配置可移植.md) |
 | Judge Model | 用模型评估另一个模型输出质量的评估方法 |

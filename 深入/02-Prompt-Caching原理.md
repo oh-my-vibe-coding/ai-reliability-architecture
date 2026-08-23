@@ -327,6 +327,9 @@ TTL 不全是承诺：Anthropic 的口径是"**至少** 5 分钟、命中续期"
 
 **自建推理侧**，vLLM（block 级 hash 表，V1 引擎默认开启）和 SGLang（RadixAttention，token 级 radix tree）都自带前缀缓存，真正的工程量在**跨实例路由**：路由器维护各实例缓存内容的近似索引，把请求打给"最可能命中的那台"，同时拿负载均衡兜底——llm-d（GKE Inference Gateway 采用）、SGLang Router、NVIDIA Dynamo、AIBrix 都已可生产使用。代价是负载可能出现热点：**命中率和均衡性之间的权衡，这些组件把它参数化了，但没有替你做掉**。
 
+> [!TIP]
+> **亲手看到前缀命中的样子**：自建 vLLM 开 prefix caching，同前缀第二次请求 TTFT 断崖下降——[贯穿部署线 · Stage 4](../练习/贯穿部署-H20推理服务.md) 有现成脚本和实验。
+
 ### 6.3 容量规划：缓存和并发是此消彼长的
 
 缓存**占显存**。一个 70B 模型、128k context 的完整 KV cache 大约 **40 GB**（口径见[深入 05](05-LLM推理服务的容量规划.md)）。
