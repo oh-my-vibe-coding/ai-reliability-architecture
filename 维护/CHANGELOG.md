@@ -15,6 +15,16 @@ tags: [meta, changelog]
 
 ---
 
+## v1.15.1 — 2026-08-23
+
+**全书引用补原文链接 + 外链新标签打开**：逐章审阅全书，为所有"引用论述"补上可点击的原文链接（arXiv / 官方文档 / 法规原文 / 博客），并落地"点击外链新标签打开"的全局行为。按 SemVer（补链 = 勘误/完善，不新增章节、不动框架）提升 v1.15.0 → v1.15.1。
+
+- **全局机制**：[mkdocs.yml](../mkdocs.yml) 加 `pymdownx.magiclink`（裸 URL 自动可点、关 repo/social 简写）+ `extra_javascript` 引入新增 [stylesheets/external-links.js](../stylesheets/external-links.js)——以 `a.host !== location.host` 判外链，加 `target="_blank"` + `rel="noopener noreferrer"`，用 MutationObserver 兼容 `navigation.instant` 的运行时改写。
+- **补链范围（覆盖全书 30+ 文件）**：深入 01/02/03/05/06/08/09/10/11/12/17/18/19/20/21/29、知识 09、架构 07（8 项法规表挂官方原文）、科学 02/03、共同语言 02、练习阅读清单 16 处、复习 Bloom 分级、代码 caching-GUIDE、[附录 B 参考文献](../附录/B-参考文献.md) 全量 inline 化。
+- **法规原文落官方页**：EU AI Act（EUR-Lex）、中国《生成式人工智能服务管理暂行办法》/《人工智能生成合成内容标识办法》（cac.gov.cn 发文页）等，均非猜测 URL。
+
+---
+
 ## v1.15.0 — 2026-08-23
 
 **新增贯穿部署线**：一条读者亲手把 Qwen3.8-27B 部署上 H20、跑成推理服务的实践线（[练习/贯穿部署-H20推理服务.md](../练习/贯穿部署-H20推理服务.md)）。Stage 0-8 覆盖 serving 起步 / prefill·TTFT / decode·并发 / KV cache / prefix caching / 量化 / 容量数学与 SLO / 换型回滚 / PD 分离，配合 [代码/贯穿部署/](../代码/贯穿部署/README.md) 四个脚本。与贯穿项目（SRE 事故助手）互补：跑通的 vLLM 端点可作贯穿项目的 LLM 后端。按 SemVer（新增章节 = MINOR）提升 v1.14.1 → v1.15.0。
