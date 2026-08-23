@@ -1,6 +1,6 @@
 ---
 title: 深入 04 · 为什么简单"你好"也会让 LLM 消耗数万 Token
-updated: 2026-07-17
+updated: 2026-08-23
 tags: [deep-dive, tokens, agent-architecture, cost]
 ---
 
@@ -243,9 +243,9 @@ Anthropic 缓存：**写入 1.25×，读取 0.1×**（见[深入 02](02-Prompt-C
 
 ### DeepSeek V4 Flash 更夸张
 
-- Cache-hit 输入：$0.0028/MTok（深入 03 2026-07 快照价）
-- 14,650 token 命中成本：**$0.00004** 每次
-- 与自身 cache-miss 价 $0.14/MTok 相比差 50×（口径同深入 03）；与 Claude Sonnet 5 无缓存输入价 $3/MTok 相比约差三个数量级
+- Cache-hit 输入：$0.007/MTok（off-peak 价，深入 03 2026-08 快照；peak 时翻倍到 $0.014，且 2026-08 起 DeepSeek 全面上调过价）
+- 14,650 token 命中成本：**$0.0001** 每次
+- 与自身 cache-miss 价 $0.22/MTok（off-peak）相比差约 31×（口径同深入 03）；与 Claude Sonnet 5 无缓存输入价 $3/MTok 相比约差两个数量级（≈430×）
 
 > [!TIP]
 > **这是国产推理服务能做到超低价的核心原因之一**——自动前缀缓存默认开启 + cache-hit 定价把 KV 复用的成本直接让利给用户（缓存按用户隔离，不跨用户共享）。

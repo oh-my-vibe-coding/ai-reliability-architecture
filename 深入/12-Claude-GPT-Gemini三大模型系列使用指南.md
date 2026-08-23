@@ -1,6 +1,6 @@
 ---
 title: 深入 12 · Claude / GPT / Gemini 三大模型系列使用指南
-updated: 2026-07-25
+updated: 2026-08-23
 tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 ---
 
@@ -9,7 +9,7 @@ tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 > [← 返回目录](../README.md)
 
 > [!WARNING]
-> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
+> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5；2026-08-23 更新 Gemini 分层）；实际生产选型前，请以 Anthropic / OpenAI / Google 官方文档和你自己的 eval 为准。
 >
 > 本章不追榜单，不给"谁最强"这种很快过期的结论。它只讲三件更耐用的东西：**怎么理解三大系列、怎么选、怎么用才能少踩坑**。
 
@@ -94,14 +94,15 @@ GPT 的工程气质是：**API 产品能力完整、结构化输出成熟、工�
 ### Gemini 系列：Pro / Flash / Flash-Lite / Live
 
 > [!WARNING]
-> **2026-03-09 起 Gemini 3 Pro Preview 已关停**，生产环境必须迁移到 **Gemini 3.1 Pro Preview**。本节模型名按官方 2026-05-19 状态写。
+> **2026-03-09 起 Gemini 3 Pro Preview 已关停**，生产环境必须迁移到 **Gemini 3.1 Pro Preview**。
 
-Gemini 当前的分层（2026-07-25 快照）：
+Gemini 当前的分层（2026-08-23 快照）：
 
-- **Gemini 3.6 Flash（稳定，2026-07-21 发布）**：**当前主力档**，接棒 3.5 Flash。$1.50/$7.50 per MTok——**输出价比 3.5 Flash 低 17%**，官方另称 DeepSWE 上 token 用量最多省 65%，是少见的"换代即省钱"。
-- **Gemini 3.5 Flash（稳定）**：上一代主力（$1.50/$9.00），仍可用；新链路优先 3.6。
-- **Gemini 3.1 Pro Preview**：复杂推理、长上下文、多模态理解的主力档；目前是预览态，Anthropic Opus 5 之外的另一旗舰候选。**Gemini 3.5 Pro 截至 2026-07-25 仍未发布**（官方口径"正在与合作方测试、准备好即开放"，未给日期）。
-- **Gemini 3 Flash（预览）**：更早一代 Flash，仍在 OpenRouter 用量榜上，但新项目应优先用 3.6 Flash。
+- **Gemini 3.7 Flash（稳定，2026-08-13 发布）**：**当前主力档**，接棒 3.6 Flash（距 3.6 仅三周）。**$0.75/$3.75 per MTok 限时半价至 2026-12-31**，2027-01-01 起回 $1.50/$7.50；缓存读 $0.075；1M ctx / 64K out。官方称 DeepSWE 65.3%（较 3.6 的 49.0% 大幅提升）、Code Arena Elo 1588。
+- **Gemini 3.6 Flash（稳定，2026-07-21 发布）**：上一代主力，定价与 3.7 完全相同（$0.75/$3.75 限时半价至 2026-12-31，之后回 $1.50/$7.50）；1M ctx / 65K out。是少见的"换代即省钱"。
+- **Gemini 3.5 Flash（稳定）**：上上一代主力（$1.50/$9.00），**未参与 3.6/3.7 的半价促销**；新链路优先 3.7。
+- **Gemini 3.1 Pro Preview**：复杂推理、长上下文、多模态理解的主力档；目前是预览态，Anthropic Opus 5 之外的另一旗舰候选。**Gemini 3.5 Pro 截至 2026-08-23 仍未发布**（官方口径"正在与合作方测试、准备好即开放"，未给日期）。
+- **Gemini 3 Flash（预览）**：更早一代 Flash，仍在 OpenRouter 用量榜上，但新项目应优先用 3.7 Flash。
 - **Flash-Lite 线（成本/吞吐档）**：超高频字段抽取、分类、routing 类任务。**注意选价不要按版本号**——2.5 Flash-Lite（$0.10/$0.40）< 3.1 Flash-Lite（$0.25/$1.50）< **新出的 3.5 Flash-Lite（$0.30/$2.50）**，版本越新反而越贵。
 - **Gemini 3.1 Flash Live / TTS**：语音、视频、实时双向交互。
 - **Gemini Deep Research / Antigravity Agent / Computer Use Preview**：Google 体系下的"托管式 Agent"分支，对应 Anthropic 的 computer use、OpenAI 的 Codex。
@@ -127,11 +128,11 @@ Gemini 的工程气质是：**长上下文、多模态、Google 生态整合、F
 
 | 场景 | Claude 默认起点 | GPT 默认起点 | Gemini 默认起点 | SRE 判断 |
 |---|---|---|---|---|
-| 代码库重构 / Agent 编码 | Sonnet / Opus | GPT flagship / Codex | 3.1 Pro Preview / 3.5 Flash | 先测 repo 理解、测试修复率、工具误用率 |
+| 代码库重构 / Agent 编码 | Sonnet / Opus | GPT flagship / Codex | 3.1 Pro Preview / 3.7 Flash | 先测 repo 理解、测试修复率、工具误用率 |
 | 事故分析 / 根因推理 | Opus / Sonnet + thinking | reasoning effort 高档 | 3.1 Pro Preview + thinking | 看是否能引用证据，不看文风 |
-| 工单分类 / 字段抽取 | Haiku | mini / nano | Flash-Lite（比价选档）/ 3.6 Flash | 成本、延迟、schema 通过率优先 |
-| 长文档 RAG | Sonnet | flagship / mini 组合 | 3.1 Pro Preview / 3.5 Flash | 长上下文必须测"引用支持率" |
-| 多模态文档 / 图片 / 视频 | Sonnet / Opus vision | GPT multimodal | 3.1 Pro Preview / 3.5 Flash | Gemini 常是强候选，但仍按任务 eval |
+| 工单分类 / 字段抽取 | Haiku | mini / nano | Flash-Lite（比价选档）/ 3.7 Flash | 成本、延迟、schema 通过率优先 |
+| 长文档 RAG | Sonnet | flagship / mini 组合 | 3.1 Pro Preview / 3.7 Flash | 长上下文必须测"引用支持率" |
+| 多模态文档 / 图片 / 视频 | Sonnet / Opus vision | GPT multimodal | 3.1 Pro Preview / 3.7 Flash | Gemini 常是强候选，但仍按任务 eval |
 | 平台 API 集成 | Sonnet + Messages API | Responses API | Gemini API / Vertex AI | 看团队既有云、审计、网络和合规约束 |
 | 高风险自动化 | Opus/Sonnet 只做建议 | reasoning + strict tools | 3.1 Pro Preview + tool boundary | 模型不是关键，权限边界才是关键 |
 
@@ -447,7 +448,7 @@ flowchart TB
 |---|---|
 | 日常工程助手 / 代码 Agent | Claude Sonnet 或 GPT coding 模型起步，关键任务加强模型复核 |
 | 平台级 AI 能力 | GPT / Claude / Gemini 都评估，重点看 API 能力、审计、fallback、成本 |
-| 长文档 / 多模态分析 | Gemini 3.1 Pro Preview / 3.5 Flash 和 Claude Sonnet 都测，不要跳过引用 eval |
+| 长文档 / 多模态分析 | Gemini 3.1 Pro Preview / 3.7 Flash 和 Claude Sonnet 都测，不要跳过引用 eval |
 | 高频分类 / 抽取 | 三家轻量档都测，谁便宜稳定用谁 |
 | 复杂事故推理 | 旗舰 / reasoning / thinking 档，强制证据引用和人工确认 |
 | 自动化生产操作 | 先别问模型，先问权限、回滚、blast radius |

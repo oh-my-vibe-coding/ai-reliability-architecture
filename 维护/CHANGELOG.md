@@ -1,6 +1,6 @@
 ---
 title: CHANGELOG · 书的版本历史
-updated: 2026-08-08
+updated: 2026-08-23
 tags: [meta, changelog]
 ---
 
@@ -12,6 +12,20 @@ tags: [meta, changelog]
 - **MAJOR** — 框架重构、整章删改
 - **PATCH** — 快照数据、勘误
 - **MINOR** — 新增章节
+
+---
+
+## v1.14.1 — 2026-08-23
+
+**月度快照更新（深入 03）**：按[月度更新清单](月度更新清单.md) Part A 走了一轮实时扫描。按 SemVer（快照数据 / 新模型入表 / 勘误 = patch）提升 v1.14.0 → v1.14.1。
+
+- **§3.11 LM Arena 三度改版并恢复可达**：上轮 Cloudflare 403 封锁本轮解除；信息架构从"Text Arena + Code Arena"改成 **Leaderboard Overview 多榜结构**（Text / WebDev / Agent / Vision / Document / 图像各一榜）。Text Arena 变成单张 688 模型大表、能力维度改以 rank 呈现（Coding 无公开 Score），并新增 **Agent Arena 对战胜率榜**。**Opus 5 进场即改写 WebDev 格局**——Fable 5 在 WebDev 的头把交椅被掀（Opus 5 max #1 / high #4，Fable 5 退 #6）；Text chat 榜 Fable 5 仍守 #1（1508）；Coding #1 被 Opus 4.7 (high) 夺走。**"Fable 5 三榜 #1"格局终结**。
+- **四家换代 + 一轮涨价**：§3.4 加 **Grok 4.6**（08-12、$2/$6 与 4.5 同价换代，`grok-4.1` 从 OpenRouter 消失）；§3.3 旗舰改为 **Gemini 3.7 Flash**（08-13，**$0.75/$3.75 限时半价至 2026-12-31**、2027-01-01 回 $1.50/$7.50，3.6 Flash 同步半价——官方 pricing 页实价纠正了 OpenRouter 的 $0.375 报价）；§3.10 加 **GLM-5.3**（08-18，$1.4/$4.4 同价换代、始终推理）+ **Kimi K3 开放权重 07-27 兑现**（分层收费 Kimi K3 License 非 MIT/Apache）；§3.8 **qwen3.8-max 转正式**（08-03，12/36 元可按量）+ 开源 2.4T-A95B/27B。
+- **§3.7 DeepSeek 全面上调 + 分时计价**：V4-Pro-0813 GA / V4-Flash-0731 正式后官方全面涨价（off-peak 口径 flash 输出 $0.28→$0.66、pro 输出 $0.87→$1.98），新增 peak/off-peak 分时计价（peak 为 UTC 周一至五 01-04 / 06-10，off-peak 半价）、新增 flash-vision-exp（08-21）；旧 alias `deepseek-chat` / `deepseek-reasoner` 07-24 停用本轮官方 pricing 页已明确。
+- **SWE-bench 六次校对零变动**：头部仍冻结在 2026-02，并列从"四方"去重为三方（MiniMax M2.5 与 Gemini 3 Flash，75.80%）。
+- **§4.1 CLI stars 月更**：opencode 破 20 万（200.4k）领先 OSS、Codex CLI 本轮 +13.0k 增量第一（114.3k）、Claude Code 142.7k；Cline VS Code 扩展 v4.1.13 与独立 CLI（cli-v3.0.57）轨道分裂。
+- **耦合点同步**：[附录 C 术语表](../附录/C-术语表.md)（Gemini 主力档 3.6→3.7）、[深入 12](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)（Gemini 分层 / 选型矩阵）、[深入 04](../深入/04-为什么简单你好也消耗数万token.md) 与 [深入 02](../深入/02-Prompt-Caching原理.md) 的 DeepSeek cache-hit 数字（$0.0028/$0.14/50× → off-peak $0.007/$0.22/约 31×）、[深入 13](../深入/13-离线批量推理.md) §2.1 DeepSeek 折扣时段行（旧的 16:30-00:30 UTC 75% 折扣窗已废 → 新 peak/off-peak 半价）、[深入 16](../深入/16-Embedding-服务作为独立运维对象.md) §2 bge-m3"最强开源"过时勘误（2026 新强者 Qwen3-Embedding-8B / Nemotron-3-Embed-8B / Microsoft Harrier，MTEB v2 + RTEB）。
+- **取数路径**：arena.ai 恢复可达（403 解除）；xAI / Mistral / Meta 官方站本轮网络层拦截不可达（未编造，以 OpenRouter 机读 API + LM Arena 交叉验证）。
 
 ---
 

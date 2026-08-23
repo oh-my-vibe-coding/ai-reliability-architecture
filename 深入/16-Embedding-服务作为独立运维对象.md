@@ -1,6 +1,6 @@
 ---
 title: 深入 16 · Embedding 服务作为独立运维对象
-updated: 2026-07-02
+updated: 2026-08-23
 tags: [deep-dive, embedding, rag, vector-db, sre]
 ---
 
@@ -68,7 +68,7 @@ flowchart LR
 | Voyage voyage-3 | - | 1024 | $0.06 | 强 retrieval 专项 |
 | Cohere embed-v3 | English | 1024 | $0.10 | 强 multilingual |
 
-> 价格 / 模型为 2026-05 快照。
+> 价格 / 模型为 2026-08 快照（OpenAI text-embedding-3 定价未变，仍是 $0.02/$0.13）。
 
 **何时选**：流量 < 100M doc/月、不在意延迟、不能自建 GPU。
 
@@ -76,11 +76,13 @@ flowchart LR
 
 | 模型 | 维度 | 大小 | 强项 |
 |---|---|---|---|
-| BAAI/bge-m3 | 1024 | 568M | **多语言 + 中文，目前最强开源**|
+| BAAI/bge-m3 | 1024 | 568M | **多语言 + 中文，可靠通用基线**（"目前最强开源"的说法 2026 已过时，见下注）|
 | BAAI/bge-large-en-v1.5 | 1024 | 335M | 英文 |
 | nomic-embed-text-v1.5 | 768 | 137M | 长文本（8k）|
 | intfloat/e5-mistral-7b-instruct | 4096 | 7B | LLM-based，最强但贵 |
 | jina-embeddings-v3 | 1024 | 570M | multilingual + 长文档 |
+
+> **2026-08 勘误**：开源 embedding 榜首已从 bge-m3 移走——2026 年的新晋强者是 **Qwen3-Embedding-8B**、**NVIDIA Nemotron-3-Embed-8B**、**Microsoft Harrier-OSS**（后两者在检索导向的 RTEB / 多语言 MTEB v2 上领先）。MTEB 官方也已推出 **v2** 与检索专用 **RTEB**（用 held-out 数据集防过拟合），读榜先认榜单版本。bge-m3 仍是可靠的通用多语言基线，但选型时请与上述新模型同台 eval。
 
 **部署技术栈**：
 - **Text Embeddings Inference (TEI)** by Hugging Face —— 类似 vLLM 但专为 embedding
