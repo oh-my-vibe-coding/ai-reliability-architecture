@@ -30,7 +30,7 @@ tags: [meta, changelog]
 
 - **样式**：[stylesheets/extra.css](../stylesheets/extra.css) 新增 `.reading-progress` 顶栏（fixed top、高 3px、accent 渐变 + transition 0.15s）+ 暗色模式适配。
 - **行为**：新增 [stylesheets/reading-progress.js](../stylesheets/reading-progress.js)，scroll 事件用 rAF 节流、按 `scrollTop / (scrollHeight - clientHeight)` 算百分比写入 `transform: scaleX`（避免 layout 抖动）；`navigation.instant` 之后路由变化重置；首选 `prefers-reduced-motion` 用户跳过动画。
-- **注册**：[mkdocs.yml](../mkdocs.yml) `extra_javascript` 引入；[阅读版构建.md](../阅读版构建.md) 同步补一条说明。
+- **注册**：`mkdocs.yml` `extra_javascript` 引入；[阅读版构建.md](../阅读版构建.md) 同步补一条说明。
 
 ---
 
@@ -38,7 +38,7 @@ tags: [meta, changelog]
 
 **全书引用补原文链接 + 外链新标签打开**：逐章审阅全书，为所有"引用论述"补上可点击的原文链接（arXiv / 官方文档 / 法规原文 / 博客），并落地"点击外链新标签打开"的全局行为。按 SemVer（补链 = 勘误/完善，不新增章节、不动框架）提升 v1.15.0 → v1.15.1。
 
-- **全局机制**：[mkdocs.yml](../mkdocs.yml) 加 `pymdownx.magiclink`（裸 URL 自动可点、关 repo/social 简写）+ `extra_javascript` 引入新增 [stylesheets/external-links.js](../stylesheets/external-links.js)——以 `a.host !== location.host` 判外链，加 `target="_blank"` + `rel="noopener noreferrer"`，用 MutationObserver 兼容 `navigation.instant` 的运行时改写。
+- **全局机制**：`mkdocs.yml` 加 `pymdownx.magiclink`（裸 URL 自动可点、关 repo/social 简写）+ `extra_javascript` 引入新增 [stylesheets/external-links.js](../stylesheets/external-links.js)——以 `a.host !== location.host` 判外链，加 `target="_blank"` + `rel="noopener noreferrer"`，用 MutationObserver 兼容 `navigation.instant` 的运行时改写。
 - **补链范围（覆盖全书 30+ 文件）**：深入 01/02/03/05/06/08/09/10/11/12/17/18/19/20/21/29、知识 09、架构 07（8 项法规表挂官方原文）、科学 02/03、共同语言 02、练习阅读清单 16 处、复习 Bloom 分级、代码 caching-GUIDE、[附录 B 参考文献](../附录/B-参考文献.md) 全量 inline 化。
 - **法规原文落官方页**：EU AI Act（EUR-Lex）、中国《生成式人工智能服务管理暂行办法》/《人工智能生成合成内容标识办法》（cac.gov.cn 发文页）等，均非猜测 URL。
 

@@ -75,7 +75,7 @@ LLM 推理：**显存、带宽、算力三者共同约束，并且 prefill 和 d
 
 ---
 
-## 1. 三角约束：HBM × Context × QPS
+## 1. 三角约束：HBM × Context × 并发
 
 GPU 推理的三个主要资源互相约束：
 

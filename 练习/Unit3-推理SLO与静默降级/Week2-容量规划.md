@@ -39,7 +39,7 @@ tags: [part-4, practice, unit3, week]
 
 **重点**：
 
-- 三角约束（HBM × context × QPS）的数学形式
+- 三角约束（HBM × context × 并发）的数学形式
 - Prefill 和 Decode 容量的**分开计算**方法
 - Prefix caching 对有效容量的放大
 
