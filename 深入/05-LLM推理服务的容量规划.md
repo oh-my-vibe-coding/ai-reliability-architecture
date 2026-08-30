@@ -83,7 +83,7 @@ GPU 推理的三个主要资源互相约束：
 flowchart TD
     H[HBM 显存<br/>装模型权重 + KV cache + activation]
     C[Context 长度<br/>KV cache 按 token 线性增长]
-    Q[QPS 并发<br/>同时活跃的请求数]
+    Q[并发<br/>同时活跃的请求数]
 
     H <-.任二增 第三必减.-> C
     C <-.任二增 第三必减.-> Q
@@ -96,7 +96,7 @@ flowchart TD
 
 - **HBM 显存**：装模型权重 + KV cache + activation buffer
 - **Context 长度**：每个活跃请求占的 KV cache 随输入 token 数线性增长
-- **QPS（并发数）**：同时活跃的请求数
+- **并发**：同时活跃的请求数
 
 **三角规则**：**任何两个增加 → 第三个必须减**。
 
