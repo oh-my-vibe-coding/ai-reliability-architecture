@@ -126,7 +126,7 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.15.2
+    default: v1.15.3
   social:
     - icon: fontawesome/solid/book
       link: ""

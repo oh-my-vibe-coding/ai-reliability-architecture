@@ -15,6 +15,15 @@ tags: [meta, changelog]
 
 ---
 
+## v1.15.3 — 2026-08-30
+
+**全书冒号渲染修复 + 阅读进度条资产补齐**：修复 mkdocs 站点"冒号行后紧跟列表"被吞成段落的渲染 bug——全书 424 处补列表前空行（405 处裸空行 + 块引用/告示内 17 处插 `>` 空行 + build/README.md 2 处），站点列表恢复为正常列表；另补齐 v1.15.2 已引用但当时缺失的 [stylesheets/reading-progress.js](../stylesheets/reading-progress.js) 资产。按 SemVer（渲染修复 + 资产补齐 = 勘误/完善，不新增章节、不动框架）提升 v1.15.2 → v1.15.3。
+
+- **冒号后列表渲染**：全书 75 文件 405 处「`：`/`:` 行 + 列表」之间插裸空行；块引用/告示（`> [!NOTE]` 等）内 17 处插只含 `>` 的空行（裸空行会终止引用）；[build/README.md](../build/README.md) 2 处。mkdocs build 后抽查 site/ 全部正常出 `<ul>`。
+- **资产补齐**：新增 [stylesheets/reading-progress.js](../stylesheets/reading-progress.js)，供 v1.15.2 已接入的阅读进度条引用。
+
+---
+
 ## v1.15.2 — 2026-08-30
 
 **阅读版新增阅读进度条 UX**：站点顶部多一条细进度条，随滚动从 0 涨到 100%，让读者对"读到哪里 / 还剩多少"有持续可见的反馈。按 SemVer（UX 增量、不新增章节、不动框架 = patch）提升 v1.15.1 → v1.15.2。
