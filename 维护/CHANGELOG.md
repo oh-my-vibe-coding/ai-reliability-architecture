@@ -1,6 +1,6 @@
 ---
 title: CHANGELOG · 书的版本历史
-updated: 2026-08-23
+updated: 2026-08-30
 tags: [meta, changelog]
 ---
 
@@ -12,6 +12,16 @@ tags: [meta, changelog]
 - **MAJOR** — 框架重构、整章删改
 - **PATCH** — 快照数据、勘误
 - **MINOR** — 新增章节
+
+---
+
+## v1.15.2 — 2026-08-30
+
+**阅读版新增阅读进度条 UX**：站点顶部多一条细进度条，随滚动从 0 涨到 100%，让读者对"读到哪里 / 还剩多少"有持续可见的反馈。按 SemVer（UX 增量、不新增章节、不动框架 = patch）提升 v1.15.1 → v1.15.2。
+
+- **样式**：[stylesheets/extra.css](../stylesheets/extra.css) 新增 `.reading-progress` 顶栏（fixed top、高 3px、accent 渐变 + transition 0.15s）+ 暗色模式适配。
+- **行为**：新增 [stylesheets/reading-progress.js](../stylesheets/reading-progress.js)，scroll 事件用 rAF 节流、按 `scrollTop / (scrollHeight - clientHeight)` 算百分比写入 `transform: scaleX`（避免 layout 抖动）；`navigation.instant` 之后路由变化重置；首选 `prefers-reduced-motion` 用户跳过动画。
+- **注册**：[mkdocs.yml](../mkdocs.yml) `extra_javascript` 引入；[阅读版构建.md](../阅读版构建.md) 同步补一条说明。
 
 ---
 
