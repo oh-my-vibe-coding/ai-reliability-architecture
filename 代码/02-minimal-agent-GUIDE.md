@@ -10,6 +10,7 @@ tags: [code, guide, agent, tool-use]
 
 > [!WARNING]
 > **价格 / 模型名快照日期**：2026-05-05。下列成本数字和模型名是**当时快照**。Anthropic / OpenAI 定价和 model name 会变。生产前请查官方：
+>
 > - https://www.anthropic.com/pricing
 > - https://platform.openai.com/docs/models
 
@@ -78,6 +79,7 @@ devfs          196K  196K     0 100% /dev
 ```
 
 **关键观察**：
+
 - 模型**自主**决定调用哪个工具、调用几次
 - Tool call 里只有命令名（`"df"` 而不是 `"df -h"`）——`-h` 等参数由服务端 `COMMAND_SPECS` 硬编码，模型只能选名字，不能传参数
 - 每次 iteration 对应一次 API 调用
@@ -120,10 +122,12 @@ devfs          196K  196K     0 100% /dev
 **症状**：连续 iteration 调用同一个 tool、相似参数。
 
 **原因**：
+
 - 工具返回了错误信息但模型没理解
 - 模型认为任务未完成一直试
 
 **解决**：
+
 - 调低 `max_iterations`
 - Tool 返回时把错误说清楚（"ERROR: ... 请尝试 Y"）
 - 在 system prompt 加"任务不能通过 tool 完成时直接回答"
@@ -147,6 +151,7 @@ ERROR: command timed out
 ```
 
 代码里 `subprocess.run(timeout=5)`。如果你的命令需要更久：
+
 - 调整 timeout
 - 或者**别让 Agent 跑慢命令**（用快速的子命令）
 
@@ -183,6 +188,7 @@ def write_to_scratch(filename: str, content: str) -> str:
 ```
 
 方法：
+
 - 在 system prompt 里要求 JSON schema
 - 或用 Anthropic 的 Structured Outputs（`output_config.format` 指定 json_schema，或 `client.messages.parse()` 直接绑 Pydantic 模型）
 
@@ -193,6 +199,7 @@ def write_to_scratch(filename: str, content: str) -> str:
 > "分析最近 100 条 nginx 访问日志，找出访问量最高的 IP，再查这个 IP 的地理位置"
 
 设计工具：
+
 - `read_file(path)`
 - `grep(pattern, file)`
 - `whois(ip)` or `curl(url)`
@@ -214,6 +221,7 @@ def run_shell_adversarial(cmd: str) -> str:
 ```
 
 **观察**：
+
 - 默认 sanitize 层挡住了吗？（包成 `<tool_output>` + system 提示后，多数模型会拒绝）
 - 试试更狡猾的 payload：让攻击文本本身也假装是 `</tool_output>` 闭合 + 新的 system 角色——能绕过吗？
 - 白名单本身（run_shell 只允许 `uptime` 等）能挡多少？
@@ -286,6 +294,7 @@ Tool use 的 API 循环里，`stop_reason` 的三种主要值分别是什么？�
 - 单用户一次请求跑几小时
 
 **应该补充的硬限制**：
+
 - Iteration 数（当前有）
 - Wall clock time（没有 —— 补上）
 - Token budget（没有 —— 补上）

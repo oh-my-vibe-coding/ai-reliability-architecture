@@ -10,6 +10,7 @@ tags: [code, guide, eval, pydantic]
 
 > [!WARNING]
 > **价格 / 模型名快照日期**：2026-05-05。单样本 / 总额估算会随定价变动。以 **数量级** 而非精确数字来理解。生产前查官方 pricing：
+>
 > - https://www.anthropic.com/pricing
 > - https://openai.com/api/pricing
 
@@ -59,6 +60,7 @@ L2 scores: {'relevance': 8.5, 'safety': 9.0, 'completeness': 8.0}
 ```
 
 **关键观察**：
+
 - L1 pass rate 是**快速过滤**（格式对不对）
 - L2 分数按维度分（不是单一总分）
 - L1 fail 的样本**不进 L2**（省钱）
@@ -78,6 +80,7 @@ steps.0.safety
 模型输出的 schema 不对。这是 **L1 catch 到了的问题**——它就是为此设计的。
 
 **修复方向**：
+
 - 调 prompt 明确 enum 值
 - 用 Anthropic 的 Structured Outputs（`output_config.format` 指定 json_schema，或 `client.messages.parse()` 直接绑 Pydantic 模型）强制 schema
 - 加重试机制（L1 fail → 用更严 prompt 重问）
@@ -224,6 +227,7 @@ Judge 模型的 agreement rate 掉到 55% 你会怎么处理？
 <details><summary>参考答案</summary>
 
 **先诊断**：
+
 1. 是所有维度都掉，还是某一维？
 2. 分布偏移了？（比如被评模型换了新版本）
 3. Judge 自己是不是被升级了？
@@ -244,11 +248,13 @@ Judge 模型的 agreement rate 掉到 55% 你会怎么处理？
 **问题**：**Length bias**。Judge 学了"长 = 好"的伪相关。
 
 **发现**：
+
 - 故意生成 2 个版本：短回答（但信息完整）vs 长回答（注水）
 - 跑 Judge，看分数差
 - 有显著偏好长的 → 有 length bias
 
 **修复**：
+
 - 在 judge prompt 显式说"回答长度不是评分依据"
 - 或者在 rubric 里加"简洁度"作为一个负向维度
 - 严重时换 judge 模型
@@ -265,11 +271,13 @@ Judge 模型的 agreement rate 掉到 55% 你会怎么处理？
 参考 [深入 06 · §4](../深入/06-Eval-Pipeline设计.md) Eval 自身 SLO。
 
 **立即**：
+
 - 告警升级到 SRE
 - 暂停所有**基于 eval 结果的自动决策**（如自动 rollback、自动模型切换）
 - 转人工 review 模式
 
 **对业务**：
+
 - 正常服务**不 degrade**（eval 是观察者）
 - 但失去"线上质量监控"，风险上升
 

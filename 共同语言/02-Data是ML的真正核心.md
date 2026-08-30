@@ -113,6 +113,7 @@ HuggingFace 用 LLM 给每页**教育价值**打 0-5 分，只保留 3+。结果
 ## 4. Dedup（去重）
 
 **为什么重要**：
+
 - 重复数据让模型**过拟合这些段落**
 - 浪费 compute
 - 危险情况下会**逐字背诵**隐私数据
@@ -138,11 +139,13 @@ HuggingFace 用 LLM 给每页**教育价值**打 0-5 分，只保留 3+。结果
 ### 5.1 什么是 Contamination
 
 训练数据里**混进了 eval 集**。例子：
+
 - MMLU 题目 + 答案出现在 Wikipedia 讨论页
 - SWE-bench 题目对应的 GitHub PR 被爬到
 - HumanEval 的解答在博客里
 
 **后果**：
+
 - 模型在 benchmark 上分数虚高
 - 生产表现和 benchmark 脱节
 - 对比其他模型不公平
@@ -160,6 +163,7 @@ HuggingFace 用 LLM 给每页**教育价值**打 0-5 分，只保留 3+。结果
 - *"要切到 private eval 重测一次"*
 
 SRE 能帮上什么：
+
 - 给 decontamination pipeline 提供大规模字符串匹配的基础设施
 - 管理 eval set 的 **canary tokens**
 - 保护 private eval 的访问控制
@@ -188,6 +192,7 @@ SRE 能帮上什么：
 ### 6.2 Annealing Mix
 
 **训练末期**（最后 10-20% steps）用**更高质量、更聚焦**的混合：
+
 - 代码比例提到 30%
 - 数学比例提到 20%
 - 教育内容比例拉高
@@ -282,6 +287,7 @@ SRE 能帮上什么：
 ## 8. Post-training Data
 
 与 pre-training 不同：
+
 - **小得多**（几万到百万条）
 - **手工 + 合成结合**
 - **标注质量**远高于 pre-training 数据
@@ -298,6 +304,7 @@ SRE 能帮上什么：
 ```
 
 **来源**：
+
 - 手工标注（贵）
 - 从 ChatGPT / Claude 蒸馏（问题：条款 + 质量漂移）
 - 自己模型早期版本生成 + 筛选
@@ -352,6 +359,7 @@ SRE 能帮上什么：
 **2025-2026 的大事**：NYT vs OpenAI 案、艺术家集体诉讼。
 
 **SRE 需要知道**：
+
 - 训练数据的**版权审计**是合规要求
 - PII 数据要么不收，要么清洗
 - 内部数据训练的模型**不能污染到公共发布模型**（隔离 pipeline）

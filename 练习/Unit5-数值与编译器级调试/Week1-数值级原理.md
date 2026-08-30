@@ -56,6 +56,7 @@ tags: [part-4, practice, unit5, week]
   - 搜 "CUDA programming guide determinism"
 
 **记录**：
+
 - PyTorch 哪些操作**默认非确定**？
 - `torch.use_deterministic_algorithms(True)` 会关掉哪些 kernel？
 - bf16 vs fp32 在 softmax 上的数值差异直觉
@@ -105,6 +106,7 @@ print(f"diff: {(p_fp32 - p_bf16.float()).abs().max()}")
 ```
 
 **记录**：
+
 - 完全相同的比例
 - 有差异时，第一个不同 token 出现在位置 X（平均）
 - 差异对最终答案的意义（语义是否一致？）
@@ -120,6 +122,7 @@ outputs = [generate(model, prompt, temp=0, seed=42) for _ in range(10)]
 **预期**：大部分情况相同，但**偶发**会不同（同一个 batch size 内）。
 
 如果都相同，试：
+
 - 改 batch size（单独跑 vs 凑 batch 一起跑）
 - 改 padding 方式
 - 开 vs 关 FlashAttention
@@ -193,6 +196,7 @@ for seq_len in [128, 1024, 8192]:
 #### Section · 观察总结（200 字）
 
 写下：
+
 - 你观察到的**最惊讶**的现象
 - 这些现象如果在生产出现，**用现有监控能看出来吗**？
 - 哪些指标应该加到 [Unit 3 · SLI](../Unit3-推理SLO与静默降级/Week1-SLI定义.md) 清单里？
@@ -200,12 +204,14 @@ for seq_len in [128, 1024, 8192]:
 ### AI 挑错
 
 **关键问题**：
+
 - "我的实验 setup 有没有坑？（seed 没 pin、batch 没控制、采样不是真 greedy）"
 - "观察到的差异能**区分**是'真的不一样'还是'测量噪声'吗？"
 
 ### 预测 · B1 · 每日 5 分钟
 
 本周每次看 LLM 生产问题，先猜：
+
 - "这有可能是数值级问题吗？"
 - "如果是，在哪一层？"
 
@@ -217,12 +223,14 @@ for seq_len in [128, 1024, 8192]:
 - [ ] 能解释**生产场景下这些问题如何暴露**
 
 **无 GPU 读者的调整自检**：
+
 - [ ] 至少完成**实验 A 的简化版**（CPU softmax 数值差异）
 - [ ] 读懂 Anthropic 事故复盘中的数值部分
 - [ ] 能解释 bf16 的精度损失如何累积到端到端效应
 - [ ] 在 Week 2 Runbook 里标注"未在 GPU 上实测"
 
 **未达标的表现**：
+
 - 只读没做实验（GPU 用户）/ 没做简化实验（CPU 用户）
 - 跑了但没记录（忘了设 seed）
 - 不能解释看到的差异

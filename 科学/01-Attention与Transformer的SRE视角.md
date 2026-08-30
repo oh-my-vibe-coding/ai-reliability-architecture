@@ -16,12 +16,14 @@ tags: [science, transformer, attention, mechanism]
 ## 0. 为什么 SRE 要懂 Attention
 
 不懂：
+
 - "1M context" 为什么实际不能全用 → 你只知道"结论"
 - 为什么 GQA 能省 KV cache → 你只会"随大流"
 - 为什么 DeepSeek sparse attention 省显存 → 你无法判断类似声明
 - Attention 数值出问题会怎样 → 你调试不到这层
 
 懂了之后：
+
 - 能**预测**新硬件、新架构能带来多少收益
 - 能**解释**为什么同样模型不同部署差这么多
 - 能**调试**别人挖不下去的性能问题
@@ -59,6 +61,7 @@ attention(Q, K, V) = softmax(Q · K^T / √d) · V
 ```
 
 直观理解：
+
 1. `Q · K^T`：让 Query 和每个 Key 算相似度 → 得到 N×N 矩阵
 2. `/√d`：缩放防止数值爆炸
 3. `softmax`：归一化成"注意力分布"
@@ -144,11 +147,13 @@ N 个位置互相算相似度 → **N² 个相似度值**。
 **所以：K 和 V 只算一次，存下来，之后 decode 全部复用**。
 
 如果不缓存：
+
 - 每生成一个 token 要重新 prefill 一次
 - 1000 个输出 token = 1000 次 O(N²) 重算
 - **完全不可用**
 
 缓存后：
+
 - 每生成一个 token = 1 次 O(N) 读
 - 显存空间换计算时间
 
@@ -177,6 +182,7 @@ N 个位置互相算相似度 → **N² 个相似度值**。
 **解决思路**：Q 的差异要大（每个 head 确实该看不同东西），但 **K 和 V 可以少一些**——因为"被查的东西"不需要 64 份不同的索引，8 份就够了。这就是 GQA 的核心直觉。
 
 GQA（Grouped Query Attention）：
+
 - 保留 64 个 Q head
 - 但只有 8 个 K、V head（8 个 Q 共享一组 KV）
 - **KV cache 减 8 倍**
@@ -237,6 +243,7 @@ Anthropic《A postmortem of three recent issues》（2025-09 复盘，事故发�
 Attention 矩阵乘的中间结果如果用 bf16，在**极端长 context + 极端 attention 分布**时会损失精度。
 
 **症状**：
+
 - 短 context 全对
 - 长 context 质量劣化
 - 但指标全绿
@@ -248,6 +255,7 @@ Attention 矩阵乘的中间结果如果用 bf16，在**极端长 context + 极�
 CUDA kernel 在**不同 batch size、不同 padding** 下可能走不同的代码路径，结果有微小差异。累积在深层可能放大。
 
 **SRE 要做的**：
+
 - 生产固定 kernel 版本（pin PyTorch / CUDA / FlashAttention 版本）
 - 灰度发布 kernel 升级前做数值回归测试
 

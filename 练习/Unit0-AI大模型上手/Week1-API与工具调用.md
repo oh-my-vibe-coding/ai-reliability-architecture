@@ -26,6 +26,7 @@ tags: [part-4, practice, unit0, week]
 - [ ] 加 system prompt（一句话"你是一个 SRE 助手"）
 - [ ] 调整 temperature（试 0 / 0.3 / 1.0），观察输出差异
 - [ ] 实现 tool use：
+
   - `run_shell(cmd)` —— 白名单 2-5 个只读命令（`uptime`, `df -h`, `ls`, `ps`, `free`），禁止其他
   - `read_file(path)` —— 只读，限制在某目录
   - 参考 [`代码/02-minimal-agent.py`](../../代码/02-minimal-agent.py)，包含 tool result 净化层示例
@@ -40,12 +41,14 @@ tags: [part-4, practice, unit0, week]
 **Anthropic API 文档 · [Tool use 章节](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview)**
 
 不开 AI、不要让 AI 帮你读。自己一字一句过一遍，特别注意：
+
 - `tool_use` 和 `tool_result` 两种消息类型的结构
 - 模型"请求调用工具"和"收到结果后继续"是**两次独立的 API 调用**
 - `tool_choice` 参数的各种模式及各自适用场景（别背数量——这个列表随文档版本漂移，以你读到的官方文档为准）
 
 ## 产出 · B2 · 30 分钟
 不用 AI，写下你对两个问题的回答：
+
 1. Tool use 流程里，**谁决定调不调用工具？谁决定用什么参数？谁决定执行？**
 2. 如果 AI 被诱导调用了错误参数（比如 `run_shell("rm -rf /")`），责任链条在哪一步断的？
 
@@ -53,6 +56,7 @@ tags: [part-4, practice, unit0, week]
 
 ## 预测 · B1 · 每日 5 分钟
 本周每次触发 tool use 之前，先猜：
+
 - **会不会调用工具？**
 - **调哪个？**
 - **参数是什么？**
@@ -66,6 +70,7 @@ tags: [part-4, practice, unit0, week]
 - [ ] 预测记录本周"没想到"次数：____ 次
 
 **贯穿项目路线额外自检**：
+
 - [ ] 代码落到 `sre-incident-agent/app/` 目录下
 - [ ] `README.md` 里有"当前状态"节，写清楚"Unit 0 W1：有 tool use 但还没 RAG"
 - [ ] 至少 2 个工具是 SRE 场景相关的（不是通用 demo 工具）
@@ -85,6 +90,7 @@ tags: [part-4, practice, unit0, week]
 ### 问题 2：如果 AI 被诱导调用了错误参数，责任链条在哪一步断的？
 
 **责任断在"执行层"**。模型的 tool_use 只是"建议"——它没有执行权。你的代码在收到 tool_use 后有两道能当场截断的关卡，外加一层事后保障：
+
 1. **参数校验**：cmd 在白名单里吗？（只允许 uptime/df/ls/ps/free）
 2. **沙箱**：即便 cmd 合法，它跑在受限环境里（容器、只读文件系统）
 3. **审计**：不阻止攻击，但每次调用都有日志，出事后可追溯

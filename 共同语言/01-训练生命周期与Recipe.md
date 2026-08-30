@@ -18,6 +18,7 @@ tags: [shared-language, training, recipe, lifecycle]
 你说："我不跑训练，为什么要学？"
 
 因为你会遇到这些场景：
+
 - ML 团队说要给 training run **申请 64 张 H100 两周** — 你得能问"为啥是这配置"
 - 训练中 **loss spike**，ML 问你"checkpoint 能从哪里恢复" — 你得听懂这是啥
 - 新模型版本上线前 ML 给你一份 **model card** — 你要会读
@@ -75,6 +76,7 @@ tags: [shared-language, training, recipe, lifecycle]
 - 产出：**base model**——只会续写，不会对话
 
 **关键词**：
+
 - **Token**：已经熟悉（见 [科学 04](../科学/04-Tokenization的坑.md)）
 - **Context length**：训练时的最大序列长度。基础预训练常用 4k-8k 短序列（省算力），再用专门的长上下文扩展阶段拉到 128k-1M——产品页写的 1M context 不是从头用 1M 训出来的，这也是 §3.2 说"训练 vs 推理可能不同"的机制
 - **Batch size**：一次 gradient update 看多少样本
@@ -83,6 +85,7 @@ tags: [shared-language, training, recipe, lifecycle]
 - **Perplexity (PPL)**：loss 的指数形式，越低越好
 
 **SRE 能参与**：
+
 - Training cluster 运维（见 [共同语言 05](05-分布式训练基础设施.md)）
 - Checkpoint 存储容量规划（一个大模型 checkpoint 可达 TB 级）
 - Monitoring（loss 曲线异常报警）
@@ -92,10 +95,12 @@ tags: [shared-language, training, recipe, lifecycle]
 **做什么**：在 pre-train 末期或之后，用**质量更高、主题更聚焦的数据**继续训练。
 
 ML 团队常说：
+
 - *"这批 recipe 在 annealing 阶段加了 15% 数学数据"*
 - *"mid-training 专门补了 code 能力"*
 
 **为什么重要**：
+
 - Pre-training 数据质量参差；高质量数据放最后阶段**影响最大**（近因效应）
 - 是当前"性能跃迁"的重要手段（如 Llama 3、Qwen 3、DeepSeek V3 都重度依赖）
 
@@ -109,6 +114,7 @@ ML 团队常说：
 - 产出：**Instruction-tuned Model**
 
 **关键词**：
+
 - **Instruction tuning**：SFT 的别名
 - **Turn**：一问一答算一 turn
 - **Multi-turn**：多轮对话训练
@@ -196,6 +202,7 @@ ML 团队发布新模型时，会有一份 **model card**（或 technical report
 | + DPO over PPO | **69.5** | 43.0 | 72.1 |
 
 **解读**：
+
 - 加数学数据让 MATH 涨但其他基本持平
 - 加代码 annealing 让 HumanEval 涨，MMLU 略降
 - DPO 比 PPO 整体好
@@ -210,16 +217,19 @@ ML 团队据此**选组合**做最终版。
 
 **现象**：loss 曲线突然飙高。
 **原因**：
+
 - 数据里有 outlier（比如一段垃圾文本）
 - 优化器 numerical 问题
 - Gradient 爆炸
 
 **ML 处理流程**：
+
 - Skip 这批数据，从最近 checkpoint 恢复
 - 或降低 learning rate 继续
 - 或直接中止重跑
 
 **SRE 要知道**：
+
 - **Checkpoint 必须频繁保存**（每 1-5k steps）
 - 单个 checkpoint 可达 1-5 TB，存储规划要跟上
 - 从 checkpoint 恢复的流程必须演练过
@@ -241,6 +251,7 @@ Loss 不再下降甚至上升。通常 recipe 有问题（超参选错、数据�
 训练数据里混进了评估集（MMLU 题目等）。导致 benchmark 分数虚高、生产表现不符。
 
 **SRE 要关心**：
+
 - 数据 pipeline 的 contamination check
 - Benchmark scores 异常高（"太好了"）要警惕
 
@@ -259,6 +270,7 @@ Loss 不再下降甚至上升。通常 recipe 有问题（超参选错、数据�
 ### 6.2 Post-training 成本
 
 经典对齐流水线（SFT + DPO/RLHF）通常比 pre-training **便宜 100×** 以上：
+
 - SFT：千元到十万美元级
 - RLHF：万到百万美元级
 

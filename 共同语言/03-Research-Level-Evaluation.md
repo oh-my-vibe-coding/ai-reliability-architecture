@@ -173,6 +173,7 @@ pass@k ≈ 1 - (1 - p)^k
 其中 p 是单次通过率。
 
 **含义**：
+
 - 如果 pass@1 是 50%，pass@10 可以高到 ~99.9%
 - **pass@1 才代表"单次可用"**，高 pass@k 只说明"有可能对"
 - 生产里重要的是 pass@1（或很小的 k）
@@ -305,6 +306,7 @@ Paper 里报告"我们赢的 10 个 benchmark"，没提"我们输的 5 个"。
 ### 8.3 当 ML 团队说 "Public benchmark 涨了" 时
 
 你要追问：
+
 - **Private eval 动了吗**？
 - **LM Arena 动了吗**？
 - **有没有 contamination check**？
@@ -319,6 +321,7 @@ Paper 里报告"我们赢的 10 个 benchmark"，没提"我们输的 5 个"。
 > **ML**：新版本 MMLU 85、GPQA Diamond 87、pass@1 HumanEval 92，比上版全面涨。准备上线。
 > **老 SRE**：嗯……好。
 > **懂了的 SRE**：等等：
+>
 > - MMLU 到 85 已经接近饱和，意义不大，LiveBench 或 MMLU-Pro 呢？
 > - GPQA Diamond 都到 87 了，还剩多少区分度？有没有跑更难的替代集？
 > - HumanEval 92 是 pass@1 还是 pass@10？我们生产场景等同 pass@1 吗？

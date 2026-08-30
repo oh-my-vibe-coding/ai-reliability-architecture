@@ -17,6 +17,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：上来就要搭 vLLM + GPU 集群，觉得"用 API 不专业"。
 
 **为什么是反模式**：
+
 - 你不知道标准模型能做到什么，就不知道自建要对齐到什么基线
 - 运维 GPU 集群的学习曲线比你想象的大一个数量级
 - 在你把 vLLM 调稳之前，业务需求已经变了三轮
@@ -32,6 +33,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：把离线数据标注/评估任务按在线 API 的标准做——关注延迟、用 on-demand GPU、不利用 batch API 的半价。
 
 **为什么是反模式**：
+
 - 批处理场景吞吐 > 延迟，Spot 实例 > On-demand，Batch API > 在线 API
 - 一个组织里离线推理的 token 消耗通常是在线的 3-10 倍，但成本思维还是在线的
 - 在线推理的 SLO 套到离线场景 = 烧钱最快的方式
@@ -47,6 +49,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：上线前跑一次 eval，通过就上线，然后半年不碰。
 
 **为什么是反模式**：
+
 - 模型悄悄升级（厂商不会通知你）、prompt 累积改动、输入分布漂移——六个月后你的 eval 结果已经和线上表现没关系了
 - 这是 Anthropic 2025 三连事故的核心教训——"你的 eval 会骗你"
 
@@ -61,6 +64,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：用 LLM 分类器做输入安全检查、在 prompt 里写"不要回答有害请求"、指望 Agent "自律"。
 
 **为什么是反模式**：
+
 - 分类器本身也是 LLM，会被更聪明的 prompt injection 绕过
 - Prompt 里的安全规则对 Agent 来说就是另一段文本，没有强制力
 - 物理边界才是不可绕过的——你信任 Agent 的自律，就像你信任用户的善意
@@ -76,6 +80,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：Agent 链无限加 tool call，追求"做得更多"但没算过步数成本。Context 膨胀了就换更大的 context window。
 
 **为什么是反模式**：
+
 - 每多一个 tool call，就多一次 latency + token 成本 + 错误概率乘积
 - Context window 的名义值 ≠ 有效值——RULER 实测的有效长度普遍远小于宣称值（快照数值见深入 03 的"宣称值 vs 实际可用"表），换更大的窗口救不了中间塌陷（Lost in the Middle）
 - 步数预算和 P99 latency budget 是同一类工程约束——不列出来它就不存在
@@ -91,6 +96,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：看"全局幻觉率 5%"觉得还不错，但没发现某类任务错误率已经 30%。
 
 **为什么是反模式**：
+
 - LLM 的失败高度集中在特定类别上——量化后的数字类任务、长 context 的中段、特定语言的 tokenization 劣化
 - 平均指标掩盖了尾部——而事故就发生在尾部
 - 量化静默降级的典型症状就是"整体 eval 只降 1-2%，某类任务崩了"
@@ -106,6 +112,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：推理服务指向 `my-model:latest`；厂商升级后行为悄悄变了，排查只能翻 changelog。
 
 **为什么是反模式**：
+
 - "Latest" 不是版本——是"我放弃版本控制"的声明
 - 厂商悄悄升级模型、你悄悄改了一行 prompt、embedding 模型被偷换——任何一个都可能导致静默降级，而且你不知道什么时候开始的
 - 回滚时发现"上一版"已经不存在了
@@ -121,6 +128,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：监控"RAG 端到端响应时间"但不知道慢在 embedding 还是 vector DB 还是 LLM。
 
 **为什么是反模式**：
+
 - RAG 是四个独立运维对象：Embedding 服务、Vector DB、Reranker、LLM
 - 每个有自己的 SLO、容量模型、升级影响面
 - 把四个对象当一个东西盯 = 不知道谁的 SLO 先崩
@@ -137,6 +145,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：设了 `cache_control` 就以为缓存生效了。缓存因为 prefix 里加了时间戳而全部失效，但请求正常返回、延迟正常——直到月底账单出来。
 
 **为什么是反模式**：
+
 - 缓存失效是静默的——没有 error、没有 timeout、没有告警
 - 唯一能发现的窗口是 cache hit rate 指标
 - 缓存失效的成本冲击往往是 2-10 倍，但财务数据有 N 天滞后
@@ -152,6 +161,7 @@ tags: [reference, anti-patterns, checklist, sre-behavior]
 **表现**：唯一看成本的地方是月末报销单。日常 Dashboard 有延迟、有错误率、有 QPS，但没有成本。
 
 **为什么是反模式**：
+
 - Token 成本是工程行为的函数——系统提示多长、Agent 走几步、缓存命中多少
 - 成本异常往往是架构问题的第一个信号（Agent 死循环、context 膨胀、缓存失效、模型误升级到旗舰版）
 - 等月末才发现成本暴涨 = 你已经瞎了三周

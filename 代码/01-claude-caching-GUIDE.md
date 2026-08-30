@@ -12,6 +12,7 @@ tags: [code, guide, prompt-caching]
 > 本文包含**价格、模型名、厂商能力**等快变信息。内容**快照日期为 2026-07-04**；实际选型或上线前，请以厂商官方 pricing 和当前生产验证为准。
 >
 > 官方 pricing 入口：
+>
 > - Anthropic: https://www.anthropic.com/pricing
 > - OpenAI: https://openai.com/api/pricing
 >
@@ -72,12 +73,14 @@ Cache hit rate: 99.8%
 ```
 
 **关键观察**：
+
 - 第一次 `cache_creation` 大，`cache_read=0`
 - 第二次 `cache_creation=0`，`cache_read` 大
 - `input_tokens`（未缓存部分）只是当次用户消息的几个 token
 - Cache hit rate 从 0 跳到 99%+
 
 **如果你看到的不是这样**：
+
 - 第二次仍然 `cache_creation` 高 → 看[常见报错 B](#b--缓存未命中)
 - 两次调用的 cache 字段全为 0 → 前缀低于最小可缓存长度（占位文本没替换），看[常见报错 B](#b--缓存未命中) 第 3 条
 
@@ -101,6 +104,7 @@ anthropic.AuthenticationError: Error code: 401
 **症状**：第二次调用 `cache_read_input_tokens=0`，`cache_creation` 仍高。
 
 **排查**：
+
 1. **两次间隔 > 5 分钟**？Anthropic cache TTL 默认 5 分钟
    - 解决：缩短间隔，或改用 1h TTL（已 GA）
 2. **SYSTEM_PROMPT 或 LARGE_CONTEXT 变了**？改任何字符都会失效
@@ -133,6 +137,7 @@ anthropic.RateLimitError: Error code: 429
 ```
 
 试用 API key 有较低速率限制。解决：
+
 - 加指数退避重试
 - 用付费 API key
 - 改用 Bedrock / Vertex（额度独立）
@@ -176,6 +181,7 @@ messages=[{
 ### 任务 4 · 跨 session 共享 Cache（较难）
 
 Anthropic cache 以 workspace 为界（同 workspace 内跨 API key 共享，但前缀不同就各自为营）。写一个多用户场景，比较：
+
 - 每个用户独立 session（cache 不共享）
 - 共享 prefix（cache 共享）
 

@@ -33,6 +33,7 @@ tags: [science, tokenization, cost, multilingual]
 ### 1.2 推理阶段
 
 对输入文本：
+
 1. 拆成字符
 2. 按训练阶段合并规则**尽量合并**成大 token
 3. 输出 token 序列
@@ -40,11 +41,13 @@ tags: [science, tokenization, cost, multilingual]
 ### 1.3 直观例子
 
 训练数据里 "the" 出现极多：
+
 - 合并 `t + h` → `th`
 - 合并 `th + e` → `the`
 - **"the" 最终是 1 个 token**
 
 训练数据里 "qwzxy" 从没出现：
+
 - 无法合并
 - **"qwzxy" 是 5 个 token**（每字一个）
 
@@ -55,6 +58,7 @@ tags: [science, tokenization, cost, multilingual]
 ### 2.1 训练数据构成
 
 大部分 LLM 的训练数据（尤其是西方厂商）：
+
 - 英文：50-70%
 - 代码：10-20%
 - 其他语言：剩下的被中文、西班牙、法语、日语等分摊
@@ -69,20 +73,24 @@ tags: [science, tokenization, cost, multilingual]
 | **中文每字平均 token** | 1.5-2.0 | 1.3-1.8 | **0.6-1.0** | 1.0-1.5 |
 
 **结论**：
+
 - 英文：1 词 ≈ 1.3 token（即 1 token ≈ 0.75 个英文词，各家 tokenizer 差异不大）
 - 中文：**Qwen 中文最省**（专门训了中文），OpenAI 中文**比英文贵约 3 倍**
 
 ### 2.3 成本影响（真实账单）
 
 假设同一段信息：
+
 - 英文 1000 词
 - 中文 2500 字（等价信息量）
 
 用 GPT-4o：
+
 - 英文：1000 × 1.35 = **1350 token**
 - 中文：2500 × 1.8 = **4500 token**（贵约 3.3 倍）
 
 用 Qwen：
+
 - 英文：1000 × 1.25 = **1250 token**
 - 中文：2500 × 0.8 = **2000 token**（比英文只贵 1.6 倍）
 
@@ -105,6 +113,7 @@ tags: [science, tokenization, cost, multilingual]
 ### 3.2 数字 tokenization 的不稳定性
 
 **关键数字"17234"**可能被切成：
+
 - `["17", "234"]`（如果 17 和 234 都在词表）
 - `["1", "7", "2", "3", "4"]`（每字一个）
 - `["172", "34"]`（别的组合）
@@ -115,6 +124,7 @@ tags: [science, tokenization, cost, multilingual]
 > **补一句 2026 的实况**：上面"随训练数据乱切"是 GPT-2/3 时代旧 BPE 的毛病。当代主流 tokenizer 已刻意收敛——Llama 系把每个数字单独成 token，GPT-4/4o（cl100k / o200k）等按**固定 1–3 位一组**从左切，`17234` 怎么切不再看运气。但切法变确定**没解决根本问题**：模型看到的仍是几块数字 token，内部没有位值（个 / 十 / 百）表示——这就是为什么它算术明显变好、却仍不可靠。下面三条后果照旧成立。
 
 **后果**：
+
 - 模型对数字的"理解"不是位值式的（ones/tens/hundreds）
 - 数学运算是"基于 token 模式"的，**不是真正的计算**
 - 超过训练见过的数字就不可靠
@@ -152,16 +162,19 @@ https://example.com/api/v2?user_id=123&session=abc
 ### 4.2 代码里的空格和缩进
 
 Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同：
+
 - GPT-4：常被合并成 1 token
 - 某些模型：4 个 token（每空格一个）
 
 **后果**：
+
 - 输出 Python 代码有时缩进错
 - 某些 tokenizer 对缩进式代码成本额外高
 
 ### 4.3 Emoji 和 Unicode 的代价
 
 一个 emoji 在 UTF-8 里可能是 4 字节。tokenizer 对 emoji 的处理参差不齐：
+
 - 主流 BPE：1 emoji ≈ 2-4 tokens
 - 冷门 emoji：每字节一个 token
 
@@ -170,6 +183,7 @@ Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同
 ### 4.4 少数民族语言 / 古文
 
 蒙古文、藏文、彝文、甲骨文……这些训练数据极少：
+
 - 每字符可能 3-8 个 token
 - 模型输出能力也弱
 
@@ -190,15 +204,18 @@ Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同
 > 这里很容易把方向算反。"555 比 750 少 26%"说的是 Sonnet 比 Opus 省，分母是 750；而我们要的是"Opus 比 Sonnet 多多少"，分母得是 555——`750/555-1 ≈ 35%`。账单跟着 token 数走，所以**对成本有意义的方向是 35%（1.35×），不是 26%**。
 
 **意味着**：
+
 - **同样一段内容，Opus 4.7+ 的 token 数比 Sonnet 4.6 多约 35%**
 - 即使单价一样，Opus 4.7+ 的实际成本高约 35%
 - 迁移时**账单会"莫名其妙涨"**
 
 **为什么 Anthropic 要换**：
+
 - 更细的 tokenization 可能对 reasoning 质量有利
 - Tokenizer 决定了模型的"语感"
 
 **SRE 含义**：
+
 - 跨模型 / 跨版本迁移时，**按"token 数"比价是错的**；要按"完成同样任务消耗的 token"比价
 - 成本预估要跑自己的数据实测，不信官方定价表的"表面数字"
 
@@ -209,12 +226,14 @@ Python 的缩进敏感。不同 tokenizer 对 `"    "`（4 空格）处理不同
 回忆 [深入 02](../深入/02-Prompt-Caching原理.md)：**Prompt Caching 按 token 粒度做 prefix 匹配**。
 
 **问题**：
+
 - 同样的文字，**不同 tokenizer 切出不同 token 序列**
 - 你从 Claude 切到 GPT：prompt 内容一样，**token 序列完全不同**
 - 你不能"跨厂商"共享缓存
 - 甚至同厂商**换 tokenizer 版本**也让缓存全失效
 
 **SRE 含义**：
+
 - 模型版本升级 = 缓存失效 = 成本冲击
 - 灰度发布预算要留出 **"缓存 cold period"**（5-10 分钟内成本可能翻倍）
 

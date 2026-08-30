@@ -93,6 +93,7 @@ tags: [meta, maintenance, ai-assisted, prompts]
 ````
 
 **用法**：
+
 1. 把 prompt 贴给 Claude Code
 2. 等它生成建议清单（通常 3-5 分钟）
 3. 自己过清单，选可接受的改动
@@ -130,6 +131,7 @@ tags: [meta, maintenance, ai-assisted, prompts]
 ```
 
 **用法**：
+
 1. AI 给出 draft
 2. 你用 B2 方式改写（不是让 AI 再改，你改）
 3. 改到满意了再 copy 到书的目录
@@ -223,11 +225,13 @@ tags: [meta, maintenance, ai-assisted, prompts]
 ## 9. 协同节奏建议
 
 **个人维护者**：
+
 - 月度：用 Prompt 1，人工决策
 - 季度：用 Prompt 2/4/5/6/7 之一（按需）
 - 年度：大改需要人工主导，AI 辅助
 
 **团队维护**：
+
 - 一个人跑 AI prompts 生成建议
 - 另一个人做决策 review
 - 第三个人 merge
@@ -237,6 +241,7 @@ tags: [meta, maintenance, ai-assisted, prompts]
 ## 10. 元启示
 
 这一章本身是 **"AI 时代的 SRE 架构师"** 的实战示范：
+
 - 明确**定义 AI 的工作范围**（[第 6 章 · 致命三角](../知识/06-AI自治与上下文架构约束.md)）
 - 明确**什么不让 AI 做**（[深入 09](../深入/09-何时不该用AI.md)）
 - 明确**人类保留什么判断权**

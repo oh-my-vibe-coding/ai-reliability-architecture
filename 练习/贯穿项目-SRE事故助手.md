@@ -88,6 +88,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 0 · 启动最小系统（~2 周）
 
 **新增**：
+
 - `app/ingest.py` — 读取 runbook/postmortem 文件，切 chunk，写入向量库
 - `app/retrieve.py` — 查询向量库的 top-k 片段
 - `app/agent.py` — 含 tool use 循环的最小 agent
@@ -97,6 +98,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 - `README.md` — 如何 ingest、如何 query、如何测 eval 的基本命令
 
 **验收**：
+
 - [ ] 能回答 **5 个事故问题**（来源：data/eval/smoke.jsonl），答对 ≥ 3 条
 - [ ] 每个回答附**来源引用**（哪个 runbook 的哪段）
 - [ ] CLI 可以一键 ingest + query
@@ -104,12 +106,14 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 1 · 权限与安全（~4 周）
 
 **新增**：
+
 - `app/permissions.yaml` — 工具权限矩阵（tool × 用户类型 × auto/confirm/forbid）
 - `docs/threat-model.md` — Lethal Trifecta 分析文档
 - `tests/injection/` — **≥3 个** prompt injection payload 测试样本
 - `app/tools.py` 扩展：**严格白名单**（只读命令 + path 限制）
 
 **验收**：
+
 - [ ] 工具白名单：未授权命令返回 `ERROR: not allowed`
 - [ ] Trifecta 分析覆盖**全部输入面**（prompt / 日志内容 / 工具返回）
 - [ ] 3 个 payload 里**至少 1 个**被基础设施层挡住（不是靠 LLM）
@@ -118,6 +122,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 2 · Trace + Eval + Flywheel（~4 周）
 
 **新增**：
+
 - `app/trace.py` — Trace schema（请求、prompt、response、tool calls、usage、判决）
 - `traces/` — trace 持久化（JSONL 起步）
 - `data/eval/gold.jsonl` — gold set（**≥30 条**，含预期关键点）
@@ -125,6 +130,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 - `app/failure_queue.py` — 失败样本入队列供人工 relabel
 
 **验收**：
+
 - [ ] 每次请求都有完整 trace 落盘
 - [ ] `eval.py` 能跑 gold set 输出报告
 - [ ] Judge 和人工对 10-20 条做过**对齐度计算**（记录 Cohen's κ 或 agreement rate）
@@ -133,6 +139,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 3 · 可靠性工程（~4 周）
 
 **新增**：
+
 - `docs/slo.md` — SLI 清单 + 目标值 + error budget policy
 - `app/gateway.py` — 基础 LLM 网关（带 token 计账、cache hit、rate limit）
 - `app/metrics.py` — TTFT / tokens/s / cost / cache hit rate 指标导出
@@ -140,6 +147,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 - 简单 Prometheus scrape endpoint 或 metrics JSON 文件
 
 **验收**：
+
 - [ ] SLO 文档里每个 SLI 有**目标值 + 测量点**
 - [ ] Gateway 能跑，能看到 cache hit rate
 - [ ] 决策树每个分支有**阈值**（不是"看情况"）
@@ -148,12 +156,14 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 4 · 复合可靠性数学（~3 周）
 
 **新增**：
+
 - `docs/step-budget.md` — Agent 的 step 图 + 每步 p_i 估算 + 端到端正确率
 - `app/agent.py` 改造：加入 **verifier / gate**（至少 2 处）
 - `data/eval/gold.jsonl` 扩展：加一组测试"加 gate 前后的对比"
 - `docs/failure-amplification.md` — 2 种级联失效场景分析
 
 **验收**：
+
 - [ ] Step 图 + p_i 表格有**具体数字**（不是全 0.95）
 - [ ] 端到端正确率**前后对比**：加 verifier 提升多少、代价多少
 - [ ] Verifier 的 false positive rate 测过（别把对的误杀）
@@ -161,11 +171,13 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ### Unit 5 · 数值底座 + 本地部署（可选）（~2 周）
 
 **新增**：
+
 - `docs/runbook-numeric.md` — 数值级故障排查 runbook
 - 可选（路线 A/B）：`app/agent.py` 支持切换到 **本地小模型**（Qwen3-1.7B / Phi-4-mini；型号为 2026-07 快照，使用时以当时最新型号为准），对比质量 / 成本
 - 可选（路线 C）：toy softmax + bf16/fp32 对比实验，写进 runbook 的"可复现实验"节
 
 **验收**：
+
 - [ ] Runbook 有**触发条件 + 分层诊断 + 具体命令**
 - [ ] 至少做过 1 次实验（toy 或 frontier 规模）
 - [ ] 如果做了本地部署，记录**和云 API 的质量差距**
@@ -179,6 +191,7 @@ tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 - 团队 review → 吸收 action items → 进入**维护期**
 
 **至此你有**：
+
 - 一个跑得动的系统
 - 完整的架构评审文档
 - 一套可复用的 runbook / SLO / 事故模式
@@ -316,6 +329,7 @@ cp ../AI时代SRE架构师之路/代码/02-minimal-agent.py app/agent.py  # 假�
 - 保留**结构和模式**（告警格式、事故流程、沟通模板）
 
 **如果暂时拿不到真实数据**，可用公开替代：
+
 - Google SRE Book 的案例
 - 公开的 postmortem 集合（各家 engineering blog）
 - AWS / GCP / Azure 官方 runbook
@@ -345,6 +359,7 @@ cp ../AI时代SRE架构师之路/代码/02-minimal-agent.py app/agent.py  # 假�
 
 ### Q3：我时间少，能裁剪吗？
 **能**。最小可行路线：
+
 - Unit 0 全做（~2 周）
 - Unit 1 做工具白名单 + Trifecta（跳过红队）
 - Unit 2 做 trace + L1 eval（跳过 L2 judge 校准）

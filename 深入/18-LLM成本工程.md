@@ -62,6 +62,7 @@ tags: [deep-dive, cost, finops, token-economics]
 ```
 
 **经验口诀**：
+
 - 一个日均 1 万次调用、每次 5k prompt + 500 completion 的 Sonnet 级应用 → **月成本约 $3k-8k**
 - 加上 Agent 多步调用（×3-10 步）→ **$10k-80k**
 - 加上 128k context 的长文档场景 → **$50k-200k+**
@@ -195,6 +196,7 @@ tags: [deep-dive, cost, finops, token-economics]
 ### 4.2 路由的成本效益计算
 
 假设：
+
 - 轻量模型成本 = 0.1× 主力
 - 意图分类成本 = 0.01× 主力
 - 70% 的请求被正确路由到轻量

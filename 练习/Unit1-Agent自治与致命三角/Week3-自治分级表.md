@@ -15,6 +15,7 @@ tags: [part-4, practice, unit1, week]
 **Simon Willison · [《Designing Agentic Loops》](https://simonwillison.net/2025/Sep/30/designing-agentic-loops/)（2025）**
 
 重点关注：
+
 - 他怎么定义 LLM agent（"runs tools in a loop to achieve a goal"），以及无人值守的 YOLO mode 有哪三个风险（误删改坏文件、源码与密钥被窃、机器被当成攻击跳板）
 - 想开 YOLO mode 时，他给的三个选项（安全沙箱 / 用别人的电脑 / 直接冒险）各接受了什么残余风险；tightly scoped credentials（staging 环境 + 预算封顶）和把网络锁到可信主机白名单，又各砍掉了哪类风险
 - 文中没有"永远不要让 AI 做 X"的清单，也没出现 reversibility 这个词。做一道归纳题：从他的实际做法（专开一个 $5 预算封顶的 Fly org、只在隔离环境里做加删索引这类操作）反推，他不肯放进无人值守循环的是哪类操作——他的判据更像可回滚性、blast radius 可控，还是花费封顶？带着你的答案做本周的分级表
@@ -23,6 +24,7 @@ tags: [part-4, practice, unit1, week]
 
 ### 第一步 · 列出 Agent 可能执行的所有操作
 按类别列，至少 15 个：
+
 - 读类：查询数据库、读日志、调查询 API……
 - 变更类：修改配置、发布、扩缩容……
 - 交互类：发消息、创建工单、推送通知……
@@ -39,13 +41,16 @@ tags: [part-4, practice, unit1, week]
 ### 第三步 · 根据属性划分 Auto / Confirm / Forbidden
 
 **Auto（可自治）判据**：
+
 - 可回滚性 = 高 **且** blast radius = 小 **且** 可审计
 
 **Confirm（需人工确认）判据**：
+
 - 可回滚性 = 中 **或** blast radius = 中
 - 必须有 human-in-the-loop 机制
 
 **Forbidden（禁止 AI 操作）判据**：
+
 - 可回滚性 = 低 **或** blast radius = 大
 - 不论 AI 多聪明，这类操作人类手工做
 
@@ -58,11 +63,13 @@ tags: [part-4, practice, unit1, week]
 
 ## 写完之后：让 AI 挑错
 贴给 AI 并问：
+
 1. "这份分级表里有没有**看起来安全但其实能被链式调用放大**的 Auto 项？"（举例：只读 API 被反复调用可能触发限流、泄露访问模式）
 2. "Confirm 档里的人工确认机制，有哪些反模式会让它形同虚设？"（举例：确认弹窗疲劳、批量审批）
 
 ## 预测 · B1 · 每日 5 分钟
 本周每次 AI 要做操作前，先猜：
+
 - "这个操作在我的分级表里是哪一档？"
 - "如果它出错，回滚代价多大？"
 

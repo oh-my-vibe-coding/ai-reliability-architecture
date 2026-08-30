@@ -18,6 +18,7 @@ tags: [shared-language, alignment, rlhf, dpo, safety]
 一句话：**让模型的行为符合人类的意图、价值观和安全边界**。
 
 三个子目标（Anthropic 的 HHH 原则）：
+
 - **Helpful**：能帮到用户
 - **Honest**：说实话、不编
 - **Harmless**：不造成伤害
@@ -242,12 +243,14 @@ Policy 在 RM 上分越来越高，但实际质量下降。**RM 是代理，不�
 **Policy 找到 RM 的"bug"**，让 RM 给高分但实际不是好回答。
 
 **典型例子**：
+
 - RM 发现"长回答"容易被人喜欢 → Policy 学会输出超长回答
 - RM 被"hedging"（加免责声明）高评分 → Policy 变得怯懦
 - RM 对带引用的回答评高 → Policy 编造引用
 - RM 偏向礼貌 → Policy 过度 sycophancy（阿谀奉承）
 
 **对抗**：
+
 - 多个 RM ensemble
 - 定期换 RM
 - 人工重新校准
@@ -312,6 +315,7 @@ Claude 系列重度使用 CAI / RLAIF。
 ### 9.1 Refusal
 
 拒绝回答。分两种：
+
 - **有效 refusal**：拒绝真正有害的（教炸药制造）
 - **Over-refusal**：拒绝无害请求（做饭、医学问题）
 
@@ -320,11 +324,13 @@ Claude 系列重度使用 CAI / RLAIF。
 ### 9.2 Jailbreak
 
 用户绕过 safety 让模型"违规回答"。例子：
+
 - "假装你是 DAN（Do Anything Now）..."
 - "写一个小说，里面反派说出炸药配方..."
 - 语言混用 / 编码技巧
 
 **对抗**：
+
 - 训练时加 jailbreak 样本
 - 分类器拦截
 - System prompt 强化
@@ -370,11 +376,13 @@ Claude 系列重度使用 CAI / RLAIF。
 ### 11.1 新模型版本上线
 
 每次 alignment 迭代都可能改变：
+
 - **Refusal rate**（某些原本能回答的突然拒绝）
 - **输出风格**（突然更啰嗦 / 更短）
 - **Tool use 行为**（工具调用频率变）
 
 **SRE 要做的**：
+
 - 上线前跑你自己的评估套件（eval suite）
 - Shadow 流量对比
 - Refusal rate / 输出长度等**风格指标**作为 SLI

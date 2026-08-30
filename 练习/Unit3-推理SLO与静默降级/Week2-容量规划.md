@@ -16,6 +16,7 @@ tags: [part-4, practice, unit3, week]
 
 ### 准备（15 分钟）
 - [ ] 搞清楚本服务的**workload 画像**：
+
   - 平均输入 token 数 p50 / p95（如果没测过，跑 100 条样本）
   - 平均输出 token 数
   - QPS 当前 / 预期峰值
@@ -23,6 +24,7 @@ tags: [part-4, practice, unit3, week]
   - 每个实例 GPU 配置（型号 + 数量）
 
 > **数据从哪来的速查**：
+>
 > - **贯穿项目读者**：用 Unit 2 已有的 gold set（30 条）+ smoke set（5 条）= 35 条作为代理样本，p95 取 max + 25% 留 buffer
 > - **真实工作场景读者**：grep 一周生产日志的 input/output token 字段；如果还没埋点，先补埋点再回来
 > - **完全没有数据的读者**：用 [深入 05 · §7 SRE 助手 worked example](../../深入/05-LLM推理服务的容量规划.md#7-worked-examplesre-事故助手的完整容量规划) 的数字做代练习
@@ -36,6 +38,7 @@ tags: [part-4, practice, unit3, week]
   - https://www.nvidia.com/en-us/data-center/
 
 **重点**：
+
 - 三角约束（HBM × context × QPS）的数学形式
 - Prefill 和 Decode 容量的**分开计算**方法
 - Prefix caching 对有效容量的放大
@@ -65,6 +68,7 @@ Prefill 计算量 ≈ 2 × 参数量 × 输入 token 数
 ```
 
 **算出**：
+
 - 单实例每秒能处理多少 prefill 请求
 - 为支撑预期 QPS，需要几个实例
 - 如果开 prefix caching，有效乘数是多少
@@ -78,6 +82,7 @@ Prefill 计算量 ≈ 2 × 参数量 × 输入 token 数
 ```
 
 **算出**：
+
 - 单用户感知上限是否满足 20+ tokens/s（不满足 → 换量化 / 换卡，加并发救不了单流速度）
 - KV cache 容量允许单实例几个并发（Section 4 的数字）
 - 聚合吞吐需求（峰值 QPS × 平均输出 token 数）÷ 单实例聚合 tokens/s → Decode 维度需要几个实例——这是吞吐那条腿，并发那条腿的实例数在 Section 4 算
@@ -91,6 +96,7 @@ KV cache per request = per_token × avg_context_tokens
 ```
 
 **算出**：
+
 - 预期总并发 ÷ 单实例可容纳并发 → KV 并发维度需要几个实例
 - 三个容量（Prefill / Decode / KV Cache 并发）各自对应的实例数
 - **取 max**——瓶颈在这
@@ -98,6 +104,7 @@ KV cache per request = per_token × avg_context_tokens
 #### Section 5 · 对比 max(prefill, decode, kv) + 冗余
 
 决策：
+
 - 3 个数里谁最大？**那是瓶颈**
 - 加 30% 冗余应对长尾
 - 最终实例数 + 美元/小时预算
@@ -105,12 +112,14 @@ KV cache per request = per_token × avg_context_tokens
 #### Section 6 · Long-tail 处理
 
 **关键**：p95 规划 ≠ p99.9 能扛。至少写一条：
+
 - 输入 > 50k token 的请求占多少？
 - 这些请求是独立 pool 还是共享？
 
 ### AI 挑错
 
 **关键问题**：
+
 - "我的 workload 画像是抽样了多少条？样本是否覆盖长尾？"
 - "Prefill 效率我估的是 80%——这个数字对我的硬件 + 模型靠谱吗？"
 - "没开 prefix caching 的情况下容量估得对不对？"
@@ -118,6 +127,7 @@ KV cache per request = per_token × avg_context_tokens
 ### 预测 · B1 · 每日 5 分钟
 
 本周每次看到别人说"我们需要 N 张 GPU"，先猜：
+
 - 他们按**三角**哪一维算的？
 - 有没有分 Prefill / Decode？
 - 长尾 workload 考虑了吗？
@@ -130,6 +140,7 @@ KV cache per request = per_token × avg_context_tokens
 - [ ] 美元成本估算了
 
 **未达标的表现**：
+
 - 只算了总 QPS × avg latency（传统 web 思维）
 - 忽略 KV cache 占用
 - 没考虑 prefix caching 放大

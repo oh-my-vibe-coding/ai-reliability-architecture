@@ -24,6 +24,7 @@ tags: [appendix, training, vendor-official, 📊]
 - **URL**：https://anthropic.skilljar.com/
 - **入口**：https://www.anthropic.com/learn
 - **主要 Track**：
+
   - **Build with Claude** —— API 开发
   - **Claude for Work** —— 团队 / 组织部署
   - **Claude for Personal use** —— 个人使用
@@ -73,6 +74,7 @@ tags: [appendix, training, vendor-official, 📊]
 ### DeepLearning.AI 合作课程
 - **URL**：https://www.deeplearning.ai/short-courses/
 - 与 OpenAI 共同出品，Andrew Ng 参与：
+
   - ChatGPT Prompt Engineering for Developers
   - Building Systems with the ChatGPT API
   - LangChain for LLM Application Development
@@ -107,6 +109,7 @@ tags: [appendix, training, vendor-official, 📊]
 ### HuggingFace Learn
 - **URL**：https://huggingface.co/learn
 - 免费系统课程：
+
   - **NLP Course**
   - **Deep RL Course**
   - **Diffusion Models Course**

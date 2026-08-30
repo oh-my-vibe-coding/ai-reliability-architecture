@@ -98,6 +98,7 @@ Softmax 把 N 个 score 归一成概率分布。**N 越大，分母越大**。
 原因（猜测）：softmax 必须总和为 1，模型需要一个"出口"把多余的 attention 倾倒出去——前几个 token 成了默认"垃圾桶"。
 
 **后果**：
+
 - **开头**因为 attention sink 有额外权重
 - **末尾**因为 recency bias 有额外权重
 - **中间**两面不靠，受影响最大
@@ -199,6 +200,7 @@ flowchart TB
 ### 3.3 RAG 里 Rerank 的地位
 
 给工程上的直观解释：
+
 - 你从 100 条片段里选 20 条喂进 context → "中间塌陷"风险极大
 - **Rerank 之后只放 Top-5** → 每条都在"头/尾"，attention 充足
 
@@ -211,6 +213,7 @@ flowchart TB
 - 多跳（多个事实跨长上下文合成）：仍然大幅塌陷——公开多针推理基准（MRCR 等）在 1M token 档普遍只有几成到七成多，远低于单针体感
 
 **SRE 工程做法**：
+
 - 把多跳拆成多个单跳
 - 每步用独立 API call
 - 中间结果可审计
@@ -240,6 +243,7 @@ flowchart TB
 **单针 needle test（"第 X 行是什么"）**容易通过——2026 前沿模型几乎必过、任何位置都能答对，它已基本失去区分度。
 
 **实测要用**：
+
 - Multi-needle test（多个事实要同时找到）
 - Reasoning test（找到事实 + 推理）
 - Distractor test（有相似但错误的信息干扰——长文里干扰项危害被放大，见 §0 context rot）

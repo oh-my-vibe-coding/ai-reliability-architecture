@@ -16,6 +16,7 @@ tags: [part-4, practice, unit2, week]
 
 ### 准备（15 分钟）
 - [ ] 选定本周聚焦的**单一 capability**（不要贪多）。例：
+
   - "从客服对话中抽取投诉原因"
   - "为工单生成 runbook 建议"
   - "给代码做 PR review"
@@ -31,6 +32,7 @@ tags: [part-4, practice, unit2, week]
   - 注：该仓库已停止活跃维护（2026-05 快照 🕒）——读它是为了理解 eval template 的结构范式，不是工具选型对象。
 
 **关注**：
+
 - Langfuse 怎么把 trace 直接变成 eval 样本？
 - OpenAI Evals 的"template"是什么、怎么用？
 - **两者的 L1 / L2 / L3 分别对应什么？**
@@ -63,6 +65,7 @@ tags: [part-4, practice, unit2, week]
 ```
 
 **设计 Judge 校准机制**：
+
 - 你打算怎么检查 judge 自己可靠？（Cohen's κ？简单 agreement？）
 - 多久校准一次？
 
@@ -76,6 +79,7 @@ tags: [part-4, practice, unit2, week]
 #### Section 4 · 三层如何互动
 
 写 150 字：
+
 - L1 失败怎么处理（直接拒绝 / 记录 / 尝试修复）
 - L2 低分是否触发 L3？
 - L1/L2 的数据是否回流作为 Flywheel 输入？
@@ -83,6 +87,7 @@ tags: [part-4, practice, unit2, week]
 #### 写完后：AI 挑错
 
 **关键问题**：
+
 - "L1 规则里有没有**过严**的？（正当的语义正确但不合规则的会被误杀）"
 - "Judge prompt 有没有隐藏偏见？（偏好长回答 / 礼貌度）"
 - "L3 主指标是否真的和业务价值对齐？"
@@ -90,6 +95,7 @@ tags: [part-4, practice, unit2, week]
 ### 预测 · B1 · 每日 5 分钟
 
 本周每次看到 AI 输出时，先猜：
+
 - **"L1 assertion 会不会挂？"**（格式 / 字段）
 - "L2 各维度大致多少分？"
 
@@ -104,6 +110,7 @@ tags: [part-4, practice, unit2, week]
 - [ ] 经过至少 1 轮 AI 挑错 + 自己改
 
 **未达标的表现**：
+
 - L1 全是"输出不为空"这种形式
 - Judge 没有校准计划 = 盲信
 - L3 主指标是"用户满意度" = 没 operationalize

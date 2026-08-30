@@ -66,6 +66,7 @@ LLM 推理：**显存、带宽、算力三者共同约束，并且 prefill 和 d
 > 用传统 Web 容量模型算 GPU 集群，**预估会差 3–10 倍**。要么买多了烧钱，要么买少了扛不住——上面三个翻车现场就是这个误差的具象化。
 
 剩下的内容回答三个问题：
+
 - 三个资源是怎么互相挤占的？（§1 三角约束 + §2 KV cache 公式）
 - 怎么精确算 prefill 和 decode 各自的极限？（§3 worked example + §4 prefill/decode 分开算）
 - 怎么把这些数字落到 autoscale 和限流里不踩坑？（§6 autoscaling 陷阱）
@@ -186,6 +187,7 @@ KV cache 可用    : 12 GB
 ### 引入 Prefix Caching
 
 如果开启 Anthropic / vLLM 式 prefix caching：
+
 - 相同前缀（system prompt + tools + CLAUDE.md，约 14k token）**只占一份**
 - 假设 100 个活跃请求共享 **14k × 0.32 MB = 4.5 GB** 前缀
 - 剩余显存 `12 - 4.5 = 7.5 GB` 服务**独立部分**
@@ -208,6 +210,7 @@ KV cache 可用    : 12 GB
 - 实际 80-90% 效率 → **~0.7s**
 
 **容量含义**：
+
 - 单张 H100 每秒能处理约 **1.4 个 4k token 的 prefill**
 - 2× H100 TP 约 **2-2.5 个/秒**（通信开销）
 - 如果 QPS > 2.5，必须加实例
@@ -220,6 +223,7 @@ KV cache 可用    : 12 GB
 - Continuous batching 下权重每步只读一次、被整个 batch 共享，**聚合吞吐 ≈ 48 × batch size**——直到每步还要读的 KV cache（batch 内每请求各一份）逐渐吃掉带宽，或显存装不下更多并发（回到 §3 的 KV 上限）。这就是 [深入 01 · §4.4](01-首包延迟与吞吐的影响因素.md) 讲的"单请求 vs 总吞吐"
 
 **容量含义**：
+
 - 如果每个用户需要 20 tokens/s 的感知速度
 - batch ≈ 12（§3 的 KV cache 并发上限）时：每步读 140 GB 权重 + ~12 GB KV ≈ 152 GB，6.7 TB/s 带宽 → ~23 ms/步 → **每用户理论 ~44 tokens/s**——KV 读取会随并发增长缓慢拉低这个数，但 20 tokens/s 的目标全员可满足
 - decode 并发的真正上限是 §3 的 KV cache 并发（显存），**不是把 48 tokens/s 分账**
@@ -268,6 +272,7 @@ flowchart LR
 如果用平均值（比如"平均输入 5k token"），你会因为**长尾请求**挤爆显存。
 
 建议监控：
+
 - `input_tokens_p50 / p95 / p99`
 - `output_tokens_p50 / p95 / p99`
 - `total_tokens_per_request_p99`
@@ -288,6 +293,7 @@ LLM 推理的 autoscaling **比 web 服务难 10 倍**。
 
 > [!WARNING]
 > 不要用 HPA default。准备好：
+>
 > - 最小副本数 ≥ 2（避免 0→1 的超长冷启动影响用户）
 > - `minReadySeconds` 和 `initialDelaySeconds` 足够长（>60s）
 > - Model weight pin 在本地 SSD / NVMe cache
@@ -299,6 +305,7 @@ LLM 推理的 autoscaling **比 web 服务难 10 倍**。
 - 业务高峰后的"凉下来"阶段特别疼
 
 **缓解**：
+
 - Scale-down 要慢（冷却期 10+ 分钟）
 - Warm pool / sticky routing
 
@@ -313,6 +320,7 @@ LLM 推理的 autoscaling **比 web 服务难 10 倍**。
 ### 陷阱 4：按 QPS 扩容很危险
 
 QPS 相同，token 流量可能差 100×。举例：
+
 - 100 QPS × 平均 500 token = 50k token/s
 - 100 QPS × 平均 50000 token = 5M token/s（100×）
 
@@ -372,6 +380,7 @@ on request:
 - **典型一次交互**：粘贴一段告警 / 日志 → Agent 调 2-4 个只读工具（查 metrics / 查依赖 / 查历史事故） → 给出诊断 + runbook 链接
 - **请求形态**（基于灰度期监控的 p95）
     - 输入总长度 ~16k token，由两部分组成：
+
         - **共享前缀**：14k token（system prompt 2k + 工具描述 3k + runbook 索引 9k）——所有用户、所有工具循环轮次都重复
         - **用户独立部分**：2k token（当前事故上下文 + 历史片段）——每请求独立
     - 输出：1k token（诊断 + 引用）
@@ -423,19 +432,23 @@ on request:
 ### 步骤 3：Prefix Cache 校验（只压低 prefill 那条腿）
 
 SRE 助手有一个明显的"高重复前缀"特征：
+
 - 14k 共享前缀（system prompt + tools schema + runbook 索引）每次请求都重复
 - Agent 工具循环里，**前 N-1 轮的 prefix 也在第 N 轮中复用**
 
 按 [深入 02 · Prompt Caching](02-Prompt-Caching原理.md) 的模型估算：
+
 - 共享前缀长度：14k token
 - 用户独立部分：2k token
 - 缓存命中率（实测灰度期）：**~85%**（剩 15% 因 runbook 索引随事故新数据周期性更新而破缓）
 - 每请求的等效 prefill token（算的是自建 GPU 的算力消耗）：
+
     - 共享前缀部分：`14k × 0.15 ≈ 2.1k`——命中的前缀在自建 vLLM 里几乎不消耗 prefill 算力（只是显存读取），按 ≈0 计。注意别把 [深入 02 · §1 Anthropic 价格模型](02-Prompt-Caching原理.md#1-一个具体场景rag-客服的账单为什么差-8-倍) 的"cache 命中按 cache-miss 价格的 ~10% 计费"拿来算算力——那是托管 API 的计费口径，不是物理模型
     - 用户独立部分：`2k`（每次都全 prefill）
     - 合计：~4.1k token 等效，约为原 16k 的 26%
 
 **修正后的 prefill 容量**：
+
 - 等效 prefill 时间：`1.55s × 0.26 ≈ 0.4s`
 - 单实例：~2.5 请求/s → 15 QPS 只需 **6 个实例**
 
@@ -446,6 +459,7 @@ SRE 助手有一个明显的"高重复前缀"特征：
 - 高峰同时活跃请求 ≈ 100
 - 实例数 ~11-12 → 平均 **8-9 并发/实例**
 - **每实例的 KV cache 占用**：
+
     - 一份共享前缀（14k token）：14k × 0.32 MB = **4.5 GB**（实例内所有并发共享一份）
     - 每并发的用户独立部分（2k token）：2k × 0.32 MB ≈ **0.65 GB**
     - 每并发的输出 KV（输出 1k token，边生成边涨）：平均在途 ~0.5k ≈ 0.16 GB，收尾时 0.32 GB——**这一项最容易被漏算**

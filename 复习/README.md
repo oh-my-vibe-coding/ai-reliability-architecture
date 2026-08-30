@@ -37,6 +37,7 @@ tags: [meta, review, spaced-repetition, active-recall]
 
 ### 方式 B · 手动快读（推荐给轻度学习者）
 按**"间隔递增"**手动过 `核心概念卡.md`：
+
 - 第 1 天：学完新 Unit 后通读
 - 第 3 天：合上答案自测
 - 第 7 天：再自测一次

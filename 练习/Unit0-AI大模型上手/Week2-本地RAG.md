@@ -29,6 +29,7 @@ tags: [part-4, practice, unit0, week]
   - 注意 Anthropic 不提供 embedding API，官方推荐的是 Voyage——别去 Anthropic 文档里找 embedding 端点
 - [ ] 写检索函数：查询 → embedding → 向量库 top-K 相似度搜索 → 返回片段 + 来源路径
 - [ ] 改造上周的 CLI：
+
   - 用户提问先调检索工具（作为 tool use 的一个工具）
   - 把检索结果塞进 prompt
   - 要求模型回答时**必须附出处**（哪个文件的哪一段）
@@ -42,6 +43,7 @@ tags: [part-4, practice, unit0, week]
 **Simon Willison · [《Embeddings: What they are and why they matter》](https://simonwillison.net/2023/Oct/23/embeddings/)**
 
 读的时候拿笔记下三件事：
+
 - 向量空间里"相似"到底是什么数学概念
 - embedding 模型和对话模型是**不同的模型**，为什么
 - 他提到的"chunking 很难"的具体例子
@@ -50,6 +52,7 @@ tags: [part-4, practice, unit0, week]
 不用 AI，为你的小 Agent 写一页**架构图 + 200 字失败模式分析**：
 
 必须包含：
+
 - Agent 的整体数据流（用户 → 检索 → 拼 prompt → 生成 → 回答）
 - 至少列出 **3 种失败模式**（例：检索不到、检索错片段、模型忽略检索结果、模型在结果里编造……）
 - 每种失败模式的可能对抗方式
@@ -58,6 +61,7 @@ tags: [part-4, practice, unit0, week]
 
 ## 预测 · B1 · 每日 5 分钟
 每次查询之前先猜：
+
 - **它会从哪份文档里检出来？**
 - **前 3 个片段会不会包含答案？**
 - **模型最终回答会不会忠实于检索结果？**
@@ -71,6 +75,7 @@ tags: [part-4, practice, unit0, week]
 - [ ] 对"RAG 为什么解决幻觉但不能完全消除"有自己的直觉解释
 
 **贯穿项目路线额外自检**：
+
 - [ ] `data/runbooks/` 有 ≥20 条真实 SRE 文档（脱敏 OK）
 - [ ] `data/eval/smoke.jsonl` 有 5 条事故问题 + 期望答案要点
 - [ ] 跑 smoke eval 能**答对 ≥3 条**（带来源引用）

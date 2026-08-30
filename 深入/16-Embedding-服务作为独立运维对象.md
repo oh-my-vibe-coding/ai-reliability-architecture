@@ -85,6 +85,7 @@ flowchart LR
 > **2026-08 勘误**：开源 embedding 榜首已从 bge-m3 移走——2026 年的新晋强者是 **Qwen3-Embedding-8B**、**NVIDIA Nemotron-3-Embed-8B**、**Microsoft Harrier-OSS**（后两者在检索导向的 RTEB / 多语言 MTEB v2 上领先）。MTEB 官方也已推出 **v2** 与检索专用 **RTEB**（用 held-out 数据集防过拟合），读榜先认榜单版本。bge-m3 仍是可靠的通用多语言基线，但选型时请与上述新模型同台 eval。
 
 **部署技术栈**：
+
 - **Text Embeddings Inference (TEI)** by Hugging Face —— 类似 vLLM 但专为 embedding
 - **vLLM** 也开始支持 embedding model
 - **FastEmbed** —— ONNX runtime，CPU 友好
@@ -163,11 +164,13 @@ Embedding 算出来的向量存在 vector DB 里。Vector DB 本身是另一个 
 > HNSW（Hierarchical Navigable Small World）是向量库最常见的索引结构——把向量组织成多层图加速相似搜索，代价是额外占用内存（约原始向量的 1.1-1.5×）。图链接的开销与维度无关，每个向量约 M × 2 × 4 bytes。
 
 **Worked example**：1 亿条文档 × 1024 维 float32：
+
 - 原始向量：100M × 4096 byte = **400 GB**
 - HNSW 索引（在内存）：~450-550 GB
 - 单机 RAM 紧张 → **分片或量化**
 
 **两种解决方案**：
+
 - **量化向量**（int8 / 二值化）：精度损失换 4-32× 内存节省。int8 标量量化典型 recall 损失仅 1-3%，二值化损失更大；上线前必须用 gold set 跑 hit@k 对比
 - **分片**：多机分区 + 路由
 
@@ -192,6 +195,7 @@ Embedding 算出来的向量存在 vector DB 里。Vector DB 本身是另一个 
 LLM 升级：换 endpoint，旧的请求记录仍然能解读。**无状态切换**。
 
 Embedding 升级：
+
 - 老向量是旧模型算的
 - 查询用新模型算的
 - 两者**在不同向量空间**——余弦距离没意义
@@ -226,10 +230,12 @@ Embedding 升级：
 - 总 token：50B
 
 **用厂商 API**：
+
 - text-embedding-3-small $0.02 / MTok → **$1000**
 - 通过 [深入 13 Batch API](13-离线批量推理.md) 折半 → **$500**
 
 **自建 bge-m3**：
+
 - 单 H100 跑 bge-m3：~50k token/s
 - 50B / 50k = 1M 秒 = **278 卡时**
 - spot H100 $2/h → **$556**
@@ -237,6 +243,7 @@ Embedding 升级：
 成本接近，但**自建后续推理成本是 0**（原 API 每次查询都要付钱）。
 
 **SRE 工作**：
+
 - 设计 batch pipeline（输入文档 stream，输出向量到新库）
 - Checkpoint 机制（处理到第 N 条，中断后继续）
 - 进度监控（"已 re-embed 47.2%"）
@@ -273,6 +280,7 @@ spans:
 ```
 
 **SRE 的可观测性 checklist**：
+
 - [ ] 每个 span 都有 model_id + sha256
 - [ ] 每个 span 都有自己的延迟 SLI
 - [ ] 端到端延迟 = sum(spans) + overhead

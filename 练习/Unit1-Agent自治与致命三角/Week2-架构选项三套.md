@@ -18,6 +18,7 @@ tags: [part-4, practice, unit1, week]
 2. **OpenAI · [Function calling 安全文档](https://platform.openai.com/docs/guides/function-calling)**（搜 function calling best practices）
 
 重点关注：
+
 - 他们自己设计的**信任边界**在哪（谁是 trusted，谁不是）
 - 他们对工具返回值是怎么处理的（尤其是错误处理）
 
@@ -57,6 +58,7 @@ tags: [part-4, practice, unit1, week]
 
 ## 写完之后：让 AI 挑错 + 红队
 贴给 AI 并问三次：
+
 1. "挑我这三套方案里的技术错误或遗漏"
 2. "站在攻击者角度，这三套方案各自最容易的绕过方式是什么"
 3. "如果必须只选一套部署，你会选哪套，为什么"
@@ -65,6 +67,7 @@ tags: [part-4, practice, unit1, week]
 
 ## 预测 · B1 · 每日 5 分钟
 本周每次接触 AI 工具使用场景，猜：
+
 - "这个设计砍了三角哪条腿？"
 - "哪条腿最容易被重新接上？"
 

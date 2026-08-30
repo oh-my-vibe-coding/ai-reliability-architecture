@@ -17,11 +17,13 @@ tags: [part-4, practice, unit5, week]
 ### 阅读 · B3 · 45 分钟（无 AI）
 
 **不读新材料**。回读：
+
 - Anthropic 事故复盘（第 N 次，现在从"runbook 视角"读）
 - 你自己 W1 的实验记录
 - [深入 10 · Pattern 1 Silent Quality Regression](../../深入/10-AI系统事故模式库.md) 和 Pattern 12
 
 找出：
+
 - 如果当时你在 Anthropic 团队，你希望团队的 runbook 第一页写什么？
 
 ### 产出 · B2 · 90-120 分钟
@@ -119,6 +121,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 #### 页 6 · Postmortem 模板
 
 出事后必填的条目：
+
 - 症状起点时间
 - 首次报警时间（和起点差了多久？= 检测盲区）
 - 定位耗时（哪一步最慢？）
@@ -128,6 +131,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 ### 验收标准
 
 这份 Runbook 应该：
+
 - [ ] **另一个没参与的同事 15 分钟内能按它定位**（让同事试读）
 - [ ] **每个诊断命令都能真的跑**（你自己跑过一遍）
 - [ ] 覆盖**至少 4 类**数值问题
@@ -144,6 +148,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 ### 预测 · B1 · 每日 5 分钟
 
 本周每次看 LLM 服务任何异常，快速自问：
+
 - "按我的 runbook，这该走哪一分支？"
 - "能多快定位？"
 

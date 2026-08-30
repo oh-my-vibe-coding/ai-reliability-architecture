@@ -27,6 +27,7 @@ tags: [part-4, practice, unit2, week]
   - arXiv 搜 "LLM-as-judge calibration"
 
 **重点记录**：
+
 - 不同 Judge 模型的**家族偏见**（OpenAI 家偏好哪种回答？Claude 家呢？）
 - Cohen's κ vs Pearson / Spearman 三者的差异
 - Position bias、length bias、self-preference 是什么
@@ -57,6 +58,7 @@ tags: [part-4, practice, unit2, week]
 3. **Bias**：`mean(judge) - mean(human)`——正则 Judge 比你松；负则严
 
 目标参考：
+
 - Agreement rate ≥ 70% = 可用
 - κ 0.4-0.6 = 中度一致；≥ 0.6 = 高度一致（生产可用线，口径见[深入 06 · §2.3](../../深入/06-Eval-Pipeline设计.md)）
 - |bias| < 1 = 无系统偏移
@@ -73,6 +75,7 @@ tags: [part-4, practice, unit2, week]
 | 换 rubric（不打 0-10 打 high/mid/low）| 中 | 简化会提升 κ |
 
 设计**你的校准 SOP**：
+
 - 每 N 周校准一次
 - 每次抽 M 条
 - κ 跌破多少时触发人工介入
@@ -92,12 +95,14 @@ tags: [part-4, practice, unit2, week]
 ### AI 挑错
 
 **挑战问题**：
+
 - "我的校准方法有没有 **N 太小** 的问题？20 条样本能得出稳定 κ 吗？"
 - "我识别的偏见清单有遗漏吗？"
 
 ### 预测 · B1 · 每日 5 分钟
 
 本周每次看到 LLM 做的打分（不限于你的 Judge），先猜：
+
 - "这个分数是客观的还是带偏见？"
 - "如果让人打，会不会差 ±1 以上？"
 
@@ -109,6 +114,7 @@ tags: [part-4, practice, unit2, week]
 - [ ] 如果对齐度差（<60%），至少**试了 1 种调整**再重测
 
 **未达标的表现**：
+
 - 没有人工打分（直接跳 Judge）→ 没有基线怎么校准
 - 盲信 Judge 高分
 - 偏见分析停在"LLM 可能有偏见"这种空话

@@ -35,6 +35,7 @@ tags: [part-4, practice, capstone, architecture-review]
 > **最推荐的 Capstone 对象**就是 [🛠️ 贯穿项目 · SRE 事故助手](贯穿项目-SRE事故助手.md)。
 >
 > 如果你从 Unit 0 就在做贯穿项目，Capstone **不需要重新选题**——直接把项目沉淀为架构评审包：
+>
 > - docs/ 里已有 threat-model / slo / step-budget / runbook / gateway / rollout 决策树等雏形
 > - Capstone 的工作是"**合并 + 打磨 + 写决策建议**"，而不是从零写
 > - 15 节大部分素材已经积累，1 周可完成
@@ -55,6 +56,7 @@ tags: [part-4, practice, capstone, architecture-review]
 **长度参考**：15-30 页（Markdown 约 800-1500 行）。**不要更长**——评审会上没人会读。
 
 **推荐工具**：
+
 - [附录 E · 模板库](../附录/E-模板库.md) 提供所有子模块的可复用模板，**直接 copy 拼装**
 - 图用 Mermaid / drawio / whiteboard 截图
 - 数字 / 定价标注"截至 YYYY-MM"

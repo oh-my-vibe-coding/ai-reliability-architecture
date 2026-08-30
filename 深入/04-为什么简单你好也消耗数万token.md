@@ -135,6 +135,7 @@ Claude Code 的 system prompt 在 2026 年约 **5-8k token**，比 2024 年的 1
 ### 2.5 MCP Servers 附带的提示 · 约 1k – 5k token
 
 每个挂上的 MCP server 会：
+
 - 注册它提供的 **工具**（计入 2.2）
 - 额外注入一段 **使用说明**（告诉模型怎么用这些工具）
 
@@ -265,6 +266,7 @@ Anthropic 缓存：**写入 1.25×，读取 0.1×**（见[深入 02](02-Prompt-C
 服务端存储对话状态、tools、files。客户端只发增量。
 - **优点**：客户端轻
 - **缺点**：
+
   - 失去可控性（不知道 prompt 到底长啥样）
   - 调试困难
   - 供应商锁定深
@@ -311,6 +313,7 @@ Anthropic API 返回里：
 - 三者之和 = 总 input
 
 **工程 SLI**：
+
 - **Cache hit rate** = `cache_read / (cache_read + input + cache_creation)`
 - 目标：`> 80%` 对于稳定对话场景
 
