@@ -69,6 +69,7 @@ extra_css:
 
 extra_javascript:
   - stylesheets/external-links.js
+  - stylesheets/reading-progress.js
 
 markdown_extensions:
   # 标准
