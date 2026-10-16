@@ -1,6 +1,6 @@
 ---
 title: 深入 16 · Embedding 服务作为独立运维对象
-updated: 2026-08-23
+updated: 2026-10-16
 tags: [deep-dive, embedding, rag, vector-db, sre]
 ---
 
@@ -30,7 +30,7 @@ flowchart LR
 本书前 15 篇深入专题里：
 
 - **LLM 推理服务** —— 第 5 章 + 深入 01/02/03/04/05 全方位覆盖
-- **Reranker** —— 在 [深入 10 Pattern 10](10-AI系统事故模式库.md#pattern-10--rag-retrieval-noise-saturation-rag-检索噪声饱和) 简短提到
+- **Reranker** —— 在 [深入 10 Pattern 10](10-AI系统事故模式库.md#pattern-10--rag-retrieval-noise-saturationrag-检索噪声饱和) 简短提到
 - **Embedding 服务 + Vector DB** —— 散落在 Unit 0 W2、深入 06，**没专章**
 
 但实际工程里 **embedding 服务的 SRE 工作量和 LLM 推理几乎相当**——而且失败模式完全不同。这一章补这个缺口。
@@ -65,10 +65,10 @@ flowchart LR
 |---|---|---|---|---|
 | OpenAI text-embedding-3-small | small | 1536 | $0.02 | 通用首选 |
 | OpenAI text-embedding-3-large | large | 3072 | $0.13 | 质量更高 |
-| Voyage voyage-3 | - | 1024 | $0.06 | 强 retrieval 专项 |
+| Voyage voyage-4 / voyage-4-lite / voyage-4-large | 检索系列 | 按模型查规格 | $0.06 / $0.02 / $0.12 | 维度与索引空间按具体型号验收 |
 | Cohere embed-v3 | English | 1024 | $0.10 | 强 multilingual |
 
-> 价格 / 模型为 2026-08 快照（OpenAI text-embedding-3 定价未变，仍是 $0.02/$0.13）。
+> 2026-10-16 核验：[OpenAI 定价](https://developers.openai.com/api/docs/pricing)的 text-embedding-3 价格未变；[Voyage 官方价格](https://docs.voyageai.com/docs/pricing)已列第 4 代、Batch 为 33% 折扣与 12h 窗口，不能套用生成模型 Batch 的 50%。Cohere v3 行保留历史参考，当前型号与价格查[官网](https://cohere.com/pricing)。MTEB 本轮 Reader 返回 403，不据此更新 SOTA；按语言、任务与自己的 gold set 验证。
 
 **何时选**：流量 < 100M doc/月、不在意延迟、不能自建 GPU。
 

@@ -1,6 +1,6 @@
 ---
 title: 科学 03 · Quantization 为什么有时坏
-updated: 2026-07-02
+updated: 2026-10-16
 tags: [science, quantization, numerical, silent-degradation]
 ---
 
@@ -164,7 +164,7 @@ Transformer 有几十到几百层。每层量化误差单独看可能只 0.1%，
 ### 3.3 对精度敏感的特殊模块
 
 **Attention 的 softmax**
-- 见[科学 01](01-Attention与Transformer的SRE视角.md#7)
+- 见[科学 01](01-Attention与Transformer的SRE视角.md#7-attention-为什么会数值出问题)
 - softmax 里的 `e^x` 对输入精度敏感
 - 量化后的 `QK^T` 如果误差分布存在偏差，softmax 会失真
 

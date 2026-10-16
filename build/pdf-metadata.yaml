@@ -5,7 +5,7 @@
 title: AI 时代的可靠性架构
 subtitle: 写给 SRE 架构师的智能系统运维指南
 author: SRE to AI SRE Learning Project
-date: 2026-07-12
+# date / version 从 README 读取，由构建脚本传入
 lang: zh-CN
 
 # PDF 设置（Pandoc 识别的标准字段）
@@ -20,12 +20,11 @@ geometry:
   - bottom=22mm
   - inner=22mm
   - outer=20mm
-fontsize: 10.5pt
+fontsize: 10pt
 linestretch: 1.35
-numbersections: true
+numbersections: false
 toc: true
 toc-depth: 3
-secnumdepth: 3
 
 # 颜色（LaTeX xcolor / hyperref）
 linkcolor: Maroon
@@ -38,4 +37,3 @@ highlight-style: tango
 
 # 其他
 colorlinks: true
-papersize: custom

@@ -1,6 +1,6 @@
 ---
 title: 深入 12 · Claude / GPT / Gemini 三大模型系列使用指南
-updated: 2026-08-23
+updated: 2026-10-16
 tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 ---
 
@@ -9,9 +9,9 @@ tags: [deep-dive, models, claude, gpt, gemini, vendor-guide, snapshot]
 > [← 返回目录](../README.md)
 
 > [!WARNING]
-> 本章包含**模型系列、能力口径、API 形态、厂商命名习惯**等快变信息。内容快照日期为 **2026-06-30**（2026-07-17 补入当日发布、原快照漏记的 Claude Sonnet 5；2026-07-25 补入新旗舰 Claude Opus 5；2026-08-23 更新 Gemini 分层）；实际生产选型前，请以 [Anthropic](https://docs.claude.com/en/docs/about-claude/models/overview) / [OpenAI](https://platform.openai.com/docs) / [Google](https://ai.google.dev/gemini-api/docs/models) 官方文档和你自己的 eval 为准。
+> 本章的模型分层与 API 约束于 **2026-10-16** 核验。具体型号、价格、context 与来源以 [深入 03 · §3](03-模型与工具场景化最佳实践.md) 为唯一快照入口；本章保留选型方法，避免复制价格后跨章漂移。生产前仍需自己的 eval。
 >
-> 本章不追榜单，不给"谁最强"这种很快过期的结论。它只讲三件更耐用的东西：**怎么理解三大系列、怎么选、怎么用才能少踩坑**。
+> 本章讲三件事：怎么理解三大系列、怎么选、怎么用才能少踩坑。
 
 ---
 
@@ -24,8 +24,8 @@ Claude、GPT、Gemini 都不是"一个模型"，而是**一组按能力、速度
 | 系列 | 常见分层语言 | 典型强项 | 常见使用姿势 |
 |---|---|---|---|
 | Claude | Opus / Sonnet / Haiku | 长文理解、代码代理、写作质量、谨慎推理 | 用 Sonnet 做主力，Opus 做难题，Haiku 做高频便宜任务 |
-| GPT | flagship / mini / nano / reasoning / codex | 通用能力、工具生态、结构化输出、Agent 与产品 API | 用旗舰做复杂任务，用 mini/nano 做路由和批处理，用 reasoning effort 控成本 |
-| Gemini | 3.1 Pro Preview / 3.6 Flash（稳定）/ Flash-Lite / Live / Embedding | 长上下文、多模态、Google 生态、低延迟 Flash | 用 3.1 Pro Preview 吃长上下文和复杂多模态，用 3.6 Flash 做高性价比线上链路 |
+| GPT | Astra / Sol / Luna；历史 mini / nano / Codex 命名 | 通用能力、工具生态、结构化输出、Agent 与产品 API | 用旗舰做复杂任务，用轻量档做路由和批处理，用 reasoning effort 控成本 |
+| Gemini | Argon / Flash / Flash-Lite / Live / Embedding | 长上下文、多模态、Google 生态 | Argon 评估复杂推理，Flash 评估线上链路 |
 
 > [!IMPORTANT]
 > 选模型时不要先问"哪个模型最好"。先问：**任务是否需要推理、是否需要长上下文、是否需要多模态、是否能接受延迟、单次错误代价多大、月度成本上限是多少**。
@@ -34,28 +34,17 @@ Claude、GPT、Gemini 都不是"一个模型"，而是**一组按能力、速度
 
 ## 1. 三个系列的常识性介绍
 
-### Claude 系列：Opus / Sonnet / Haiku（+ Fable 研究分支）
+### Claude 系列：Opus / Sonnet / Haiku / Fable
 
-Claude 的命名基本可以这样理解：
+- **Opus**：复杂编码与知识工作的候选。
+- **Sonnet**：速度与能力平衡的候选。
+- **Haiku**：高频分类、抽取、路由的候选。
+- **Fable**：高难推理与长程 Agent 的候选；不能把旧版本的研究分支标签当成当前可用性结论。
 
-- **Opus**：最强、最贵、最适合高难推理 / 复杂代码 / 架构分析。**当前旗舰：Opus 5**（2026-07-24 发布，`claude-opus-5`，沿用 Opus 4.8 的 $5/$25 per MTok "同价换代"；Opus 4.8 转上一代但仍在服务，4.7 / 4.6 已进 Migrating 文档）。
-- **Sonnet**：主力平衡档，通常是生产和日常工程任务的默认首选。**当前：Sonnet 5**（2026-06-30 接棒 Sonnet 4.6，官方定位"最 agentic 的 Sonnet"、agentic 基准逼近 Opus 4.8；首发价 $2/$10 per MTok 至 2026-08-31，之后 $3/$15。Sonnet 4.6 转上一代，仍可用。定价与代际见 [深入 03 · §3.1](03-模型与工具场景化最佳实践.md)）。
-- **Haiku**：轻量快速档，适合分类、抽取、批处理、低延迟链路。**当前：Haiku 4.5**（`claude-haiku-4-5-20251001`）。
-- **Fable / Mythos（研究分支）**：2026-06-09 起 Anthropic 在 Opus/Sonnet/Haiku 主线之外开了 Fable 5（通用研究形态）和 Mythos Preview（Project Glasswing 防御性安全研究，邀请制）；不是日常生产线的默认选择，是 SRE 评估"前沿能力 / 安全研究"时才纳入的分支。
-
-Claude 的工程气质是：**长上下文读写、代码代理、自然语言质量、谨慎的安全边界**。如果你的任务像"让一个高水平工程师读一堆材料后写方案"，Claude 往往很顺手。
-
-使用上，Claude 有几个特别值得内化的习惯：
-
-- 用清晰的段落、XML 风格标签、明确的输入区块隔离上下文。
-- 对长任务给出角色、目标、约束、停止条件和验收标准。
-- 对 Agent / tool use 强制 step budget、权限白名单和确认边界。
-- 对复杂推理任务考虑 extended thinking，但要单独预算延迟和 token。
-- 对固定长上下文使用 prompt caching，尤其是系统提示、工具说明、长规范文档。
+当前各线型号见 [深入 03 · §3.1](03-模型与工具场景化最佳实践.md)。对长任务明确目标、约束、停止条件和验收标准；对工具强制 step budget、白名单与审计；固定前缀采用缓存并监控真实命中。
 
 > [!WARNING]
-> **Opus 4.8 起 `effort` 参数默认 `high`，Opus 5 延续该默认**——Claude API 和 Claude Code 都生效。意味着你**不显式传 `effort`，每次调用都走最深思考档**，对延迟敏感、批处理、路由层这些场景会一次性烧掉 3-10× 的 token 预算。SRE 的动作：在网关 / SDK 包装层显式 `effort=medium` / `low`，再按任务白名单升档；不要把"和 Opus 4.7 一样的调用模板"原样上线。**注意 4.8 → 5 升级不会自动帮你修好这件事**——同价换代（$5/$25 未变）意味着换代本身不涨单价，但"更强的模型倾向于想更久"，迁移后要重新基线化实测 token 消耗。
-
+> **默认参数属于型号契约**：官方 [effort 文档](https://platform.claude.com/docs/en/build-with-claude/effort)中，Opus 5.5 默认改为 `medium`，Sonnet 5.5 为 `high`；Opus 5.5 的 adaptive thinking 常开，禁用会报 400。不要把旧型号"默认 high"或"关 thinking 降成本"的配置直接复制。每次换型都要做 effort 分档 eval。
 
 ### GPT 系列：旗舰 / 轻量 / 推理 / Codex
 
@@ -64,11 +53,11 @@ GPT 系列的核心不是某一个模型名，而是 OpenAI 平台围绕模型�
 可以把 GPT 系列粗分为：
 
 - **旗舰通用模型**：复杂推理、代码、写作、跨模态任务的主力。
-- **mini / nano 等轻量模型**：便宜、快，适合路由、分类、抽取、批量处理。
+- **轻量模型**：当前 Luna 与历史 mini / nano 命名都服务于成本敏感任务；不能从名字推断相同 context 或参数支持。
 - **reasoning 模型 / reasoning effort**：需要"多想一会"的数学、规划、复杂代码、故障分析。
 - **Codex / coding 优化模型**：面向软件工程任务，适合代码库理解、修改、测试与代理式开发。
 
-GPT 的工程气质是：**API 产品能力完整、结构化输出成熟、工具生态强、适合做平台层集成**。如果你要做一个可规模化的 AI 能力平台，GPT 系列通常是必须评估的一条主线。
+当前 Astra / Sol / Luna 的定位与规格见 [深入 03 · §3.2](03-模型与工具场景化最佳实践.md)。GPT 的工程气质是：**API 产品能力完整、结构化输出成熟、工具生态强、适合做平台层集成**。如果你要做一个可规模化的 AI 能力平台，GPT 系列通常是必须评估的一条主线。
 
 ### API 协议哲学：Messages、Responses 与 Chat Completions
 
@@ -91,24 +80,15 @@ GPT 的工程气质是：**API 产品能力完整、结构化输出成熟、工�
 - 用轻量模型做 router / classifier / validator，旗舰模型只接真正难的请求。
 - Tool calling 的宿主代码必须负责权限、幂等、回滚和审计。
 
-### Gemini 系列：Pro / Flash / Flash-Lite / Live
+### Gemini 系列：Argon / Flash / Flash-Lite / Live
 
-> [!WARNING]
-> **2026-03-09 起 Gemini 3 Pro Preview 已关停**，生产环境必须迁移到 **Gemini 3.1 Pro Preview**。
+- **Argon**：复杂推理、软件工程、多模态与多步 Agent 的旗舰候选。
+- **Flash**：速度与成本平衡的线上候选。
+- **Flash-Lite**：高频分类、抽取、routing，按实际价格选择具体档位。
+- **Live / Live Extended Thinking**：实时语音链路，单独预算音频和思考延迟。
+- **Embedding / Deep Research / Antigravity**：分别作为检索与托管 Agent 产品验收，不合并成一种推理 API。
 
-Gemini 当前的分层（2026-08-23 快照）：
-
-- **Gemini 3.7 Flash（稳定，2026-08-13 发布）**：**当前主力档**，接棒 3.6 Flash（距 3.6 仅三周）。**$0.75/$3.75 per MTok 限时半价至 2026-12-31**，2027-01-01 起回 $1.50/$7.50；缓存读 $0.075；1M ctx / 64K out。官方称 DeepSWE 65.3%（较 3.6 的 49.0% 大幅提升）、Code Arena Elo 1588。
-- **Gemini 3.6 Flash（稳定，2026-07-21 发布）**：上一代主力，定价与 3.7 完全相同（$0.75/$3.75 限时半价至 2026-12-31，之后回 $1.50/$7.50）；1M ctx / 65K out。是少见的"换代即省钱"。
-- **Gemini 3.5 Flash（稳定）**：上上一代主力（$1.50/$9.00），**未参与 3.6/3.7 的半价促销**；新链路优先 3.7。
-- **Gemini 3.1 Pro Preview**：复杂推理、长上下文、多模态理解的主力档；目前是预览态，Anthropic Opus 5 之外的另一旗舰候选。**Gemini 3.5 Pro 截至 2026-08-23 仍未发布**（官方口径"正在与合作方测试、准备好即开放"，未给日期）。
-- **Gemini 3 Flash（预览）**：更早一代 Flash，仍在 OpenRouter 用量榜上，但新项目应优先用 3.7 Flash。
-- **Flash-Lite 线（成本/吞吐档）**：超高频字段抽取、分类、routing 类任务。**注意选价不要按版本号**——2.5 Flash-Lite（$0.10/$0.40）< 3.1 Flash-Lite（$0.25/$1.50）< **新出的 3.5 Flash-Lite（$0.30/$2.50）**，版本越新反而越贵。
-- **Gemini 3.1 Flash Live / TTS**：语音、视频、实时双向交互。
-- **Gemini Deep Research / Antigravity Agent / Computer Use Preview**：Google 体系下的"托管式 Agent"分支，对应 Anthropic 的 computer use、OpenAI 的 Codex。
-  - **Computer Use Preview**（`gemini-2.5-computer-use-preview-10-2025`）：让 Gemini 直接驱动浏览器/操作系统。
-  - **风险**：同时踩到了致命三角的三条腿——私有数据访问（上下文/系统里的敏感数据）+ 不受信输入（网页内容）+ 外泄通道（对外请求/表单提交）。
-  - **动作**：启用前必须按 [深入 07 · Prompt Injection 红队](07-Agent-Prompt-Injection红队实战.md) 走一轮 egress 防御和权限白名单审计。详见 [第 6 章 · 致命三角](../知识/06-AI自治与上下文架构约束.md)。
+具体型号、上下文边界和促销期限见 [深入 03 · §3.3](03-模型与工具场景化最佳实践.md)。Argon 只支持隐式缓存，且输入输出共享总窗口；不能假设"1M 输入之外还能额外生成 1M 输出"。旧 Computer Use Preview 已关停，新型号上的 computer use 能力须按 [深入 07](07-Agent-Prompt-Injection红队实战.md) 重测 egress 与工具权限。
 
 Gemini 的工程气质是：**长上下文、多模态、Google 生态整合、Flash 档高性价比**。如果任务里有大量 PDF、视频、图片、表格、长文档，或者你已经在 Google Cloud / Vertex AI 体系里，Gemini 是必须评估的主线。
 
@@ -128,13 +108,13 @@ Gemini 的工程气质是：**长上下文、多模态、Google 生态整合、F
 
 | 场景 | Claude 默认起点 | GPT 默认起点 | Gemini 默认起点 | SRE 判断 |
 |---|---|---|---|---|
-| 代码库重构 / Agent 编码 | Sonnet / Opus | GPT flagship / Codex | 3.1 Pro Preview / 3.7 Flash | 先测 repo 理解、测试修复率、工具误用率 |
-| 事故分析 / 根因推理 | Opus / Sonnet + thinking | reasoning effort 高档 | 3.1 Pro Preview + thinking | 看是否能引用证据，不看文风 |
-| 工单分类 / 字段抽取 | Haiku | mini / nano | Flash-Lite（比价选档）/ 3.7 Flash | 成本、延迟、schema 通过率优先 |
-| 长文档 RAG | Sonnet | flagship / mini 组合 | 3.1 Pro Preview / 3.7 Flash | 长上下文必须测"引用支持率" |
-| 多模态文档 / 图片 / 视频 | Sonnet / Opus vision | GPT multimodal | 3.1 Pro Preview / 3.7 Flash | Gemini 常是强候选，但仍按任务 eval |
+| 代码库重构 / Agent 编码 | Sonnet / Opus | GPT flagship / Codex | Argon / Flash | 先测 repo 理解、测试修复率、工具误用率 |
+| 事故分析 / 根因推理 | Opus / Sonnet + thinking | reasoning effort 高档 | Argon + thinking | 看是否能引用证据，不看文风 |
+| 工单分类 / 字段抽取 | Haiku | Luna 等轻量档 | Flash-Lite（比价选档）/ Flash | 成本、延迟、schema 通过率优先 |
+| 长文档 RAG | Sonnet | 旗舰 / 轻量组合 | Argon / Flash | 长上下文必须测"引用支持率" |
+| 多模态文档 / 图片 / 视频 | Sonnet / Opus vision | GPT multimodal | Argon / Flash | Gemini 常是强候选，但仍按任务 eval |
 | 平台 API 集成 | Sonnet + Messages API | Responses API | Gemini API / Vertex AI | 看团队既有云、审计、网络和合规约束 |
-| 高风险自动化 | Opus/Sonnet 只做建议 | reasoning + strict tools | 3.1 Pro Preview + tool boundary | 模型不是关键，权限边界才是关键 |
+| 高风险自动化 | Opus/Sonnet 只做建议 | reasoning + strict tools | Argon + tool boundary | 模型不是关键，权限边界才是关键 |
 
 > [!TIP]
 > 真正成熟的团队通常不是"选一家"，而是做**模型路由**：简单任务走便宜快模型，复杂任务走旗舰 / reasoning，故障时能切到另一家。
@@ -161,7 +141,7 @@ flowchart TB
 
 ### 路由规则示例
 
-- **默认**：Sonnet / GPT mini+flagship / Gemini Flash 这类平衡档。
+- **默认**：Sonnet / GPT Sol / Gemini Flash 这类平衡档。
 - **升级**：满足任一条件就升级到强模型：
 
   - 用户请求包含多步规划、架构决策、复杂代码修改
@@ -451,7 +431,7 @@ flowchart TB
 |---|---|
 | 日常工程助手 / 代码 Agent | Claude Sonnet 或 GPT coding 模型起步，关键任务加强模型复核 |
 | 平台级 AI 能力 | GPT / Claude / Gemini 都评估，重点看 API 能力、审计、fallback、成本 |
-| 长文档 / 多模态分析 | Gemini 3.1 Pro Preview / 3.7 Flash 和 Claude Sonnet 都测，不要跳过引用 eval |
+| 长文档 / 多模态分析 | Gemini Argon / Flash 和 Claude Sonnet 都测，不要跳过引用 eval |
 | 高频分类 / 抽取 | 三家轻量档都测，谁便宜稳定用谁 |
 | 复杂事故推理 | 旗舰 / reasoning / thinking 档，强制证据引用和人工确认 |
 | 自动化生产操作 | 先别问模型，先问权限、回滚、blast radius |

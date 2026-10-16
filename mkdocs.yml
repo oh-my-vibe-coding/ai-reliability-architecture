@@ -116,6 +116,7 @@ markdown_extensions:
 # 预处理钩子：把 GitHub `> [!NOTE]` 映射为 MkDocs `!!! note`
 hooks:
   - hooks/github_callouts.py
+  - hooks/heading_anchors.py
 
 plugins:
   - search:
@@ -126,14 +127,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.15.5
+    default: v1.15.6
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的可靠性架构》 · v1.12.8 · 2026-07-17 ·
+  《AI 时代的可靠性架构》 · v1.15.6 · 2026-10-16 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────
@@ -279,6 +280,7 @@ nav:
 
   - 维护 · 让书活着:
       - 维护系统 README: 维护/README.md
+      - 2026-10 维护与发布记录: 维护/2026-10-维护记录.md
       - CHANGELOG: 维护/CHANGELOG.md
       - 漂移度表: 维护/漂移度表.md
       - 内容路线图 · 扩写计划: 维护/内容路线图-v2.md

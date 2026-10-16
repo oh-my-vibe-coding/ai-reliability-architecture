@@ -1,6 +1,6 @@
 ---
 title: 附录 D · 厂商官方学习资源（📊 每季度校对）
-updated: 2026-07-12
+updated: 2026-10-16
 tags: [appendix, training, vendor-official, 📊]
 ---
 
@@ -66,9 +66,10 @@ tags: [appendix, training, vendor-official, 📊]
 - Python / Node 实操示例：embedding、fine-tuning、function calling、prompt caching、Responses API 等
 
 ### OpenAI Platform 官方文档
-- **URL**：https://platform.openai.com/docs
+- **URL**：https://developers.openai.com/api/docs
 - 含 Quickstart、Models、Guides、API Reference
 - 必读：Models、Responses API、Function calling、Structured outputs、Reasoning、Prompt caching
+- 2026-10-16 已复核上述[模型目录](https://platform.openai.com/docs/models)与[缓存指南](https://developers.openai.com/api/docs/guides/prompt-caching)：按 GPT 当前型号区分 effort、缓存写价和长上下文档位；旧课程示例须按当前文档改参数，不沿用旧单价。
 - 对应本书：[深入 12 · Claude / GPT / Gemini 三大模型系列使用指南](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)
 
 ### DeepLearning.AI 合作课程
@@ -250,7 +251,7 @@ URL 会变。如果本附录的链接失效：
 | 厂商 | 核心入口 | 最值得做的 |
 |---|---|---|
 | Anthropic | https://anthropic.skilljar.com/ · https://github.com/anthropics/courses | Course 1 + Course 5 |
-| OpenAI | https://github.com/openai/openai-cookbook · https://platform.openai.com/docs | Cookbook 对口 recipe + Evals repo |
+| OpenAI | https://github.com/openai/openai-cookbook · https://developers.openai.com/api/docs | Cookbook 对口 recipe + Evals repo |
 | Google | https://github.com/google-gemini/cookbook | Cookbook 对口任务 |
 | HuggingFace | https://huggingface.co/learn | LLM Course（深化 ML） |
 | DeepSeek / Mistral / Qwen / xAI | 各自官方 docs | 有空再看 |

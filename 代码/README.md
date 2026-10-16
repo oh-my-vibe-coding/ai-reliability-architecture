@@ -1,6 +1,6 @@
 ---
 title: 参考代码 · README
-updated: 2026-07-02
+updated: 2026-10-16
 tags: [code, reference, templates]
 ---
 
@@ -82,7 +82,7 @@ export OPENAI_API_KEY=your_key  # 如果用 OpenAI embedding
 | Unit 2 W1-W2（Trace-Eval）| [`04-eval-skeleton.py`](04-eval-skeleton.py) | 三层 eval 骨架 |
 | Unit 3 W1-W4（推理 SLO / 网关）| [`05-llm-gateway.py`](05-llm-gateway.py) + [`01-claude-caching.py`](01-claude-caching.py) | 计账 + 限流 + caching |
 | Unit 4（复合可靠性 / verifier）| [`04-eval-skeleton.py`](04-eval-skeleton.py) 扩展 | Verifier ≈ 实时 eval |
-| Unit 5（数值底座）| 主要靠 [科学 03/04](../科学/) + Anthropic postmortem，代码侧 [`07-canary-check.py`](07-canary-check.py) 可参考 | — |
+| Unit 5（数值底座）| 主要靠 [科学 03](../科学/03-Quantization为什么有时坏.md) / [04](../科学/04-Tokenization的坑.md) + Anthropic postmortem，代码侧 [`07-canary-check.py`](07-canary-check.py) 可参考 | — |
 
 ---
 

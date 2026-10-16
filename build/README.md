@@ -1,6 +1,6 @@
 ---
 title: PDF 构建系统
-updated: 2026-07-12
+updated: 2026-10-16
 tags: [meta, build, pdf, pandoc, xelatex]
 ---
 
@@ -17,6 +17,8 @@ tags: [meta, build, pdf, pandoc, xelatex]
 | `pdf-metadata.yaml` | Pandoc 元数据（title / author / geometry / ...）|
 | `pdf-style.tex` | XeLaTeX preamble（字体 / 标题样式 / 代码块 / 页眉 / 链接色）|
 | `build-pdf.sh` | PDF 构建脚本（主书版）|
+| `prepare-pdf.py` | 合并章节、隔离章节元数据、渲染 Mermaid、转换在线链接 |
+| `test_prepare_pdf.py` | PDF 预处理回归检查 |
 | `build-site.sh` | MkDocs 站点构建脚本 |
 | `README.md` | 本文档 |
 
@@ -58,12 +60,15 @@ tags: [meta, build, pdf, pandoc, xelatex]
 
 ```bash
 bash build/build-pdf.sh
-# 输出：output/AI时代的可靠性架构-v1.11.3.pdf
+# 输出：output/AI时代的可靠性架构-v1.15.6.pdf
 ```
 
-**改版本号**：
+默认从根 README 读取版本和日期，并包含第 7 章。章节的 YAML 元数据不会覆盖封面，页眉使用同一版本号；原稿已有章节编号，不再追加自动编号。Mermaid 先渲染为 PNG，临时文件写入 `build/tmp/`；PDF 内的相对 Markdown 链接转到 GitHub Pages。
+
+**覆盖版本号**：
 ```bash
-VERSION=v1.11.3 bash build/build-pdf.sh
+VERSION=v1.15.6 bash build/build-pdf.sh
+# 日期也可覆盖：RELEASE_DATE=2026-10-16
 ```
 
 ---
@@ -76,6 +81,16 @@ VERSION=v1.11.3 bash build/build-pdf.sh
 |---|---|---|
 | `pandoc` | Markdown → LaTeX → PDF 管道 | `brew install pandoc`（macOS）/ `apt install pandoc`（Ubuntu）|
 | `xelatex` | LaTeX 引擎（CJK 友好）| 见下方 |
+| `python3` | 预处理脚本 | Python 3.9+ |
+| Node.js + `mmdc` | Mermaid 图渲染 | Node.js 22.13+；`npm install -g @mermaid-js/mermaid-cli@12.0.0` |
+
+`mmdc` 默认使用 Puppeteer 的浏览器。已有 Chrome 时，可将可执行路径写入 JSON，并通过环境变量传入：
+
+```bash
+MMDC=/path/to/mmdc PUPPETEER_CONFIG=/path/to/puppeteer.json bash build/build-pdf.sh
+```
+
+JSON 示例：`{"executablePath":"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"}`。渲染失败会中止构建，日志标出对应 `.mmd` 文件。
 
 ### XeLaTeX 安装
 
@@ -88,7 +103,7 @@ brew install --cask mactex-no-gui
 brew install --cask basictex
 sudo tlmgr update --self
 sudo tlmgr install xecjk ctex fontspec titlesec booktabs mdframed \
-                   framed enumitem fancyhdr xcolor hyperref longtable
+                   framed fvextra enumitem fancyhdr xcolor hyperref longtable
 ```
 
 **Ubuntu / Debian**：
@@ -117,6 +132,8 @@ sudo apt-get install -y \
 ```bash
 sudo apt install fonts-noto-cjk fonts-noto-cjk-extra
 ```
+
+西文正文优先使用 STIXGeneral（macOS 自带）或 DejaVu Serif（Ubuntu 可装 `fonts-dejavu`），以覆盖比较符号与希腊字母；等宽字体优先 DejaVu Sans Mono for Powerline。发布时应检查构建日志中的 `Missing character`，避免数学符号被丢弃。
 
 **验证**：
 ```bash
@@ -177,7 +194,7 @@ pip install mkdocs-with-pdf
 cp build/build-pdf.sh build/build-pdf-deep.sh
 # 编辑，把 FILES 改成 深入/*.md
 # 跑：bash build/build-pdf-deep.sh
-# 输出：output/AI时代的可靠性架构-v1.11.3-深入卷.pdf
+# 输出：output/AI时代的可靠性架构-v1.15.6-深入卷.pdf
 ```
 
 同理做科学卷、共同语言卷、复习卷。每本 50-100 页较舒适。
@@ -191,6 +208,7 @@ cp build/build-pdf.sh build/build-pdf-deep.sh
 | `! Undefined control sequence` | LaTeX 包缺失 | `sudo tlmgr install <缺失包>` |
 | `Package xeCJK Error: No Chinese font` | 字体缺失 | 装字体或改 `pdf-style.tex` |
 | `Missing character` | Emoji / 特殊符号 LaTeX 不支持 | 源 MD 少用 emoji；或改 preamble 加 fallback |
+| `Mermaid rendering failed` | 图语法或浏览器配置错误 | 检查日志中的 `.mmd`，确认 `mmdc` 版本与 Puppeteer 配置 |
 | `Overfull \hbox` | 代码行 / 表格过宽（警告，不致命）| 忽略或在源里换行 |
 | 构建卡住无输出 | TeX 在下载包（MiKTeX / basictex）| 等待或换完整 TeX 发行版 |
 | `File 'xx.sty' not found` | 某 LaTeX 包没装 | `tlmgr install xx`（macOS / Linux）|
@@ -208,7 +226,7 @@ pandoc 深入/03-模型与工具场景化最佳实践.md \
 ## 本构建系统的设计原则
 
 1. **源 Markdown 是唯一 authoritative**。PDF 是派生物，不手工编辑 PDF 去修 bug
-2. **幂等**：同样输入 → 同样输出
+2. **内容可复现**：固定输入与工具版本，避免章节元数据或本机日期改变书稿语义；不承诺 PDF 字节完全相同
 3. **失败要响**：不静默，要打印清晰错误 + 修复建议
 4. **合理裁剪**：主 PDF 只含阅读主线，不是"所有内容的堆砌"
 5. **Vendor-neutral**：不锁定 TeX 发行版 / 字体厂商，通过 fallback 支持多环境

@@ -1,6 +1,6 @@
 ---
 title: CHANGELOG · 书的版本历史
-updated: 2026-08-30
+updated: 2026-10-16
 tags: [meta, changelog]
 ---
 
@@ -12,6 +12,24 @@ tags: [meta, changelog]
 - **MAJOR** — 框架重构、整章删改
 - **PATCH** — 快照数据、勘误
 - **MINOR** — 新增章节
+
+---
+
+## 未发布（Unreleased）
+
+- 当前 Code Arena、MTEB 与 SWE-bench 排名未能取得可核验原始表；待来源恢复后刷新，历史快照已标明日期。
+- Meta API 规格、IDE / Eval / 框架历史价格与星数需专项复核；旧表保持旧快照，不当作当前承诺。
+
+---
+
+## v1.15.6 — 2026-10-16
+
+**10 月维护更新**：按月度清单核验快变事实，补做季度扫描；本次只修订既有内容与构建，不新增内容章节或调整主线，按 SemVer 发布 patch。来源、取数边界与审查记录见[维护记录](2026-10-维护记录.md)。
+
+- **模型与榜单**：[深入 03](../深入/03-模型与工具场景化最佳实践.md)更新 Claude 5.5 / Fable 5.1、GPT-6、Gemini 4 Argon / 3.8 Flash、Grok 4.7、DeepSeek alias 与分时价、Kimi / GLM 价格，以及 OpenRouter 周榜、Arena Text / Agent；Code / SWE-bench 未得新排名，明确历史数据边界。
+- **跨章一致性**：[深入 12](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)、[术语表](../附录/C-术语表.md)引用模型快照；[深入 02](../深入/02-Prompt-Caching原理.md)补 OpenAI 新代际缓存写价、断点与保留配置；[深入 04](../深入/04-为什么简单你好也消耗数万token.md)重算前缀费用；[复习卡](../复习/核心概念卡.md)与 Anki CSV 同步改为迁移预算机制题。
+- **Batch / Embedding / 记忆**：[深入 13](../深入/13-离线批量推理.md)修复实例数量纲、更新 Haiku 示例并重审自建临界点，区分处理窗口与业务 SLA；[深入 16](../深入/16-Embedding-服务作为独立运维对象.md)补 Voyage 第 4 代与 Batch 折扣；[深入 08](../深入/08-大模型的记忆是怎么回事.md)补 Letta SDK 入口变动。
+- **阅读与发布**：中文标题补兼容 GitHub 的锚点并保留旧 MkDocs URL；修复少量存量失效锚点与目录链接；PDF 统一版本 / 日期、补第 7 章、隔离章节元数据、渲染 Mermaid 并转换在线链接，修复旧封面 / 页眉与代码换行；月检清单明确检查代理正文和多产品 release 轨道。
 
 ---
 
@@ -943,11 +961,11 @@ tags: [meta, changelog]
 **月度快照更新**：v1.3.0 后 2 周内厂商 / 榜单变化的系统性消化，框架与目录不变，全部为快变内容校对。
 
 ### 修订（按章节）
-- **[深入 12 · §1 Gemini 段](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md#gemini-系列pro--flash--flash-lite--live)** —— Gemini 3 Pro Preview 已于 2026-03-09 关停，整段重写：升级到 3.1 Pro Preview / 3.5 Flash（稳定）/ 3.1 Flash-Lite 三档；加 §0 心智地图、§2 选型矩阵、TL;DR 同步更新。
-- **[深入 03 · §3.11 榜单快照](../深入/03-模型与工具场景化最佳实践.md#311-关键榜单快照2026-05-24)** —— LM Arena Overall Top 10（Gemini 3.5 Flash 新进 #9，Grok 4.20 双子出榜）、Coding Top 5（#5 由 GLM-5.1 换为 GPT-5.4 High）、SWE-bench 加注 "mini-SWE-agent 框架口径" 并补全局 Top 5 来源。
+- **[深入 12 · §1 Gemini 段](../深入/12-Claude-GPT-Gemini三大模型系列使用指南.md)** —— Gemini 3 Pro Preview 已于 2026-03-09 关停，整段重写：升级到 3.1 Pro Preview / 3.5 Flash（稳定）/ 3.1 Flash-Lite 三档；加 §0 心智地图、§2 选型矩阵、TL;DR 同步更新。
+- **[深入 03 · §3.11 榜单快照](../深入/03-模型与工具场景化最佳实践.md)** —— LM Arena Overall Top 10（Gemini 3.5 Flash 新进 #9，Grok 4.20 双子出榜）、Coding Top 5（#5 由 GLM-5.1 换为 GPT-5.4 High）、SWE-bench 加注 "mini-SWE-agent 框架口径" 并补全局 Top 5 来源。
 - **[深入 03 · §1.5 OpenRouter 用量](../深入/03-模型与工具场景化最佳实践.md#15-开源-vs-闭源的差距变化)** —— Top 10 重写：DeepSeek 系列占 3 席，Anthropic 双子稳定 #3-4，"Owl Alpha" 实验模型进 #5；加 MoneyShare 维度（按月累计）。
 - **[深入 03 · §4.1 工具生态](../深入/03-模型与工具场景化最佳实践.md#41-agentic-cli-工具)** —— stars / release 数字按月度更新；**opencode 项目 owner 由 `sst/opencode` 改名为 `anomalyco/opencode`**（旧 URL 仍 301，但脚注与正文同步更）。
-- **[深入 03 · §3 OpenAI GPT 家族](../深入/03-模型与工具场景化最佳实践.md#gpt-5-家族)** —— gpt-5.5 补全价格（$5 / $30 per MTok）和 reasoning 档位；gpt-5.4 / 5.4-mini 同步补价格列；context 口径从 "1.05M (922K in/128K out)" 校准为官方 "1M / 128K out"。
+- **[深入 03 · §3 OpenAI GPT 家族](../深入/03-模型与工具场景化最佳实践.md)** —— gpt-5.5 补全价格（$5 / $30 per MTok）和 reasoning 档位；gpt-5.4 / 5.4-mini 同步补价格列；context 口径从 "1.05M (922K in/128K out)" 校准为官方 "1M / 128K out"。
 - **[附录 C · 术语表](../附录/C-术语表.md)** —— 新增 "Tokenizer 代际差异" 条（Opus 4.7 用新 tokenizer，token 体积比 Sonnet 4.6 大 ~1.35×）；Gemini 分层条加注稳定档迁移。
 - **[附录 D · Qwen URL](../附录/D-厂商官方学习资源.md)** —— `https://huggingface.co/Qwen（HF` 括号粘连修复（URL 后加空格分隔）。
 - **全书 LM Arena URL** —— `lmarena.ai` 301 跳转到 `arena.ai`，所有引用同步更新（深入 03 脚注 + 月度清单 + 维护清单 + 漂移度表 + 共同语言 03 + AI辅助更新）。

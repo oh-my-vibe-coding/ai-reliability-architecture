@@ -8,7 +8,8 @@
 set -euo pipefail
 
 # --- 配置 ---
-VERSION="${VERSION:-v1.11.3}"
+VERSION="${VERSION:-$(sed -n 's/.*版本.*：.*\(v[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' README.md | head -1)}"
+[[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "无法从 README.md 解析版本号" >&2; exit 1; }
 OUTPUT_DIR="output"
 OUTPUT_FILE="${OUTPUT_DIR}/AI时代的可靠性架构-${VERSION}.pdf"
 BUILD_DIR="build"
@@ -101,6 +102,7 @@ FILES=(
   "知识/04-系统架构与复合AI可靠性数学.md"
   "知识/05-AI推理服务的可靠性工程.md"
   "知识/06-AI自治与上下文架构约束.md"
+  "知识/从链到图-多智能体系统的可靠性.md"
   "知识/07-质量可观测性与DataFlywheel.md"
   "知识/08-组织与判断力.md"
   "知识/09-工程底座.md"
@@ -153,11 +155,17 @@ fi
 info "章节数：${#FILES[@]}"
 info "输出：${OUTPUT_FILE}"
 
+command -v python3 >/dev/null 2>&1 || die "缺少 python3（PDF 预处理所需）"
+command -v "${MMDC:-mmdc}" >/dev/null 2>&1 || die "缺少 Mermaid 渲染器：npm install -g @mermaid-js/mermaid-cli@12.0.0（或设置 MMDC 路径）"
+mkdir -p build/tmp
+python3 build/prepare-pdf.py --output build/tmp/book.md "${FILES[@]}"
+printf '\\newcommand{\\BookVersion}{%s}\n' "$VERSION" > build/tmp/version.tex
+
 # --- Pandoc 参数 ---
 # 说明：
 #   --pdf-engine=xelatex        XeLaTeX 对 CJK 友好
 #   --toc --toc-depth=3         自动目录
-#   --number-sections           章节编号
+#   原稿自带章节编号，不再追加自动编号
 #   --top-level-division=chapter 把最高级的 H1 当 chapter
 #   --metadata-file=...         PDF 元数据
 #   --include-in-header=...     注入 LaTeX preamble
@@ -170,10 +178,13 @@ PANDOC_ARGS=(
   --pdf-engine=xelatex
   --pdf-engine-opt=-shell-escape
   --metadata-file="${METADATA}"
+  --metadata="title:AI 时代的可靠性架构"
+  --metadata="date:${RELEASE_DATE:-$(sed -n 's/^updated: //p' README.md | head -1)}"
+  --metadata="version:${VERSION}"
+  --include-in-header=build/tmp/version.tex
   --include-in-header="${STYLE}"
   --toc
   --toc-depth=3
-  --number-sections
   --top-level-division=chapter
   --resource-path=".:build"
   --wrap=preserve
@@ -184,7 +195,7 @@ info "开始构建 PDF ..."
 echo "----------------------------------------"
 
 # 跑！
-if pandoc "${PANDOC_ARGS[@]}" "${FILES[@]}"; then
+if pandoc "${PANDOC_ARGS[@]}" build/tmp/book.md; then
   echo "----------------------------------------"
   if [[ -f "${OUTPUT_FILE}" ]]; then
     SIZE=$(du -h "${OUTPUT_FILE}" | cut -f1)

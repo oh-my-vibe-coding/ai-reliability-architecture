@@ -1,6 +1,6 @@
 ---
 title: 第 20 章 · 贯穿项目：SRE 事故助手
-updated: 2026-07-02
+updated: 2026-10-16
 tags: [part-4, practice, capstone-project, rag, agent, sre-incident-assistant]
 ---
 
@@ -343,7 +343,7 @@ cp ../AI时代SRE架构师之路/代码/02-minimal-agent.py app/agent.py  # 假�
 | [Unit 0-5 周任务](周循环总览.md) | **每周 B2 产出优先落到项目**（代码 / 文档 / 配置） |
 | [复习系统](../复习/README.md) | 过概念时**对照项目当前状态**，快速识别盲点 |
 | [附录 E · 模板库](../附录/E-模板库.md) | 项目 `docs/` 目录**直接复用这些模板** |
-| [深入 01-10 专题](../深入/) | 项目实际碰到问题时**按需查**，不求通读 |
+| [深入专题](../README.md#深入专题) | 项目实际碰到问题时**按需查**，不求通读 |
 | [代码参考](../代码/README.md) | **起步直接 copy 改**，尤其 01 caching / 02 agent / 04 eval |
 | [Capstone](Capstone-AI生产架构评审包.md) | 项目的**最终产出**就是 Capstone 的内容 |
 

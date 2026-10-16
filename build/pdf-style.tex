@@ -7,6 +7,14 @@
 \usepackage{xeCJK}
 \usepackage{fontspec}
 
+% Latin Modern 的文本字体缺少比较符号 / 希腊字母，优先使用完整字符集。
+\IfFontExistsTF{STIXGeneral}{%
+  \setmainfont[ItalicFont={STIXGeneral-Regular},ItalicFeatures={FakeSlant=0.15},%
+    BoldItalicFont={STIXGeneral-Bold},BoldItalicFeatures={FakeSlant=0.15}]{STIXGeneral}%
+}{%
+  \IfFontExistsTF{DejaVu Serif}{\setmainfont{DejaVu Serif}}{}%
+}
+
 % --- 字体候选：系统里有哪个用哪个 ---
 % 正文 serif（中英混排，主衬线）
 \IfFontExistsTF{Noto Serif CJK SC}{%
@@ -44,7 +52,9 @@
 }
 
 % 等宽（代码）
-\IfFontExistsTF{JetBrains Mono}{%
+\IfFontExistsTF{DejaVu Sans Mono for Powerline}{%
+  \setmonofont[Scale=0.88]{DejaVu Sans Mono for Powerline}%
+}{\IfFontExistsTF{JetBrains Mono}{%
   \setmonofont[Scale=0.88]{JetBrains Mono}%
 }{%
   \IfFontExistsTF{Menlo}{%
@@ -56,7 +66,7 @@
       \setmonofont[Scale=0.88]{Courier New}%
     }%
   }%
-}
+}}
 
 % 中文等宽（可选，让代码里的中文注释不太窄）
 \IfFontExistsTF{Noto Sans Mono CJK SC}{%
@@ -78,7 +88,7 @@
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
   {\normalfont\sffamily\huge\bfseries\color{black!85}}
-  {\normalsize\sffamily\color{black!50}第 \thechapter\ 章}
+  {}
   {0.5em}
   {}
 \titlespacing*{\chapter}{0pt}{-8pt}{16pt}
@@ -105,7 +115,7 @@
 
 % Pandoc 用 fancyvrb + Shaded 环境；我们重定义 Shaded 给它一个浅背景
 \usepackage{framed}
-\usepackage{fancyvrb}
+\usepackage{fvextra}
 \renewenvironment{Shaded}{%
   \begin{snugshade}%
 }{%
@@ -149,7 +159,8 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small\sffamily\color{black!60}AI 时代的可靠性架构}
-\fancyhead[R]{\small\sffamily\color{black!60}v1.11.3}
+\providecommand{\BookVersion}{}
+\fancyhead[R]{\small\sffamily\color{black!60}\BookVersion}
 \fancyfoot[C]{\small\thepage}
 \renewcommand{\headrulewidth}{0.2pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -180,7 +191,7 @@
 
 % --- 图片（防止过大溢出）---
 \usepackage{graphicx}
-\setkeys{Gin}{width=\linewidth,keepaspectratio}
+\setkeys{Gin}{width=\linewidth,height=0.85\textheight,keepaspectratio}
 
 % --- 微排版（防止标点挤在行首 / 孤行）---
 \widowpenalty=10000
