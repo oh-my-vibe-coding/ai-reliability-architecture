@@ -1,6 +1,6 @@
 ---
 title: 代码 04 · Eval Pipeline 骨架 · 教学指南
-updated: 2026-07-04
+updated: 2026-10-16
 tags: [code, guide, eval, pydantic]
 ---
 
@@ -149,7 +149,7 @@ except (json.JSONDecodeError, TypeError):
 
 - 每周让人工给 20 条样本打分
 - 计算 **agreement rate**：`|human - judge| <= 1` 的比例
-- agreement < 70% → 暂停 judge 自动决策
+- agreement < 70% → 暂停 judge 自动决策（教学示例门槛；生产需按任务、类别分布、样本量和置信区间校准）
 - 进阶：本骨架用 1-10 分演示对齐度计算；生产建议 binary 标签制（[深入 06 · §2.1](../深入/06-Eval-Pipeline设计.md)）——把 judge 输出改成 pass/fail 并重算 κ，是最有价值的改造练习
 
 **思考**：N = 20 够吗？什么时候需要更多？

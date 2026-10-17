@@ -60,10 +60,10 @@ Claude Code 首次"你好"约消耗多少 input token？,~14-25k。,deep-dive-04
 "你好" token 的主要去向（按占比）？,System prompt (~37%) + 工具定义 (~49%) + CLAUDE.md 等 (~14%)，用户消息本身仅 2 token。,deep-dive-04
 为什么 LLM API 每次必须重传全部上下文？,LLM API 无状态——模型没有记忆，每次调用必须携带全部上下文。,deep-dive-04
 为什么多轮对话"越聊越贵"，而且是平方级、不是线性？,因为无状态——每一轮都要为整段历史重新付一次输入费。历史随轮数线性变长，累计成本 ≈ 各轮历史长度之和 → 随轮数呈平方级（N²）增长：轮数翻倍、成本约翻四倍。缓解见前缀缓存（深入 02）与上下文压缩；具体 token 与账单数值见深入 04 §2–§3、§2.8。,deep-dive-04
-单请求 KV cache 大小公式？,2 × num_layers × num_heads × head_dim × bytes_per_element × token数。,deep-dive-05
+单请求 KV cache 大小公式？,2 × num_layers × num_kv_heads × head_dim × bytes_per_element × token数（标准 MHA/GQA/MQA，不含分页、对齐等开销）。,deep-dive-05
 GQA 能把 KV cache 缩多少？,约 8-16×（Llama 3 70B 用 KV heads=8，相比 64 减 8×）。,deep-dive-05
-训练 vs 推理集群的核心差异？,训练是全集群一个故障域、IB 必须；推理是请求级独立、可 scale out。,deep-dive-05
-Judge 模型需要做什么定期校准？,抽样 50-100 条让人工 + judge 对同一批样本打标签，算 Cohen's κ，目标 ≥ 0.6。,deep-dive-06
+训练 vs 推理集群的核心差异？,同步训练作业通常把参与 GPU 置于一个故障域，需高带宽低延迟集合通信；推理也可能跨卡并行，但可按请求和副本做弹性扩展。,deep-dive-05
+Judge 模型需要做什么定期校准？,抽样 50-100 条让人工 + judge 对同一批样本打标签，算 Cohen's κ；0.6 可作示例起点，需按任务、类别分布和置信区间校准，并用滚动窗口看趋势。,deep-dive-06
 Eval 自己需要的 SLO 有哪些？,覆盖率、评估延迟、Judge 对齐度、pipeline uptime、失败率、数据新鲜度。,deep-dive-06
 Data Flywheel 的完整循环？,生产 trace → 标注失败集 → eval 更新 → prompt/模型变更 → rollout → 新 trace。,deep-dive-06
 攻击 6 类？,Direct / Indirect / Tool Poisoning / Exfiltration / Loop Hijacking / History Poisoning。,deep-dive-07
@@ -96,11 +96,11 @@ Prompt 变更上线前的三道关卡？,静态检查（diff 评审 + 渲染测�
 「Prompt 回滚 < 5 分钟」的四个前提？,旧版本永不静默删除；发布走可移动指针（不是硬编码重新部署）；模型 / 工具 schema 等绑定件一起回——否则回到的是没测过的新组合；指针变更能在 SLO 内传播到全部消费实例（客户端缓存 TTL 小于回滚 SLO 或有推送失效）。,deep-dive-21
 Self-attention 的三个角色 Q/K/V 分别表示什么？,Q=我在找什么（query），K=我是什么（key），V=我的信息（value）。,science-01
 Attention 的计算复杂度？,O(N²)——N 个位置互相算相似度。长 context 成本的物理根因。,science-01
-KV Cache 为什么能节省计算？,每生成新 token 时，历史 token 的 K 和 V 完全不变，可存下来复用。,science-01
-Attention Sink 是什么？,模型在 softmax 里需要一个"出口"倾倒多余注意力，前几个 token 成了默认"垃圾桶"——解释了为什么前置内容受重视。,science-01
-长 context 中间塌陷的 4 个叠加原因？,训练分布（重要信息多在首尾）+ 位置编码几何偏差 + softmax 稀释 + attention sink 效应。,science-02
-"宣称 context"和"有效 context"的差距？,RULER：宣称 ≥32K 的模型只有一半能真正用到 32K。Gemini 1.5 1M 实测有效 >128K。,science-02
-长 context 能替代 RAG 吗？,不能。中间塌陷 + 成本线性涨 + 延迟高。RAG + Rerank 仍是必要的。,science-02
+KV Cache 为什么能节省计算？,对因果自回归模型，在权重、位置编码和前缀配置不变时，追加 token 不改变历史位置的 K/V，可存下来供后续 decode 复用。,science-01
+Attention Sink 是什么？,部分 attention head 会把较高权重分配给起始 token；StreamingLLM 保留这些起始 KV 可稳定流式推理，但不等于保存了开头语义记忆，也不保证指令遵循。,science-01
+哪些因素可能与长 context 中间塌陷有关？,训练分布、位置编码、注意力竞争、上下文干扰等可能共同相关；具体贡献需在同一任务设置下实测，不能把四项当作已证实的固定叠加。,science-02
+"宣称 context"和"有效 context"的差距？,RULER 2024 受测样本中，宣称 ≥32K 的模型只有部分能稳定用到 32K；这是历史基准快照，不能直接代表当前所有模型。Gemini 1.5 的长上下文结果也应按其报告和任务设置理解。,science-02
+长 context 能替代 RAG 吗？,不能仅凭窗口长度决定。应比较有效召回、推理质量、延迟、成本与数据更新需求；RAG 和 Rerank 是否采用由任务 eval 决定。,science-02
 Outlier features 是什么，为什么毁掉量化？,少数激活维度值极大（±100+），其他维度都在 ±1 以内。int8 只有 256 级，覆盖 outlier 就丢普通值精度。,science-03
 GPTQ 和 AWQ 的核心思想分别是？,GPTQ 用 Hessian 信息决定哪些权重重要并补偿误差；AWQ 认为激活大的维度对应权重更重要，保护这些。,science-03
 量化静默降级的典型症状？,整体 eval 通过但某类任务崩（数字/结构化输出对量化特别敏感）。必须按任务类型分桶监控。,science-03
@@ -123,10 +123,10 @@ HHH 三原则？,Helpful / Honest / Harmless。对齐的三目标。,shared-lang
 DPO 相比 RLHF 的优势？,不训 Reward Model，直接用偏好对比做训练。简单 100×、稳定、效果接近。,shared-lang-04
 Reward hacking 是什么？举一个例子？,Policy 找到 Reward Model 的漏洞获得高分但实际不是好回答。例：RM 偏好长回答 → Policy 学会啰嗦。,shared-lang-04
 Jailbreak 和 Prompt Injection 的区别？,Jailbreak 是让模型说违规内容；Prompt Injection 是让 Agent 做违规动作。对 SRE 后者更严重。,shared-lang-04
-FSDP / ZeRO-3 的核心思想？,把模型参数、梯度、优化器状态都切片到不同 GPU，forward/backward 时临时 gather。兼得 DP 简单和 TP 省显存。,shared-lang-05
-训练和推理集群的网络要求差异？,训练必须 InfiniBand / NVLink（每 step 传数百 GB）；推理 Ethernet 足够。,shared-lang-05
+FSDP / ZeRO-3 的核心思想？,将参数、梯度与优化器状态分片；forward/backward 按需 all-gather 参数，反向对梯度做 reduce-scatter。可在数据并行编程模型下节省显存，是否采用取决于内存与通信配置。,shared-lang-05
+训练和推理集群的网络要求差异？,同步训练通常需要高带宽低延迟集合通信，节点内常用 NVLink/PCIe，跨节点可用 InfiniBand 或 RoCE；推理是否需要高速互联取决于并行方式和规模。,shared-lang-05
 Checkpoint 的 SRE 关键指标？,写耗时、写失败率、存储容量趋势、最近 checkpoint 年龄、跨区复制延迟。,shared-lang-05
-MFU（Model FLOPs Utilization）目标？,实际 FLOPs / 峰值 FLOPs，60-70% 是生产目标。低于 50% = 效率问题。,shared-lang-05
+MFU（Model FLOPs Utilization）怎么看？,实际 FLOPs / 峰值 FLOPs。60–70% 可作为部分训练配置的参考区间；可达水平取决于硬件、模型、并行策略和 workload，不能用单一百分比判定低效。,shared-lang-05
 B1 动作的核心提问是什么？,"我错在'不知道'还是'没想到'？"——前者补知识，后者是思维钝化信号。,training
 B2 动作的三步？,自己写初稿（不许 AI 写）→ AI 挑错（不许重写）→ 自己改。,training
 B3 渐进节奏？,第 1 月每周 45min → 第 2-3 月每周 90min → 第 4 月+ 每月 3-4 小时。,training

@@ -60,14 +60,14 @@ tags: [meta, build, pdf, pandoc, xelatex]
 
 ```bash
 bash build/build-pdf.sh
-# 输出：output/AI时代的可靠性架构-v1.15.6.pdf
+# 输出：output/AI时代的可靠性架构-v1.15.7.pdf
 ```
 
 默认从根 README 读取版本和日期，并包含第 7 章。章节的 YAML 元数据不会覆盖封面，页眉使用同一版本号；原稿已有章节编号，不再追加自动编号。Mermaid 先渲染为 PNG，临时文件写入 `build/tmp/`；PDF 内的相对 Markdown 链接转到 GitHub Pages。
 
 **覆盖版本号**：
 ```bash
-VERSION=v1.15.6 bash build/build-pdf.sh
+VERSION=v1.15.7 bash build/build-pdf.sh
 # 日期也可覆盖：RELEASE_DATE=2026-10-16
 ```
 
@@ -194,7 +194,7 @@ pip install mkdocs-with-pdf
 cp build/build-pdf.sh build/build-pdf-deep.sh
 # 编辑，把 FILES 改成 深入/*.md
 # 跑：bash build/build-pdf-deep.sh
-# 输出：output/AI时代的可靠性架构-v1.15.6-深入卷.pdf
+# 输出：output/AI时代的可靠性架构-v1.15.7-深入卷.pdf
 ```
 
 同理做科学卷、共同语言卷、复习卷。每本 50-100 页较舒适。

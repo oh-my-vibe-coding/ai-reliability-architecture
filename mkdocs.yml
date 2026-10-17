@@ -127,14 +127,14 @@ plugins:
 extra:
   version:
     provider: mike
-    default: v1.15.6
+    default: v1.15.7
   social:
     - icon: fontawesome/solid/book
       link: ""
       name: 源 Markdown
 
 copyright: >
-  《AI 时代的可靠性架构》 · v1.15.6 · 2026-10-16 ·
+  《AI 时代的可靠性架构》 · v1.15.7 · 2026-10-16 ·
   源 Markdown 在本项目根目录；本站点仅为阅读呈现层。
 
 # ────────────────────────────────────────────────────────────

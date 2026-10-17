@@ -63,7 +63,7 @@ LLM 推理：**显存、带宽、算力三者共同约束，并且 prefill 和 d
 | 容量建模 | `concurrency = QPS × avg_latency` | 三角约束（见 §1） |
 
 > [!WARNING]
-> 用传统 Web 容量模型算 GPU 集群，**预估会差 3–10 倍**。要么买多了烧钱，要么买少了扛不住——上面三个翻车现场就是这个误差的具象化。
+> 只用传统 Web 容量模型算 GPU 集群容易产生数量级误差，因为它忽略了 token 长度、prefill/decode 分工和 KV cache。误差幅度取决于 workload，不能预设固定的 3–10 倍。
 
 剩下的内容回答三个问题：
 
@@ -98,7 +98,7 @@ flowchart TD
 - **Context 长度**：每个活跃请求占的 KV cache 随输入 token 数线性增长
 - **并发**：同时活跃的请求数
 
-**三角规则**：**任何两个增加 → 第三个必须减**。
+**三角规则**：在硬件和 SLO 固定时，提高 context 或并发会挤占同一显存预算；具体能否同时增加，要由 KV cache、调度和实测吞吐共同确定。
 
 ### 举个直观例子
 
@@ -546,9 +546,9 @@ SRE 助手有一个明显的"高重复前缀"特征：
 ## 10. 给 SRE 的一句话总结
 
 > [!IMPORTANT]
-> LLM 容量规划 = **三个独立的容量模型叠加**（prefill 吞吐 / decode 吞吐 / KV cache 并发），按 max 取实例数，再加冗余。
+> LLM 容量规划 = **三个相互关联的容量模型**（prefill 吞吐 / decode 吞吐 / KV cache 并发），分别求出所需实例数后取约束最紧的一项，再按 SLO 加冗余。
 >
-> 不要复用 web 服务的 `QPS × latency` 心智模型——**那个在这里会差 3-10×**。
+> 不要只复用 web 服务的 `QPS × latency` 心智模型：Little's Law 仍然成立，但 LLM 服务还必须把 token 速率、prefill/decode 分离和 KV cache 占用纳入模型。
 
 ---
 

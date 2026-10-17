@@ -1,6 +1,6 @@
 ---
 title: 附录 E · 模板库
-updated: 2026-07-04
+updated: 2026-10-16
 tags: [appendix, templates, reusable]
 ---
 
@@ -117,7 +117,7 @@ Response: {response}
 **校准机制**：
 - 每周抽 50-100 条让人工打分
 - 算 Cohen's κ 或 agreement rate（标签一致的比例；若用多档 rubric 则 |human - judge| ≤ 1）
-- 目标：κ ≥ 0.6 / agreement ≥ 70%
+- 目标起点（需按任务校准）：κ ≥ 0.6 / agreement ≥ 70%
 - 不达标 → 暂停自动决策 + 换 Judge / 改 rubric
 
 **偏见自检**：

@@ -50,7 +50,7 @@ tags: [part-4, practice, unit3, week]
 | TTFT p50 / p95 / p99 | 首 token 延迟分位数 | 客户端侧计时 | 对话类 p99 < 1s | ... |
 | tokens/s p50 / p95 | 输出速度分位数 | 客户端每 token 间隔 | 取决于模型 | |
 | End-to-end latency p99 | 整个请求 | 客户端 | 业务对齐 | |
-| Queue wait time | 等调度时间 | 服务端 | < batch_size × avg_step | |
+| Queue wait time | 等调度时间 | 服务端 | 按负载、并发和延迟 SLO 建基线 | 示例阈值需用压测校准 |
 
 **注意**：每个 SLI 标注**是客户端测还是服务端测**——两端数字不同。
 
@@ -60,14 +60,14 @@ tags: [part-4, practice, unit3, week]
 
 | SLI | 定义 | 目标 | 告警阈值 |
 |---|---|---|---|
-| KV cache utilization | 预分配 KV 池的块使用率（vLLM: `gpu_cache_usage_perc`） | < 85% | > 95% |
+| KV cache utilization | KV 池的块使用率（vLLM 指标名称随版本核验；V1 常见为 `vllm:kv_cache_usage_perc`） | < 85% | > 95% |
 | Queue depth | 排队请求数 | < 2× batch_size | > 5× |
 | GPU util | 算力利用率 | ... | ... |
 | Preemption rate | 抢占频率 | < 1% | > 5% |
 | Active concurrency | 同时服务数 | ... | ... |
 | Input size p99 | 输入长度分位 | 监控漂移 | 突增 2× |
 
-**注意**：不要用 `nvidia-smi` 的显存占比当这个 SLI——vLLM 等引擎启动时就预分配约 90% 显存作 KV 池，显存占比常态接近满、与负载无关。
+**注意**：不要用 `nvidia-smi` 的显存占比当这个 SLI——推理引擎会预留显存给权重、运行时工作区和 KV cache；预留比例与版本、配置和模型有关，不能把整块显存都当作 KV 池。请以部署版本实际暴露的 Prometheus 指标和配置为准。
 
 #### Section 3 · 质量类 SLI（最容易忽略）
 

@@ -124,18 +124,18 @@ LLM 服务的质量看 assertion / judge。Embedding 服务的质量看 **retrie
 | **Hit@k** | gold set 的 top-k 包含正确答案的比例 | > 90%（k=10）|
 | **MRR** (Mean Reciprocal Rank) | 1/正确答案排名的平均 | > 0.7 |
 | **NDCG@k** | 排序加权的命中率（排在前面的正确结果比排在后面的得分更高） | > 0.8 |
-| **Embedding drift** | 同一 batch 文档在不同时间的 embedding 距离 | < 阈值（应该 0，除非模型变了）|
+| **Embedding drift** | 同一 batch 文档在不同时间的 embedding 距离 | 在约定数值容差内；超出时核查版本与配置并做召回回归 |
 | **Cold corpus retrieval** | 新加入的文档能否被检索到 | > 95% |
 
 ### 3.3 一致性 SLI（极重要，常被忽略）
 
 | SLI | 含义 |
 |---|---|
-| **Embedding determinism** | 同样输入两次得到的 embedding 是否完全相同？（应该）|
+| **Embedding determinism** | 同样输入两次的向量差异是否在约定数值容差内？|
 | **Cross-region consistency** | 同一模型不同区域服务 embedding 是否一致？|
 | **Version consistency** | Registry 里 pin 的模型版本和实际服务用的是同一个吗？|
 
-不一致 = 同一段文本的查询向量和入库向量不在同一空间 → 查不到。这是 RAG 系统**最隐蔽**的 bug。
+浮点计算的微小差异不等于向量空间不兼容。模型、tokenizer、pooling 或归一化配置变化才可能破坏查询与入库向量的兼容性；超出容差时应核查配置，并通过 gold set 验证召回影响。
 
 ---
 
@@ -353,7 +353,7 @@ spans:
 |---|---|---|
 | Hit@10 on gold set | > 90% | < 85% |
 | MRR on gold set | > 0.7 | < 0.65 |
-| Embedding drift | 0 | 任何非零 |
+| Embedding drift | 在约定容差内 | 超出容差时排查，并结合召回回归决定是否阻断 |
 | Cold document retrievability | > 95% | < 90% |
 
 ### Consistency SLI

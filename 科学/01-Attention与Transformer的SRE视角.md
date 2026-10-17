@@ -1,6 +1,6 @@
 ---
 title: 科学 01 · Attention 与 Transformer 的 SRE 视角
-updated: 2026-07-02
+updated: 2026-10-16
 tags: [science, transformer, attention, mechanism]
 ---
 
@@ -116,14 +116,14 @@ N 个位置互相算相似度 → **N² 个相似度值**。
 内存写：2 × N × d × 层数  （KV cache）
 ```
 
-**特性**：大矩阵乘法，**GPU 算力打满** → Compute-bound
+**特性**：长序列 prefill 常由大矩阵乘法主导，可能呈 compute-bound；短序列、小 batch 或特定 kernel / 硬件配置下也可能受带宽或 launch 开销限制。
 
 ### Decode 阶段（逐 token 生成）
 
 - 当前已有 N 个 token
 - 生成第 N+1 个 token
-- **只算当前位置**的 Q（1×d）
-- 和**全部历史 K**（N×d）做 attention → 得到 1×N attention 分布
+- 为新位置计算 Q、K、V（各为 1×d），并把新 K/V 追加到 cache
+- 与历史及当前位置的 K 做 attention，再对对应 V 加权；单步 attention 的复杂度随上下文长度线性增长
 - 加权 V → 新 token 的向量
 
 ```
@@ -131,20 +131,20 @@ N 个位置互相算相似度 → **N² 个相似度值**。
 内存读：整个模型参数 + 整个 KV cache
 ```
 
-**特性**：计算量小，但要读巨量数据 → **Memory-bandwidth-bound**
+**特性**：小 batch decode 常受权重与 KV cache 读取带宽限制；增大 batch、上下文长度或改变并行配置后，瓶颈可能转移。
 
 > [!IMPORTANT]
 > **这就是为什么[深入 01](../深入/01-首包延迟与吞吐的影响因素.md) 说 prefill 和 decode 的瓶颈根本不同**——它们在 attention 层做的事情**量级完全不同**。
 
 ---
 
-## 4. KV Cache 为什么能存（节省 99% 计算）
+## 4. KV Cache 为什么能存（避免重复计算）
 
-观察一件事：**每生成新 token 时，历史 token 的 K 和 V 完全不变**。
+对因果自回归模型，在模型权重、位置编码和前缀配置不变时，追加新 token 不会改变历史位置的 K 和 V。
 
 证明直觉：K 和 V 是由 token 本身和它前面的上下文决定的；新 token 加进来不改变它们的历史位置。
 
-**所以：K 和 V 只算一次，存下来，之后 decode 全部复用**。
+**所以：历史 K 和 V 无需随每个新 token 重算，存下来供后续 decode 复用**。
 
 如果不缓存：
 
@@ -220,9 +220,10 @@ Multi-head Latent Attention：不直接存每个 head 的 K/V，先把它们压�
 - **SRE 含义**：便宜的长 context 开始成为现实，但要做自己的 eval
 
 ### Attention Sink
-保留前几个 token（"起始锚点"）永远关注，中间做 sliding。
-- **好处**：长对话保持"记忆起点"
-- **SRE 含义**：解释了为什么"system prompt 放最前"除了 caching 外还有 attention 理由
+一些模型会在部分 attention head 上对起始 token 分配较高注意力。StreamingLLM 一类方法在滑动窗口外保留这些起始 token 的 KV，以支持长流式生成。
+
+- **好处**：在特定模型与推理配置下，帮助稳定超出训练窗口的流式生成
+- **边界**：保留起始 KV 不等于保留开头内容的语义记忆，也不保证模型持续遵循 system prompt
 
 ---
 
@@ -232,7 +233,7 @@ SRE 必须知道的故障面：
 
 ### 7.1 Softmax 数值稳定性
 
-`softmax(x)` 里有 `e^x`。如果 x 很大（比如 attention score 飙到 80），`e^80` 溢出。
+`softmax(x)` 里有 `e^x`。溢出阈值取决于数值格式：FP16 的指数范围较窄，约在输入 11 左右就可能溢出；FP32 与 BF16 的上限约在 89 左右。实现通常先减去最大值以避免指数溢出，但这并不能消除所有舍入误差或内核问题。
 
 **实现上**：要做 `x - max(x)` 保护 → 这个"减 max"操作在 FlashAttention、bf16 实现里**可能出 bug**。
 
@@ -267,8 +268,8 @@ CUDA kernel 在**不同 batch size、不同 padding** 下可能走不同的代�
 |---|---|---|
 | **Attention kernel 吞吐** (TFLOPS) | 由 GPU profiler 给 | 突降 → kernel 退化 |
 | **KV cache 压缩比** | 期望 vs 实际占用 | 突高 → GQA 配置被改或失效 |
-| **Per-layer attention entropy** | 可选高级指标 | 突降至接近 0 → softmax 坏了（argmax-like） |
-| **长 context 质量曲线** | eval vs context 长度 | 尾部塌陷 → kernel / 数值问题 |
+| **Per-layer attention entropy** | 可选高级指标 | 突降可提示分布变尖；需结合模型、输入、层和 head 的基线排查，不能单独判定 softmax 故障 |
+| **长 context 质量曲线** | eval vs context 长度 | 质量下降时同时核查数据、位置、检索、缓存精度与 kernel；曲线本身不能定位为 kernel 问题 |
 
 ---
 
