@@ -1,6 +1,6 @@
 ---
 title: 代码 02 · 最小 Agent · 教学指南
-updated: 2026-07-12
+updated: 2026-10-18
 tags: [code, guide, agent, tool-use]
 ---
 
@@ -42,7 +42,7 @@ export ANTHROPIC_API_KEY=sk-ant-...
 
 ### 例 1（"帮我看下磁盘"）
 
-```
+```text
 === 例 1：让 Agent 查磁盘 ===
 
 --- Iteration 1 ---
@@ -58,7 +58,7 @@ devfs          196K  196K     0 100% /dev
 
 ### 例 2（"综合检查"）
 
-```
+```text
 --- Iteration 1 ---
 [Tool call] run_shell({"command": "uptime"})
 [Tool result] 14:32  up 3 days, ...
@@ -111,7 +111,7 @@ devfs          196K  196K     0 100% /dev
 
 ### A · Tool 白名单被触发
 
-```
+```text
 [Tool result] ERROR: command 'rm' not in whitelist
 ```
 
@@ -134,7 +134,7 @@ devfs          196K  196K     0 100% /dev
 
 ### C · `tool_use_id` 不匹配
 
-```
+```text
 anthropic.BadRequestError: Error code: 400 - unexpected `tool_use_id` found in `tool_result` blocks
 ```
 
@@ -146,7 +146,7 @@ anthropic.BadRequestError: Error code: 400 - unexpected `tool_use_id` found in `
 
 ### D · Tool timeout
 
-```
+```text
 ERROR: command timed out
 ```
 
@@ -287,7 +287,7 @@ Tool use 的 API 循环里，`stop_reason` 的三种主要值分别是什么？�
 
 <details><summary>参考答案</summary>
 
-参考 [深入 10 · Pattern 4 · Tool Abuse Loop](../深入/10-AI系统事故模式库.md#pattern-4--tool-abuse--recursive-agent-loop)。
+参考 [深入 10 · Pattern 4 · Tool Abuse Loop](../深入/10-AI系统事故模式库.md#pattern-4-tool-abuse-recursive-agent-loop)。
 
 - Agent 可能在某类任务上无限循环（尤其是 ambiguous 目标）
 - 单请求成本可能 $10+

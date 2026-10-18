@@ -1,6 +1,6 @@
 ---
 title: 深入 04 · 为什么简单"你好"也会让 LLM 消耗数万 Token
-updated: 2026-10-16
+updated: 2026-10-17
 tags: [deep-dive, tokens, agent-architecture, cost]
 ---
 
@@ -12,67 +12,55 @@ tags: [deep-dive, tokens, agent-architecture, cost]
 
 ## 0. 先看现象
 
-在 LLM 网关 / 监控仪表盘上，你会看到一个反直觉的事实：
+在带有系统指令、工具定义和项目资料的编码助手中，短消息可能对应很长的模型输入。下面是本章用于解释构成的**教学估算**，不是本轮对任何客户端的实测，也不是各版本的固定开销：
 
-| 用户输入 | 实际发送给模型的 token 数 |
+| 用户输入 | 可能出现的输入量级（示意） |
 |---|---|
-| `你好` | **13,000 – 25,000+**（首轮） |
-| `ls` | **同上** |
-| `这个文件改一下空格` | **20,000 – 40,000+**（带项目上下文） |
-| 多轮对话第 20 轮 | **80,000 – 200,000+** |
+| `你好` / `ls` | 预载较多指令和工具时，可达上万 token |
+| `这个文件改一下空格` | 加载项目资料后，可能进一步增加 |
+| 长对话中的一次请求 | 取决于保留历史、工具结果、压缩和检索策略 |
 
-> [!WARNING]
-> 这不是 bug，是**架构必然**。理解它才能设计成本、延迟和路由策略——否则你会怀疑人生。
+> [!NOTE]
+> 短消息与大输入可以同时出现，但不是架构要求每个请求都达到某个 token 数。先核对实际 usage、版本和配置，再判断开销是否合理。
 
 ---
 
-## 1. 为什么会这样：LLM API 是无状态的
+<a id="1-为什么会这样llm-api-是无状态的"></a>
 
-传统 Web 服务：
+<a id="1-llm-api"></a>
 
-```
-Client --HTTP--> Server
-              |
-              +---> Session store (Redis/DB)
-              |
-              +---> Memory
-```
+## 1. 为什么会这样：区分上下文与服务状态
 
-Server 有记忆，可以查会话、用户档案、历史。
+这里需要区分**一次生成所用的上下文**与**承载会话的服务**。独立生成不会自动读到应用的所有历史；应用可以传入所需消息，也可以使用服务端会话或响应引用来延续上下文。
 
-LLM API：
+以 OpenAI 为例，[Conversation state 文档](https://developers.openai.com/api/docs/guides/conversation-state)提供手工管理历史、`previous_response_id` 和持久 Conversations 对象。引用 ID 可以减少客户端重传的数据，但文档明确说明：使用 `previous_response_id` 时，链中先前的输入 token 仍按输入计费。顶层 `instructions` 的延续规则也要单独核对，不能假设所有配置都会继承。
 
-```
-Client --HTTP--> LLM API
-              |
-              +---> （没有状态——模型本身没有记忆）
+```text
+客户端管理：消息 / 工具 / 所选历史 → 当前请求 → 模型可见上下文
+服务端管理：新增输入 + 会话或响应 ID → 服务端组织上下文 → 模型
 ```
 
-**模型没有任何记忆**。每次 API 调用都必须**把一切它需要知道的东西全部带上**：
+因此，应该分别问三个问题：
 
-- 它是谁（角色）
-- 它可以做什么（工具清单）
-- 项目背景是什么
-- 之前说过什么（对话历史）
-- 用户这次问什么
+- **传了多少**：请求正文是全量消息，还是新增内容加引用？
+- **模型看了多少**：哪些指令、历史、检索结果真正进入了本次上下文？持久存储不等于全部可见。
+- **怎样付费**：未缓存输入、缓存读写、输出及工具调用分别采用什么口径？引用 ID 不等于历史免费。
 
-这就是为什么 `你好` 会带着几万 token 一起送进去——那几万 token 不是"你好"生成的，是**让这个模型能对你说话的全部前置条件**。
-
-可以把这套"全部前置条件"想成一副**行囊**：模型每开一轮工，你都得把整副行囊重新背给它看一遍——它是谁、能用哪些工具、项目长什么样、之前走到哪。行囊里绝大部分东西每轮都一样，但模型不记事，所以每一轮都得原样再背一次。"你好"不过是行囊最上面临时塞的一张便签；真正压秤的，是下面那套每轮都要重背的家当。
+一句"你好"之所以可能很贵，是客户端或服务选择带入了大量前置材料。系统角色、工具协议、项目资料和历史都可能占用输入；其中哪些必要，必须结合任务判断。
 
 > [!NOTE]
-> **一个事实，四个后果。** "无状态、每轮重背整副行囊"是本章——也是整个推理成本模型——的总钥匙。它一次推出四件事，本书分开讲、不在每章重推：
+> 本章讨论四种需要观测的影响，而不是从"无状态"推出四条普遍定律：
 >
-> - **省钱**：行囊里不变的部分每轮逐字节相同，前缀可缓存，命中价约常价的 1/10（[深入 02 · Prompt Caching](02-Prompt-Caching原理.md)）。
-> - **这张账单**：首轮一句"你好"就要背上万 token（本章 §2–§3）。
-> - **越聊越贵**：第 N 轮要为前面 N-1 轮的全部 token 再付一次钱，成本随轮数平方级累加、不是线性（本章 §2.8）。
-> - **越聊越"钝"**：窗口被行囊塞满后，越靠中段的信息越容易被略过、召回下降（[科学 02 · Lost in the Middle](../科学/02-Lost-in-the-Middle.md)）。
+> - **缓存**：稳定前缀可能复用；命中条件与价格按模型契约核验，见[深入 02](02-Prompt-Caching原理.md)。
+> - **首轮开销**：检查预载材料与延迟加载策略，不能用本章估算替代实际 usage。
+> - **累计输入**：保留并反复处理完整历史时会累加，平方增长需要 §2.8 的条件。
+> - **信息利用**：长窗口不保证稳定召回，需要用具体任务测试，见[科学 02](../科学/02-Lost-in-the-Middle.md)。
 
 ---
 
 ## 2. Token 构成解剖（按量级排序）
 
-以一次典型的 **Claude Code / Trae / Cursor Composer / Codex CLI** 调用为例。
+以下范围用于拆解一种预载较多材料的请求。客户端版本、工具发现和动态加载方式都会改变构成，不能据此判断当前产品的固定开销。
 
 ### 2.1 系统提示 System Prompt · 约 3k – 8k token
 
@@ -84,7 +72,7 @@ Client --HTTP--> LLM API
 - **安全指南**：哪些操作要确认、哪些禁止
 - **输出格式**：markdown 规范、引用约定、代码块语言标签
 
-Claude Code 的 system prompt 在 2026 年约 **5-8k token**，比 2024 年的 1-2k 涨了好几倍——因为工具越做越能干。
+本章示例可为系统指令预留数千 token；本轮未对客户端提示词做版本化测量，不据此断言其历年代际增长。
 
 ### 2.2 工具定义（Tool Schemas）· 约 5k – 15k token
 
@@ -106,7 +94,7 @@ Claude Code 的 system prompt 在 2026 年约 **5-8k token**，比 2024 年的 1
 }
 ```
 
-**每个工具的描述越细致，模型用得越准，但 token 越多**。常见工具 token 成本：
+工具描述影响输入长度，也可能影响调用质量；增加描述能否减少误用需要测试。下面仅列估算量级：
 
 | 工具 | 单个 token 数 |
 |---|---|
@@ -114,7 +102,7 @@ Claude Code 的 system prompt 在 2026 年约 **5-8k token**，比 2024 年的 1
 | 复杂工具（含示例和规则） | 800–2000 |
 | Claude Code 的 `Bash`、`Edit`、`Agent` 等带详细说明的 | 1500–3000 各自 |
 
-一个典型的 Claude Code 会话预载 **15-25 个内置工具** + MCP 工具 + Skills 工具，合计 **8-15k token** 很常见。
+若预载大量工具，定义本身就可能占用数千 token；按需发现或延迟加载会改变实际输入，需检查运行版本。
 
 ### 2.3 项目上下文 `CLAUDE.md` / `AGENTS.md` · 约 2k – 10k token
 
@@ -134,12 +122,12 @@ Claude Code 的 system prompt 在 2026 年约 **5-8k token**，比 2024 年的 1
 
 ### 2.5 MCP Servers 附带的提示 · 约 1k – 5k token
 
-每个挂上的 MCP server 会：
+MCP 接入可能带来：
 
 - 注册它提供的 **工具**（计入 2.2）
-- 额外注入一段 **使用说明**（告诉模型怎么用这些工具）
+- 客户端额外注入的 **使用说明**（告诉模型怎么用这些工具）
 
-装 3-5 个常用 MCP（如文件系统、GitHub、数据库），很快追加 2-4k token。
+是否把全部定义和说明放进每次请求，取决于客户端的工具发现与加载策略。
 
 ### 2.6 Skills / Hooks / Sub-agent 描述 · 约 500 – 3k token
 
@@ -157,7 +145,9 @@ Claude Code 的 Skills 机制会把**可用 skill 列表**塞进 prompt：
 - 当前日期时间
 - 模型自己的名字和能力范围
 
-### 2.8 对话历史 · 随对话线性增长
+<a id="28-对话历史--随对话线性增长"></a>
+
+### 2.8 对话历史 · 保留策略决定增长
 
 这是最容易失控的部分。每一轮包括：
 
@@ -166,27 +156,29 @@ Claude Code 的 Skills 机制会把**可用 skill 列表**塞进 prompt：
 - **工具调用请求**（tool_use 块，几百 token）
 - **工具执行结果**（可能很大：一个 `Read` 可能返回几 k token，`Bash ls -la` 几百，`grep` 结果一片）
 
-**长对话的 token 增长曲线**：
+**未压缩历史持续累积时的一组示意输入**：
 
-```
+```text
 第 1 轮：   15k token
 第 5 轮：   30k token
 第 10 轮：  60k token
 第 20 轮：  120k token
-第 50 轮：  300k+ token   （很多模型已撑不住）
+第 50 轮：  300k+ token   （是否可接收须核对具体型号窗口与输出余量）
 ```
 
-注意这张曲线画的是**单轮**上下文有多大；真正咬人的是**累计账单**。因为每一轮都要把到目前为止的整段历史重发一遍——第 1 轮发 1 段、第 2 轮发 2 段……第 N 轮发 N 段——一次会话累计送进去的 token 大约是 N²/2 的量级。**轮数翻一倍，累计成本翻的是四倍。** 这是"Agent 越跑越贵"的数学根，也是 Claude Code 里 `/compact` / `/clear` 不是可选项、而是必需品的原因。
+这列数字表示单轮输入，不是实测曲线。若每轮新增固定的 Δ token，第 n 轮都处理此前完整历史，且没有裁剪、压缩或选择性检索，那么 N 轮累计历史输入约为 `Δ × N(N-1)/2`，再加每轮固定前缀 `N × P`。历史项才接近平方增长；短会话或固定前缀主导时，不能说总量必然翻四倍。
+
+服务端引用可以减少传输，未必减少计入输入的历史；缓存可能降低这些 token 的单价。因此**累计上下文 token 与累计费用也不能画等号**。压缩、分段和检查点应按任务连续性、信息损失与预算选择，不能用固定轮数强制清空全部历史。
 
 ### 2.9 最后才是用户这次说的话
 
-"你好" 只占 **2 个 token**。
+"你好"本身通常很短，确切 token 数取决于 tokenizer；下面为方便演算取 2。
 
 ---
 
 ## 3. 一个具体的 token 分布示例
 
-在 Claude Code 里说 `你好`（默认配置，在一个有 `CLAUDE.md` 的项目里），LLM 网关能观察到的 **请求 1**：
+假设一个编码助手预载以下材料，可构造这份 **14,652 token 的教学账单**。它不是 Claude Code 当前默认配置的抓包记录：
 
 | 来源 | 估算 Token | 占比 |
 |---|---|---|
@@ -199,7 +191,7 @@ Claude Code 的 Skills 机制会把**可用 skill 列表**塞进 prompt：
 | 用户消息"你好" | 2 | 0.01% |
 | **合计** | **≈ 14,650** | 100% |
 
-这就是为什么你会在网关看到**输入 1.4 万 token**。
+这个示例说明，用户消息短不代表模型输入短；占比要由真实请求重新计算。
 
 ```mermaid
 pie title 一次"你好"请求的 token 分布
@@ -212,14 +204,17 @@ pie title 一次"你好"请求的 token 分布
     "用户消息 '你好'" : 2
 ```
 
-用户消息在整张饼里小到几乎看不见——这张图是对"API 无状态必然带来大前缀"最直观的呈现。
+用户消息在示例中所占很小；图中比例来自上表假设，不表示所有编码助手都采用这套前缀。
 
 > [!NOTE]
-> 真实数字随厂商和版本变化。Claude Code 2024 年的 system prompt 约 1-2k token，2026 年已达 5-8k，因为工具变复杂、skill 生态更大。Trae / Cursor / Codex CLI 的量级类似。
+> 本轮没有执行真实模型调用或客户端 token 测量。§4 为便于比较取 14,650 token 的可缓存前缀，两者都只是教学假设。
 
 ---
 
-## 4. 经济学含义：Prompt Caching 不是可选项
+<a id="4-prompt-caching"></a>
+<a id="4-经济学含义prompt-caching-不是可选项"></a>
+
+## 4. 经济学含义：先算缓存是否合算
 
 ### 如果不用缓存
 
@@ -243,44 +238,39 @@ Sonnet 5.5 默认 5min 缓存写入 1.25×，读取 **0.05×**：
 - 与同模型 off-peak cache-miss $0.15 / MTok 相比为 1/50。这里只比较前缀输入，不能忽略输出、peak 时段与 alias 路由变化。
 
 > [!TIP]
-> **这是国产推理服务能做到超低价的核心原因之一**——自动前缀缓存默认开启 + cache-hit 定价把 KV 复用的成本直接让利给用户（缓存按用户隔离，不跨用户共享）。
+> 这组算例只说明已列价格和完整命中条件下的前缀费用，不足以解释一家服务商的总体成本或所有部署的缓存隔离策略。
 
 ---
 
-## 5. 为什么架构上必须这么做
+<a id="5-为什么架构上必须这么做"></a>
 
-有人会问："为什么不把 system prompt 和 tool schema 存在服务端，每次只发用户消息？"
+## 5. 谁管理状态，怎样交接
 
-答案：**有一些厂商在做，但不普及**，且有工程代价。
+客户端管理、服务端会话和缓存可以组合使用。选型要检查状态能否导出、删除、审计与迁移，以及引用失效后如何恢复。
 
-### 5.1 Anthropic 的 Prompt Caching（`cache_control`，客户端显式管理）
-缓存仍然在服务端，但客户端要**每次都发完整 prompt**，匹配靠 prefix。**客户端视角没"减负"**。
+<a id="51-anthropic-prompt-cachingcache_control"></a>
+<a id="51-anthropic-的-prompt-cachingcache_control客户端显式管理"></a>
 
-### 5.2 OpenAI 的 Responses API（其前身 Assistants API 已宣布弃用）
-服务端存储对话状态、tools、files。客户端只发增量。
-- **优点**：客户端轻
-- **缺点**：
+### 5.1 客户端管理与 Prompt Caching
 
-  - 失去可控性（不知道 prompt 到底长啥样）
-  - 调试困难
-  - 供应商锁定深
-  - 不适合跨厂商的 Agent 框架
+客户端可以保留所选历史并构造请求，稳定前缀按接口规则尝试缓存。缓存是否命中与传输正文大小是两件事；缓存也不能替代任务进度、业务副作用和恢复记录。
+
+<a id="52-openai-responses-api-assistants-api"></a>
+<a id="52-openai-的-responses-api其前身-assistants-api-已宣布弃用"></a>
+
+### 5.2 OpenAI Responses 与 Conversations
+
+`previous_response_id` 延续响应链，Conversations 提供可持久使用的会话对象。按[迁移文档](https://developers.openai.com/api/docs/guides/migrate-to-responses)，通过前者延续时仍需重发稳定的顶层 `instructions`。接入时应核实哪些状态被保存、怎样选择上下文、如何计费和导出，而不是假设客户端从此无需管理任何状态。
 
 ### 5.3 Google Gemini Context Caching
-隐式缓存已默认开启（行为类似 OpenAI 的自动缓存，客户端照发全量 prompt）；真正给客户端"减负"的是显式路径：创建 cached content、按存储时长付租金，**客户端要先 create，再引用 ID**。
-- 适合：单次大 context，大量复用（显式路径的主场）
-- 不适合：对话场景的动态上下文
 
-### 结论
+隐式前缀缓存与显式 cached content 引用解决的传输、复用和存储问题不同。具体支持范围随模型及接口变化，见[官方说明](https://ai.google.dev/gemini-api/docs/caching)与[深入 02](02-Prompt-Caching原理.md)。不要把缓存对象直接当作完整的任务记忆或恢复日志。
 
-**在可预见未来，Agent 工具依然会"每次发完整 prompt"**，因为：
+<a id="结论"></a>
 
-- 跨厂商通用（同一套 Agent 实现可挂 Claude / GPT / Gemini）
-- Prompt 可审计、可 diff
-- 缓存机制补成本
-- **客户端是单一真相源**
+### 状态选择的检查点
 
-所以"你好 = 几万 token"是这个生态系统的**结构性特征**。
+客户端保留明确消息有利于跨提供商迁移和内容审计；服务端会话可以简化延续和持久化。两种方式都需要记录实际输入、状态生命周期、访问权限和恢复路径。没有证据支持所有 Agent 未来都会采用全量重传，也不能把上万 token 当成工作的必要起价。
 
 ---
 
@@ -309,7 +299,7 @@ Anthropic API 返回里：
 **工程 SLI**：
 
 - **Cache hit rate** = `cache_read / (cache_read + input + cache_creation)`
-- 目标：`> 80%` 对于稳定对话场景
+- 按任务的可复用前缀、有效期、写入费用和命中实测设置目标，不把 80% 当作通用准入线
 
 ### 6.2 工具厂商的 debug 模式
 
@@ -324,9 +314,11 @@ export OPENAI_LOG=debug
 claude --debug
 ```
 
-开 debug 后可以看到**实际发送的完整 prompt**，方便定位哪里胖了。
+日志可见范围取决于 SDK 和客户端版本；不能保证开启 debug 就能取得完整模型输入。需要完整归因时，在获准的应用边界记录组装后的请求与服务端 usage，并按数据规则处理日志。
 
-### 6.3 自建 LLM 网关要监控什么
+<a id="63-自建-llm-网关要监控什么"></a>
+
+### 6.3 自建 LLM 网关要监控什么（阈值需校准）
 
 | 指标 | 说明 | 告警阈值 |
 |---|---|---|
@@ -374,7 +366,7 @@ elif intent == "research":
     tools = [search_web, read_file]
 ```
 
-**代价**：意图分类需要一次额外调用（可以用小模型/便宜模型做）。
+**代价**：加载判断本身可能需要规则或额外调用；要验证漏载、延迟和权限边界。
 
 ### 7.3 分级 MCP Server
 
@@ -382,17 +374,17 @@ elif intent == "research":
 
 ### 7.4 Context Compaction
 
-对话超过阈值（比如 50k token）自动压缩：
+根据上下文余量、任务连续性与预算决定何时压缩；下面是一种实现思路：
 
-- 把老对话压成摘要（用小模型做一次 summarization）
+- 把适合压缩的历史摘要化，检查关键约束、来源和未完成事项是否保留
 - 保留最近 N 轮原文 + 压缩历史
-- Claude Code 的 `/compact` 就是这个机制的手动版
+- 压缩后验证状态是否足以继续工作，失败时能够回到持久记录
 
 ### 7.5 合理放置可缓存内容
 
 按**变化频率从低到高**排列 prompt 内容：
 
-```
+```text
 [系统提示]        ← 最少变（可能一个月一次）
 [工具定义]        ← 配置变时才变
 [CLAUDE.md]       ← 项目变时才变
@@ -400,7 +392,7 @@ elif intent == "research":
 [当前用户消息]    ← 每次变
 ```
 
-**越靠前的越要缓存**。一次 `cache_control` 写入覆盖前三段，后续所有请求都能命中前缀。
+稳定内容可放在前部尝试复用；是否可缓存、有效期、断点和命中仍受模型与接口条件约束，不能保证后续全部命中。
 
 ### 7.6 压缩 tool schema
 
@@ -410,7 +402,7 @@ elif intent == "research":
 
 ### 7.7 预算告警
 
-```
+```text
 if input_tokens > budget_per_request:
     log_warning("oversized prompt")
     alert_if_persistent()
@@ -422,12 +414,12 @@ if input_tokens > budget_per_request:
 
 ## 8. 常见陷阱
 
-- ❌ **每次把当前时间塞 system prompt 前面**：缓存每次失效，账单翻倍（参见[深入 02 · 失效的七种形态](02-Prompt-Caching原理.md#5-缓存什么时候作废失效的七种形态)）
+- ❌ **每次把当前时间塞 system prompt 前面**：可能缩短可复用前缀，费用变化需按实际命中计算（参见[深入 02 · 失效的七种形态](02-Prompt-Caching原理.md#5-缓存什么时候作废失效的七种形态)）
 - ❌ **`CLAUDE.md` 越长越好**：错。长到没人读的 `CLAUDE.md` 只在付钱，不在赋能
-- ❌ **把 user_id 放 prompt 开头做"个性化"**：每个用户独享缓存，命中率归零
+- ❌ **把 user_id 放 prompt 开头做"个性化"**：可能限制跨请求复用，仍要按提供商隔离规则和请求前缀分析
 - ❌ **工具注册一大堆但 90% 用不上**：token 都在白占
 - ❌ **不做 compaction**：长对话直撞 context 上限
-- ❌ **看到"input: 14k"就以为是 bug**：这是**基础事实**，不是 bug
+- ❌ **只凭"input: 14k"判定正常或异常**：先解释实际构成，再核对必要性和变化来源
 - ❌ **按 `input_tokens` 一个字段看总成本**：要看 `input + cache_creation + cache_read` 的总和
 
 ---
@@ -435,14 +427,9 @@ if input_tokens > budget_per_request:
 ## 9. 给 SRE 的一句话总结
 
 > [!IMPORTANT]
-> **"你好 = 14k token"** 是 Agent 工具的**架构特征**，不是 bug。
+> **用户输入、请求传输、模型上下文与计费 token 是不同口径。**
 >
-> SRE 架构师要做的不是消灭它，而是：
->
-> 1. **设计缓存策略**让大部分 token 在 cache-hit 价格下流转
-> 2. **监控 token 来源分布**快速定位异常
-> 3. **为自建 Agent 精简 system prompt 和 tool schema**
-> 4. **做 context compaction** 让对话能长期进行
+> 先解释输入来自哪里，再决定精简、缓存、持久会话或压缩；用实际完成质量、费用和恢复能力检验选择。
 
 ---
 
@@ -451,7 +438,8 @@ if input_tokens > budget_per_request:
 - Anthropic · Prompt Caching docs · https://platform.claude.com/docs/en/docs/build-with-claude/prompt-caching
 - Anthropic · Building effective agents · https://www.anthropic.com/research/building-effective-agents
 - OpenAI · Prompt Caching · https://platform.openai.com/docs/guides/prompt-caching
-- OpenAI · Responses API · https://platform.openai.com/docs/api-reference/responses
+- OpenAI · Conversation state · https://developers.openai.com/api/docs/guides/conversation-state
+- OpenAI · Migrate to Responses · https://developers.openai.com/api/docs/guides/migrate-to-responses
 - Google · Gemini Context Caching · https://ai.google.dev/gemini-api/docs/caching
 - DeepSeek · Context Caching · https://api-docs.deepseek.com/guides/kv_cache
 

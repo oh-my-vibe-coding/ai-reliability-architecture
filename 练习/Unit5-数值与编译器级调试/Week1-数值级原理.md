@@ -1,6 +1,6 @@
 ---
 title: Unit 5 · Week 1 · 数值级原理 + 复现实验
-updated: 2026-07-02
+updated: 2026-10-17
 tags: [part-4, practice, unit5, week]
 ---
 
@@ -10,7 +10,7 @@ tags: [part-4, practice, unit5, week]
 
 ## 本周目标
 
-从概念进入**实操**——搭一个最小复现实验，亲手看到 bf16/fp32 差异、kernel 非确定性。
+从概念进入**实操**——通过最小对照实验，区分精度差异、配置或运算顺序差异、同条件运行的非确定性。结果不同不自动证明存在 kernel 故障。
 
 ## 任务清单
 
@@ -58,7 +58,7 @@ tags: [part-4, practice, unit5, week]
 **记录**：
 
 - PyTorch 哪些操作**默认非确定**？
-- `torch.use_deterministic_algorithms(True)` 会关掉哪些 kernel？
+- `torch.use_deterministic_algorithms(True)` 对哪些操作提供确定性实现，不支持时会怎样处理，代价是什么？
 - bf16 vs fp32 在 softmax 上的数值差异直觉
 
 ### 产出 · B2 · 90-120 分钟（最少动手 60 分钟）
@@ -111,7 +111,7 @@ print(f"diff: {(p_fp32 - p_bf16.float()).abs().max()}")
 - 有差异时，第一个不同 token 出现在位置 X（平均）
 - 差异对最终答案的意义（语义是否一致？）
 
-#### 实验 B · Kernel 非确定性
+#### 实验 B · 可重复性与执行条件
 
 ```python
 # 同 prompt 跑 10 次，temperature=0
@@ -119,7 +119,7 @@ outputs = [generate(model, prompt, temp=0, seed=42) for _ in range(10)]
 # 看是否都相同
 ```
 
-**预期**：大部分情况相同，但**偶发**会不同（同一个 batch size 内）。
+先固定输入 token、采样、batch 和环境，重复记录结果。输出可能完全一致；这也是有效观察，不必为了完成练习制造差异。出现差异时，先区分随机采样、状态与执行路径，再调查非确定算子。
 
 如果都相同，试：
 
@@ -127,12 +127,12 @@ outputs = [generate(model, prompt, temp=0, seed=42) for _ in range(10)]
 - 改 padding 方式
 - 开 vs 关 FlashAttention
 
-找出**让同 prompt 输出不同**的触发条件。
+分别记录固定条件内的重复性，以及改变一个条件后的差异。换 batch、padding 或 attention 实现后的差异，不能单独证明同条件执行非确定。
 
 **低配替代（路线 C）**：
 
 ```python
-# 纯 PyTorch CPU 展示非确定性的根因：浮点加法不满足结合律
+# 纯 PyTorch CPU 展示运算顺序差异：浮点加法不满足结合律
 import torch
 
 torch.manual_seed(0)
@@ -145,8 +145,8 @@ print(x.sort().values.sum().item())  # 按大小排序后求和
 
 # 观察：三个结果的尾数不同（实测一例：519.51935 / 519.51978 / 519.5，
 # 具体数值随环境有差异）——同一组浮点数，加法顺序变了，结果就变了。
-# GPU kernel 非确定的根因正在这里：atomic add 的执行顺序由调度决定，
-# 每次运行可能不同，等价于每次换一种求和顺序
+# 这三条表达式各自仍可能每次返回相同结果，不是运行非确定性的证明。
+# 对实际使用非确定归约的算子，执行顺序变化可能导致类似差异；需另行验证
 
 # 对比：开严格确定性模式
 torch.use_deterministic_algorithms(True)
@@ -154,9 +154,9 @@ torch.use_deterministic_algorithms(True)
 # matmul / softmax 有确定性实现，照常运行，不要期待这里报错
 ```
 
-**意义**：即使不跑大模型，也能**亲手见证非确定性的根因**——浮点加法顺序不同结果就不同，GPU 上调度顺序不受你控制。这是 runbook 里关键一节。
+**意义**：理解运算顺序如何影响浮点结果，同时区分不同计算路径与同一路径重复运行不一致。这个 toy 实验没有证明某个 GPU kernel 存在非确定性或功能错误。
 
-#### 实验 C · 长 context 的精度累积
+#### 实验 C · 序列长度与数值差异
 
 ```python
 # 短 context 和长 context 的 attention 精度
@@ -185,13 +185,12 @@ for seq_len in [128, 1024, 8192]:
     rel = ((out_bf16 - out_fp32).abs() / (out_fp32.abs() + 1e-9)).mean()
     print(f"seq_len={seq_len}, 平均相对误差 = {rel:.4f}")
 
-# 观察：相对误差随 seq_len 上升（实测约 0.025 → 0.044）
-# 注意必须看相对误差：softmax 的每个概率约按 1/seq_len 缩小，
-# 绝对误差会被稀释得越来越小，只看绝对误差会得出相反结论
-# 这就是"长 context 更容易出数值问题"的数学本质
+# 上式记录逐元素相对误差，但接近零的参考值会使它非常敏感。
+# 应同时记录绝对误差、整体误差与输出尺度，不预设误差必随长度单调增加。
+# 不同长度使用的矩阵也不同；本实验不能单独证明长度导致生产质量退化
 ```
 
-**意义**：不需要 GPU 也能**定量观察**"长 context 放大精度损失"，为运维长 context 服务提供直觉。
+**意义**：观察不同形状下两条精度路径的差异，并学习选择误差口径。长 context 的语义退化还可能来自信息组织、截断或缓存；不能由这个矩阵实验直接推出。
 
 #### Section · 观察总结（200 字）
 

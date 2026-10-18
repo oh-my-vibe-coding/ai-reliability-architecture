@@ -1,6 +1,6 @@
 ---
 title: Unit 5 · Week 2 · Runbook 产出
-updated: 2026-07-02
+updated: 2026-10-17
 tags: [part-4, practice, unit5, week]
 ---
 
@@ -43,7 +43,7 @@ tags: [part-4, practice, unit5, week]
 - ✅ 最近**有硬件更换 / CUDA 升级 / 模型量化 / kernel 库升级**
 - ✅ 长 context 场景下劣化比短 context 严重
 
-满足 2 条以上 → 走本 runbook。
+以上是进入调查的线索，不是数值故障的诊断标准；阈值需按自己的任务指标和基线校准。先确认质量回归，再按第 10 章的流程排除输入、配置与执行路径差异。
 
 #### 页 2 · 快速分层（Triage）
 
@@ -52,7 +52,7 @@ tags: [part-4, practice, unit5, week]
 ```mermaid
 flowchart TD
     A[质量降了] --> B{最近有代码 / 配置变更?}
-    B -->|有| R[先 rollback 再说]
+    B -->|有| R[核对变更与对照<br/>按恢复策略限制影响]
     B -->|无| C{跨任务类型都降?}
     C -->|是| X1[模型层<br/>API 升级 / kernel]
     C -->|否| X2[按类型查<br/>outlier / quantization]
@@ -61,13 +61,13 @@ flowchart TD
     D -->|是| X3[KV cache 量化<br/>或 attention 问题]
     D -->|否| E{某个 batch size 专门差?}
     X3 --> E
-    E -->|是| X4[kernel 非确定性<br/>padding 问题]
+    E -->|是| X4[核对 padding / mask<br/>数值容差与算子路径]
     E -->|否| X5[进入最小复现流程<br/>见 W1 方法论，收集证据后升级]
 ```
 
 #### 页 3 · 数值层诊断命令集
 
-每一类都给具体命令：
+每一类都给具体命令。以下脚本名是待实现的接口示意，并非仓库已有脚本；交付 runbook 时应替换为已实现、在注明环境中实测的命令，并保存输出与判定依据：
 
 **A. 检查 bf16 vs fp32 差异**
 ```bash
@@ -76,11 +76,11 @@ python scripts/test_precision.py --model $MODEL --samples golden.jsonl
 # 预期 output: 各 sample 下 bf16 和 fp32 输出是否一致
 ```
 
-**B. 检查 kernel 非确定性**
+**B. 检查同条件可重复性**
 ```bash
 # 同 prompt 重复 10 次
 python scripts/test_determinism.py --prompt "..." --runs 10
-# 应该全部一致；有分歧 = kernel 问题苗头
+# 记录实际 token 输入、采样、seed、batch 和环境；分歧是调查线索，不是 kernel 根因证明
 ```
 
 **C. 检查量化漂移**
@@ -103,9 +103,9 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 |---|---|---|
 | 某类任务**精细数字错** | Quantization outlier | 实验 A |
 | 长 context **偶发乱码** | Softmax 数值溢出 | 实验 C |
-| 不同 batch size **结果不同** | Kernel 非确定 + padding | 实验 B |
-| CUDA / PyTorch 升级后质量变 | Kernel 语义变了 | 对比 version pin |
-| 模型版本切换后细微差异 | bf16 vs fp32 累积差 | 实验 A |
+| 不同 batch size **结果不同** | padding / mask、算子选择或数值差异 | 控制输入与执行形状对照 |
+| CUDA / PyTorch 升级后质量变 | 配置、算子或编译路径变化 | 固定条件回放与版本对照 |
+| 模型版本切换后细微差异 | 权重、tokenizer、模板或生成配置变化 | 先核对版本与输入 |
 
 每条症状 → 至少一个具体的诊断命令。
 
@@ -114,7 +114,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 如果定位了但短期不能修：
 
 - 退回上一版 kernel / PyTorch
-- 临时切回全精度（牺牲成本）
+- 在兼容性、容量和任务评估通过后，尝试更高精度的稳定路径
 - 把受影响任务类型路由到稳定 pool
 - **定期发 status update**（让业务知道在修）
 
@@ -132,7 +132,7 @@ pip freeze | grep -E "torch|transformers|flash-attn|vllm|cuda"
 
 这份 Runbook 应该：
 
-- [ ] **另一个没参与的同事 15 分钟内能按它定位**（让同事试读）
+- [ ] **另一个没参与的同事能在约定时间内开始有效排查，并知道何时升级**（演练验证；不要求 15 分钟内确认根因）
 - [ ] **每个诊断命令都能真的跑**（你自己跑过一遍）
 - [ ] 覆盖**至少 4 类**数值问题
 - [ ] 包含**实验 A/B/C 的可复用脚本**

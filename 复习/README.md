@@ -1,6 +1,6 @@
 ---
 title: 复习系统 · 如何使用
-updated: 2026-07-04
+updated: 2026-10-18
 tags: [meta, review, spaced-repetition, active-recall]
 ---
 
@@ -9,7 +9,7 @@ tags: [meta, review, spaced-repetition, active-recall]
 > [← 返回目录](../README.md)
 
 > [!NOTE]
-> 4-5 个月的学习周期里，**前面学的容易忘**。本系统用 **Spaced Repetition + Active Recall + Bloom 分级** 保证知识留存。
+> 4-5 个月的学习周期里，**前面学的容易忘**。本系统用 **Spaced Repetition + Active Recall + Bloom 分级**安排复习，再用延迟重做和迁移检查效果。
 
 ---
 
@@ -32,8 +32,10 @@ tags: [meta, review, spaced-repetition, active-recall]
 ### 方式 A · Anki（推荐给重度学习者）
 1. 下载 [Anki](https://apps.ankiweb.net/) （免费）
 2. `File → Import` 导入 `anki-import.csv`
-3. 每天花 10-20 分钟过当日卡片
-4. 按 Anki 的 SM-2 算法自动安排间隔
+3. 每天可从 10-20 分钟起步，按实际负担调整
+4. 按所选调度设置安排间隔，依据实际负担调整新卡与复习量
+
+本版包含 **140 张唯一题面**，Markdown 与 CSV 逐卡对应。已有 v1.15.7 牌组可先看[题面迁移表](v1.16.0-题面迁移.csv)，再检查导入变更：首字段改名可能形成新笔记，应更新原笔记以保留进度。10-17 与 10-18 的迁移说明见[维护记录](../维护/2026-10-17-三层维护记录.md)和[发布审查](../维护/2026-10-18-发布审查.md)。
 
 ### 方式 B · 手动快读（推荐给轻度学习者）
 按**"间隔递增"**手动过 `核心概念卡.md`：
@@ -56,7 +58,7 @@ tags: [meta, review, spaced-repetition, active-recall]
 
 **或者**：直接把 `anki-import.csv` 喂给任何 SR 软件（Anki Desktop / AnkiDroid / Mochi / RemNote / Apple Shortcuts + ChatGPT），让算法替你排。**强烈不推荐用 Excel 排间隔**——会忘。
 
-**没坚持的成本**：4 个月后 Unit 0/1 基本忘光。
+若旧问题已经无法独立解释或重做，优先回到对应材料与实验，不以连续打卡证明掌握。
 
 ---
 
@@ -78,7 +80,7 @@ tags: [meta, review, spaced-repetition, active-recall]
 
 本书的主要练习都标了 Bloom 六级之一：
 
-```
+```text
 记忆 → 理解 → 应用 → 分析 → 综合 → 评估
 ```
 
@@ -104,7 +106,7 @@ tags: [meta, review, spaced-repetition, active-recall]
 | 学习科学原理 | 本系统的应用 |
 |---|---|
 | **Spaced Repetition**（Ebbinghaus）| 对抗遗忘曲线，按间隔复习 |
-| **Active Recall / Testing Effect** | 从记忆中提取比重读有效 3-5× |
+| **Active Recall / Testing Effect** | 用主动提取检查回忆与理解，再核对错误 |
 | **Elaboration** | Active Recall 题强制你"关联已有知识" |
 | **Bloom's Taxonomy** | 让你看到自己的学习停留在哪一层，避免"看似懂了" |
 | **Metacognition** | 暴露"没想到"的盲区，是最重要的学习信号 |
@@ -114,8 +116,4 @@ tags: [meta, review, spaced-repetition, active-recall]
 ## 7. 给 SRE 的一句话提醒
 
 > [!IMPORTANT]
-> **学完不复习 = 没学**。
->
-> 4-5 个月跨度上，**没有 SR 机制的自学者平均 30 天后遗忘 60%**（Ebbinghaus curve 依然有效）。
->
-> 这个复习系统不是"加分项"，**是让前 3 个月没白学的保险**。
+> 复习用于发现遗忘与理解缺口。间隔、题目和时长可调整；用具体的延迟重做、解释与新情境表现检验效果，不套用统一遗忘百分比。

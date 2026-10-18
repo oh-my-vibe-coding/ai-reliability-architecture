@@ -1,6 +1,6 @@
 ---
 title: 附录 B · 一手材料与参考文献
-updated: 2026-08-23
+updated: 2026-10-17
 tags: [appendix]
 ---
 
@@ -69,6 +69,25 @@ tags: [appendix]
 ## 阅读原则（重要）
 
 1. **一手优于二手**：能读官方文档 / 作者本人博客，不读别人的解读。
-2. **无 AI 阅读**：这些材料是 B3 阅读块的主要对象。
+2. **保留独立尝试**：这些材料可用于 B3。允许术语、翻译和调试辅助，再对关键关系独立解释并核实，见[第 18 章](../练习/10-三个核心训练动作.md)。
 3. **反复读**：同一篇重要文献（如 Anthropic 事故复盘）在不同单元会用不同视角读。每次读完和上次笔记对比。
-4. **做笔记**：手写或纯文本，**不要让 AI 帮你总结**——总结是你自己的事。
+4. **做笔记并检验**：记录自己的判断和证据。可以用 AI 辅助整理，但不能把它的总结或认可当成原文与理解的证明。
+
+
+---
+
+## 工作范式、学习与长任务验证（本轮补充）
+
+以下材料于 2026-10-17 核对，研究或工程结果只支持各自范围，不表示已在本项目复现实验。
+
+- Anthropic · [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) · 跨会话进度与交接案例。
+- Anthropic · [Harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) · 编排组件与评价器的任务化验证。
+- Anthropic · [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) · 会话日志、harness 与执行环境的职责分离。
+- Anthropic · [How AI assistance impacts the formation of coding skills](https://www.anthropic.com/research/AI-assistance-coding-skills) · Trio 入门任务的即时理解测验，不能外推为长期能力结论。
+- METR · [Time-horizon 方法说明](https://metr.org/time-horizons/) · 人类任务难度与 AI 成功概率；该页已注明不再持续更新。
+- METR · [Early-2026 AI usage survey](https://metr.org/blog/2026-05-11-ai-usage-survey/) · 自报告生产率的口径与限制，不能当成控制实验。
+- Lù 等 · [AgentHorizon](https://arxiv.org/abs/2610.11050) · 2026-10-08 预印本，本轮只核对摘要；长轨迹 judge 的成对正反例设计。
+
+---
+
+[← 维护记录](../维护/2026-10-17-三层维护记录.md)  ·  [📖 目录](../README.md)

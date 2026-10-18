@@ -1,6 +1,6 @@
 ---
 title: 深入 16 · Embedding 服务作为独立运维对象
-updated: 2026-10-16
+updated: 2026-10-17
 tags: [deep-dive, embedding, rag, vector-db, sre]
 ---
 
@@ -12,7 +12,7 @@ tags: [deep-dive, embedding, rag, vector-db, sre]
 
 ## 0. 为什么 Embedding 值得单独一章
 
-RAG 系统在 SRE 视角下不是"一个东西"，是**四个独立服务**的组合：
+下面将含重排器的一种 RAG 方案拆成四个运维对象。实际实现可以合并组件，也可以省去重排；图示不要求每一项都单独部署：
 
 ```mermaid
 flowchart LR
@@ -33,10 +33,10 @@ flowchart LR
 - **Reranker** —— 在 [深入 10 Pattern 10](10-AI系统事故模式库.md#pattern-10--rag-retrieval-noise-saturationrag-检索噪声饱和) 简短提到
 - **Embedding 服务 + Vector DB** —— 散落在 Unit 0 W2、深入 06，**没专章**
 
-但实际工程里 **embedding 服务的 SRE 工作量和 LLM 推理几乎相当**——而且失败模式完全不同。这一章补这个缺口。
+Embedding 与向量索引有各自的版本、容量和质量问题，维护量取决于任务、数据变化与部署方式，不能预设它与生成服务相当。
 
 > [!IMPORTANT]
-> 一个 RAG 系统失败的根因里，**embedding / vector 层占 60%+**，prompt / LLM 层只占 30-40%。但读者注意力分布通常反过来。这本身就是工程认知偏差。
+> 没有足够来源支持一组通用的检索层与生成层故障占比。应分别检查检索遗漏、证据噪声与生成误用，再按本方失败样本决定投入。
 
 ---
 
@@ -51,7 +51,7 @@ flowchart LR
 | **典型 batch size** | 16-64 | 256-1024（短文本可塞更多）|
 | **模型规模** | 7B-700B | 通常 100M-7B |
 | **量化敏感性** | 中等（int8 通常 OK）| 较敏感（模型权重与存储向量量化是两回事，均须 gold-set 验证，见 §4.2）|
-| **升级影响** | 文本生成行为可能漂移 | **全部历史向量作废** |
+| **升级影响** | 文本生成行为可能漂移 | 向量空间或索引契约变化时需评估重建与迁移 |
 
 这些差异决定了 embedding 服务的 SRE 工作和 LLM 服务**不是同一个 playbook**。
 
@@ -61,16 +61,16 @@ flowchart LR
 
 ### 2.1 形态 A · 厂商 API（OpenAI / Voyage / Cohere）
 
-| 厂商 | 模型 | 维度 | 价格 (per MTok) | 备注 |
+| 厂商 | 模型 | 维度 | 价格 / 计费口径 | 备注 |
 |---|---|---|---|---|
 | OpenAI text-embedding-3-small | small | 1536 | $0.02 | 通用首选 |
 | OpenAI text-embedding-3-large | large | 3072 | $0.13 | 质量更高 |
 | Voyage voyage-4 / voyage-4-lite / voyage-4-large | 检索系列 | 按模型查规格 | $0.06 / $0.02 / $0.12 | 维度与索引空间按具体型号验收 |
-| Cohere embed-v3 | English | 1024 | $0.10 | 强 multilingual |
+| Cohere | `embed-v5.0-pro` / `embed-v5.0-fast` | 默认 2048，可配置 | 按服务与部署查官方计价 | 不把 Model Vault 实例价当 token 单价 |
 
-> 2026-10-16 核验：[OpenAI 定价](https://developers.openai.com/api/docs/pricing)的 text-embedding-3 价格未变；[Voyage 官方价格](https://docs.voyageai.com/docs/pricing)已列第 4 代、Batch 为 33% 折扣与 12h 窗口，不能套用生成模型 Batch 的 50%。Cohere v3 行保留历史参考，当前型号与价格查[官网](https://cohere.com/pricing)。MTEB 本轮 Reader 返回 403，不据此更新 SOTA；按语言、任务与自己的 gold set 验证。
+> 2026-10-17 核验：[OpenAI 定价](https://developers.openai.com/api/docs/pricing)与[Voyage 价格](https://docs.voyageai.com/docs/pricing)仍支持上表美元 / MTok 报价；Voyage Batch 是 33% 折扣与 12h 窗口。Cohere [官方模型页](https://docs.cohere.com/docs/cohere-embed)已列 Embed 5 Pro / Fast，默认 2048 维，不能复用旧 v3 的价格与索引配置；[价格页](https://cohere.com/pricing)需区分服务与实例计价。MTEB 本轮仍返回 403，不据此更新 SOTA。
 
-**何时选**：流量 < 100M doc/月、不在意延迟、不能自建 GPU。
+**何时选**：比较获准的处理范围、任务质量、峰值配额、延迟、总成本和维护能力。不能只用统一文档量门槛决定托管或自管。
 
 ### 2.2 形态 B · 自建开源（bge / nomic / e5 / jina）
 
@@ -79,10 +79,10 @@ flowchart LR
 | BAAI/bge-m3 | 1024 | 568M | **多语言 + 中文，可靠通用基线**（"目前最强开源"的说法 2026 已过时，见下注）|
 | BAAI/bge-large-en-v1.5 | 1024 | 335M | 英文 |
 | nomic-embed-text-v1.5 | 768 | 137M | 长文本（8k）|
-| intfloat/e5-mistral-7b-instruct | 4096 | 7B | LLM-based，最强但贵 |
+| intfloat/e5-mistral-7b-instruct | 4096 | 7B | LLM-based 候选，质量与资源需实测 |
 | jina-embeddings-v3 | 1024 | 570M | multilingual + 长文档 |
 
-> **2026-08 勘误**：开源 embedding 榜首已从 bge-m3 移走——2026 年的新晋强者是 **Qwen3-Embedding-8B**、**NVIDIA Nemotron-3-Embed-8B**、**Microsoft Harrier-OSS**（后两者在检索导向的 RTEB / 多语言 MTEB v2 上领先）。MTEB 官方也已推出 **v2** 与检索专用 **RTEB**（用 held-out 数据集防过拟合），读榜先认榜单版本。bge-m3 仍是可靠的通用多语言基线，但选型时请与上述新模型同台 eval。
+> **2026-08 历史记录，本轮未取得 MTEB 新榜复核**：旧记录称开源 embedding 榜首已从 bge-m3 移走——2026 年的新晋强者是 **Qwen3-Embedding-8B**、**NVIDIA Nemotron-3-Embed-8B**、**Microsoft Harrier-OSS**（后两者在检索导向的 RTEB / 多语言 MTEB v2 上领先）。MTEB 官方也已推出 **v2** 与检索专用 **RTEB**（用 held-out 数据集防过拟合），读榜先认榜单版本。bge-m3 仍是可靠的通用多语言基线，但选型时请与上述新模型同台 eval。
 
 **部署技术栈**：
 
@@ -156,7 +156,7 @@ Embedding 算出来的向量存在 vector DB 里。Vector DB 本身是另一个 
 
 向量库容量算法：
 
-```
+```text
 存储 = 向量数 × (维度 × 4 bytes + metadata 大小)
 索引内存 = HNSW 内存 ≈ 向量数 × (维度 × 4 + M × 2 × 4) bytes，M 常取 16-64
 ```
@@ -255,7 +255,7 @@ Embedding 升级：
 
 把 embedding + vector + reranker + LLM 看成一个系统，trace 必须串起来：
 
-```
+```text
 trace_id: ...
 spans:
   - name: query_embedding
